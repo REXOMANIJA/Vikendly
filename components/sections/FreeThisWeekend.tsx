@@ -41,7 +41,7 @@ export default function FreeThisWeekend({
               key={house.id}
               house={house}
               destinationName={destinationOf(house)?.name}
-              quote={calculateTotalPrice(house, checkIn, checkOut, house.capacity, destinationOf(house))}
+              quote={calculateTotalPrice(house, checkIn, checkOut, house.capacity)}
               quoteLabel={t('quoteLabel', { count: house.capacity })}
               guests={house.capacity}
               linkQuery={{

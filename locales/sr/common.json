@@ -75,7 +75,6 @@
     "from": "Od {price}",
     "perNight": "/noć",
     "nights": "{count, plural, one {# noć} few {# noći} other {# noći}}",
-    "totalIncludes": "uklj. čišćenje i boravišnu taksu",
     "totalWord": "ukupno",
     "badges": {
       "partiesAllowed": "Žurke dozvoljene",
@@ -83,7 +82,9 @@
       "pool": "Bazen",
       "pets": "Ljubimci OK"
     },
-    "perPerson": "{price} po osobi"
+    "perPerson": "{price} po osobi",
+    "sleeps": "Noćenje: {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}",
+    "dayCapacity": "Druženje: {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}"
   },
   "search": {
     "title": "Rezultati pretrage",
@@ -96,7 +97,7 @@
     "title": "Zašto Vikendly?",
     "totalPrice": {
       "title": "Ukupna cena bez iznenađenja",
-      "text": "Čišćenje i boravišna taksa su uračunati u cenu koju vidite."
+      "text": "Cena koju vidite je cena za ceo boravak, bez dodatnih stavki."
     },
     "pricePerPerson": {
       "title": "Cena po osobi",
@@ -111,8 +112,8 @@
       "text": "Svaku kuću lično pregledamo pre nego što je objavimo."
     },
     "directContact": {
-      "title": "Direktan kontakt",
-      "text": "Dogovarate se direktno sa vlasnikom, preko Vibera ili WhatsAppa."
+      "title": "Mi dogovaramo za vas",
+      "text": "Pošaljete upit, mi proverimo termin sa vlasnikom i javimo vam se."
     },
     "eyebrow": "Zašto mi",
     "intro": "Nismo još jedan veliki oglasnik. Biramo manji broj kuća, lično ih proveravamo i pokazujemo sve što treba da znate pre nego što krenete."
@@ -124,8 +125,8 @@
       "text": "Izaberite destinaciju, datume i broj gostiju i odmah vidite ukupnu cenu."
     },
     "step2": {
-      "title": "Pošaljite zahtev",
-      "text": "Vlasnik potvrđuje termin, a detalje dogovarate direktno sa njim."
+      "title": "Pošaljite upit",
+      "text": "Mi proveravamo termin sa vlasnikom i javljamo vam se telefonom."
     },
     "step3": {
       "title": "Uživajte",
@@ -212,7 +213,7 @@
     "similarTitle": "Slične kuće",
     "photoAlt": "{name}, fotografija {n}",
     "mobilePrice": "od {price} / noć",
-    "mobileCta": "Izračunajte cenu",
+    "mobileCta": "Pošaljite upit",
     "calculator": {
       "title": "Izračunajte cenu",
       "weekdayRate": "Radnim danima",
@@ -220,24 +221,58 @@
       "perNight": "{price} / noć",
       "weekdayLine": "{count, plural, one {# noć} few {# noći} other {# noći}} radnim danima × {price}",
       "weekendLine": "{count, plural, one {# noć} few {# noći} other {# noći}} vikendom × {price}",
-      "cleaning": "Čišćenje",
-      "touristTax": "Boravišna taksa",
-      "touristTaxDetail": "{price} po osobi po noći",
       "total": "Ukupno",
       "perPerson": "{price} po osobi",
       "pickDates": "Izaberite datume i broj gostiju da vidite ukupnu cenu.",
       "tooFewNights": "Ova kuća se izdaje na najmanje {count, plural, one {# noć} few {# noći} other {# noći}}.",
       "tooManyGuests": "Kuća prima najviše {count, plural, one {# gosta} few {# gosta} other {# gostiju}}.",
-      "invalidDates": "Datum odlaska mora biti posle datuma dolaska."
+      "invalidDates": "Datum odlaska mora biti posle datuma dolaska.",
+      "guestsLabel": "Broj osoba koje noće",
+      "priceTableTitle": "Cene po broju osoba",
+      "tierRow": "Do {count, plural, one {# osobe} few {# osobe} other {# osoba}}",
+      "wholeHouse": "Cela kuća (do {count, plural, one {# osobe} few {# osobe} other {# osoba}})",
+      "columnWeekday": "Radnim danima",
+      "columnWeekend": "Petak i subota"
     },
-    "contact": {
-      "title": "Pošaljite upit vlasniku",
-      "note": "Dogovarate se direktno sa vlasnikom. On potvrđuje da li je termin slobodan.",
-      "viber": "Viber",
-      "whatsapp": "WhatsApp",
-      "call": "Pozovite",
-      "messageWithDates": "Zdravo, zanima me da li je {house} slobodna od {checkIn} do {checkOut}, za {guests, plural, one {# osobu} few {# osobe} other {# osoba}}. (Vikendly)",
-      "messageNoDates": "Zdravo, zanima me {house}. Koji termini su slobodni? (Vikendly)"
+    "sleeps": "Noćenje: {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}",
+    "dayCapacity": "Žurka ili druženje: {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}",
+    "capacityNote": "Noćiti može {sleeps}, a na žurci ili druženju tokom dana može biti {day}.",
+    "gallery": {
+      "showAll": "Sve fotografije ({count})",
+      "close": "Zatvorite",
+      "prev": "Prethodna fotografija",
+      "next": "Sledeća fotografija",
+      "counter": "{current} / {total}",
+      "more": "+{count}",
+      "open": "Otvorite fotografiju {n}",
+      "dialog": "Fotografije: {name}"
+    },
+    "upTo": "{count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}",
+    "booking": {
+      "title": "Pošaljite upit za rezervaciju",
+      "howItWorks": "Upit je besplatan i ne obavezuje vas. Proverićemo termin sa vlasnikom i javiti vam se.",
+      "contactLegend": "Vaši podaci",
+      "name": "Ime i prezime",
+      "phone": "Telefon",
+      "email": "Email",
+      "message": "Poruka",
+      "optional": "opciono",
+      "messagePlaceholder": "Npr. dolazimo sa psom, slavimo rođendan…",
+      "submit": "Pošaljite upit",
+      "sending": "Šaljem…",
+      "pickFirst": "Izaberite datume i broj osoba da biste poslali upit.",
+      "sentTitle": "Hvala, {name}!",
+      "sentSummary": "Primili smo vaš upit za {house}, {dates}, za {guests, plural, one {# osobu} few {# osobe} other {# osoba}}.",
+      "sentNext": "Proverićemo termin sa vlasnikom i javiti vam se na {phone}.",
+      "sendAnother": "Pošaljite još jedan upit",
+      "errors": {
+        "dates": "Proverite datume dolaska i odlaska.",
+        "past": "Datum dolaska je prošao. Izaberite drugi datum.",
+        "guests": "Proverite broj osoba.",
+        "contact": "Proverite ime i telefon (i email, ako ste ga upisali).",
+        "house": "Ova kuća trenutno nije dostupna.",
+        "server": "Upit nije poslat zbog greške kod nas. Pokušajte ponovo za par minuta."
+      }
     }
   }
 }

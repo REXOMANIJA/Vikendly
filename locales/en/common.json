@@ -75,7 +75,6 @@
     "from": "From {price}",
     "perNight": "/night",
     "nights": "{count, plural, one {# night} other {# nights}}",
-    "totalIncludes": "incl. cleaning and tourist tax",
     "totalWord": "total",
     "badges": {
       "partiesAllowed": "Parties allowed",
@@ -83,7 +82,9 @@
       "pool": "Pool",
       "pets": "Pets OK"
     },
-    "perPerson": "{price} per person"
+    "perPerson": "{price} per person",
+    "sleeps": "Sleeps {count, plural, one {up to # guest} other {up to # guests}}",
+    "dayCapacity": "Gatherings: {count, plural, one {up to # guest} other {up to # guests}}"
   },
   "search": {
     "title": "Search results",
@@ -96,7 +97,7 @@
     "title": "Why Vikendly?",
     "totalPrice": {
       "title": "Total price, no surprises",
-      "text": "Cleaning and tourist tax are included in the price you see."
+      "text": "The price you see is the price for the whole stay, with nothing added."
     },
     "pricePerPerson": {
       "title": "Price per person",
@@ -111,8 +112,8 @@
       "text": "We check every house in person before it goes live."
     },
     "directContact": {
-      "title": "Direct contact",
-      "text": "Arrange everything directly with the owner on Viber or WhatsApp."
+      "title": "We arrange it for you",
+      "text": "Send a request, we check the dates with the owner and get back to you."
     },
     "eyebrow": "Why us",
     "intro": "We are not another huge listings site. We pick fewer houses, check them in person and show everything you need to know before you go."
@@ -125,7 +126,7 @@
     },
     "step2": {
       "title": "Send a request",
-      "text": "The owner confirms the dates and you arrange the details directly with them."
+      "text": "We check the dates with the owner and call you back."
     },
     "step3": {
       "title": "Enjoy",
@@ -212,7 +213,7 @@
     "similarTitle": "Similar houses",
     "photoAlt": "{name}, photo {n}",
     "mobilePrice": "from {price} / night",
-    "mobileCta": "Calculate price",
+    "mobileCta": "Send a request",
     "calculator": {
       "title": "Calculate the price",
       "weekdayRate": "Weekdays",
@@ -220,24 +221,58 @@
       "perNight": "{price} / night",
       "weekdayLine": "{count, plural, one {# weekday night} other {# weekday nights}} × {price}",
       "weekendLine": "{count, plural, one {# weekend night} other {# weekend nights}} × {price}",
-      "cleaning": "Cleaning",
-      "touristTax": "Tourist tax",
-      "touristTaxDetail": "{price} per person per night",
       "total": "Total",
       "perPerson": "{price} per person",
       "pickDates": "Pick dates and guests to see the total price.",
       "tooFewNights": "This house is rented for at least {count, plural, one {# night} other {# nights}}.",
       "tooManyGuests": "The house sleeps at most {count, plural, one {# guest} other {# guests}}.",
-      "invalidDates": "Check-out must be after check-in."
+      "invalidDates": "Check-out must be after check-in.",
+      "guestsLabel": "Guests staying overnight",
+      "priceTableTitle": "Prices by group size",
+      "tierRow": "Up to {count, plural, one {# guest} other {# guests}}",
+      "wholeHouse": "Whole house (up to {count, plural, one {# guest} other {# guests}})",
+      "columnWeekday": "Weekdays",
+      "columnWeekend": "Fri and Sat"
     },
-    "contact": {
-      "title": "Send the owner a request",
-      "note": "You arrange everything directly with the owner, who confirms whether the dates are free.",
-      "viber": "Viber",
-      "whatsapp": "WhatsApp",
-      "call": "Call",
-      "messageWithDates": "Hi, is {house} available from {checkIn} to {checkOut}, for {guests, plural, one {# guest} other {# guests}}? (Vikendly)",
-      "messageNoDates": "Hi, I am interested in {house}. Which dates are available? (Vikendly)"
+    "sleeps": "Sleeps {count, plural, one {up to # guest} other {up to # guests}}",
+    "dayCapacity": "Parties and gatherings: {count, plural, one {up to # guest} other {up to # guests}}",
+    "capacityNote": "The house sleeps {sleeps}, and a party or daytime gathering can have {day}.",
+    "gallery": {
+      "showAll": "All photos ({count})",
+      "close": "Close",
+      "prev": "Previous photo",
+      "next": "Next photo",
+      "counter": "{current} / {total}",
+      "more": "+{count}",
+      "open": "Open photo {n}",
+      "dialog": "Photos: {name}"
+    },
+    "upTo": "{count, plural, one {up to # guest} other {up to # guests}}",
+    "booking": {
+      "title": "Send a booking request",
+      "howItWorks": "A request is free and non-binding. We check the dates with the owner and get back to you.",
+      "contactLegend": "Your details",
+      "name": "Full name",
+      "phone": "Phone",
+      "email": "Email",
+      "message": "Message",
+      "optional": "optional",
+      "messagePlaceholder": "E.g. we are bringing a dog, it is a birthday…",
+      "submit": "Send request",
+      "sending": "Sending…",
+      "pickFirst": "Pick dates and the number of guests to send a request.",
+      "sentTitle": "Thank you, {name}!",
+      "sentSummary": "We received your request for {house}, {dates}, for {guests, plural, one {# guest} other {# guests}}.",
+      "sentNext": "We will check the dates with the owner and call you on {phone}.",
+      "sendAnother": "Send another request",
+      "errors": {
+        "dates": "Please check the check-in and check-out dates.",
+        "past": "The check-in date has passed. Please pick another date.",
+        "guests": "Please check the number of guests.",
+        "contact": "Please check your name and phone (and email, if you entered one).",
+        "house": "This house is not available right now.",
+        "server": "Your request could not be sent because of an error on our side. Please try again in a few minutes."
+      }
     }
   }
 }

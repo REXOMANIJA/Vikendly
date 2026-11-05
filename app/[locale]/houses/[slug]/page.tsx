@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
+import Gallery from '@/components/house/Gallery';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import {
@@ -21,6 +21,7 @@ import {
   Users,
   BedDouble,
   Bath,
+  DoorOpen,
   CalendarDays,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -34,6 +35,7 @@ import {
   getSimilarHouses,
 } from '@/lib/data';
 import { PriceCalculatorFromUrl } from '@/components/house/PriceCalculator';
+import { getLowestNightlyPrice } from '@/lib/pricing';
 import HouseCard from '@/components/cards/HouseCard';
 
 type Params = Promise<{ locale: string; slug: string }>;
@@ -97,6 +99,7 @@ export default async function HousePage({ params }: { params: Params }) {
   const destinationOf = (id: string) => destinations.find((d) => d.id === id);
   const destination = destinationOf(house.destinationId);
   const { rules } = house;
+  const hasDayCapacity = house.dayCapacity != null && house.dayCapacity > house.capacity;
 
   const ruleItems = [
     { ok: rules.partiesAllowed, label: rules.partiesAllowed ? t('partiesAllowed') : t('partiesNotAllowed') },
@@ -127,44 +130,27 @@ export default async function HousePage({ params }: { params: Params }) {
           </h1>
           <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-text/80">
             <li className="inline-flex items-center gap-1.5">
-              <Users className="size-4" aria-hidden /> {t('guests', { count: house.capacity })}
+              <BedDouble className="size-4" aria-hidden /> {t('sleeps', { count: house.capacity })}
             </li>
-            <li className="inline-flex items-center gap-1.5">
-              <BedDouble className="size-4" aria-hidden /> {t('bedrooms', { count: house.bedrooms })}
-            </li>
-            <li className="inline-flex items-center gap-1.5">
-              <Bath className="size-4" aria-hidden /> {t('bathrooms', { count: house.bathrooms })}
-            </li>
+            {hasDayCapacity && (
+              <li className="inline-flex items-center gap-1.5">
+                <Users className="size-4" aria-hidden /> {t('dayCapacity', { count: house.dayCapacity! })}
+              </li>
+            )}
+            {house.bedrooms != null && (
+              <li className="inline-flex items-center gap-1.5">
+                <DoorOpen className="size-4" aria-hidden /> {t('bedrooms', { count: house.bedrooms })}
+              </li>
+            )}
+            {house.bathrooms != null && (
+              <li className="inline-flex items-center gap-1.5">
+                <Bath className="size-4" aria-hidden /> {t('bathrooms', { count: house.bathrooms })}
+              </li>
+            )}
           </ul>
         </header>
 
-        {/* Photos: first one large, up to four more beside it */}
-        <div
-          className={`grid gap-2 overflow-hidden rounded-2xl ${
-            house.photos.length > 1 ? 'md:grid-cols-4 md:grid-rows-2' : ''
-          }`}
-        >
-          {house.photos.slice(0, 5).map((photo, i) => (
-            <div
-              key={photo}
-              className={`relative ${
-                i === 0
-                  ? `aspect-[4/3] ${house.photos.length > 1 ? 'md:col-span-2 md:row-span-2' : 'md:aspect-[21/9]'}`
-                  : 'hidden md:block aspect-[4/3]'
-              }`}
-            >
-              <Image
-                src={photo}
-                alt={t('photoAlt', { name: house.name, n: i + 1 })}
-                fill
-                unoptimized
-                priority={i === 0}
-                sizes={i === 0 ? '(min-width: 768px) 50vw, 100vw' : '25vw'}
-                className="object-cover"
-              />
-            </div>
-          ))}
-        </div>
+        <Gallery photos={house.photos} name={house.name} />
 
         <div className="mt-10 grid gap-10 lg:grid-cols-12">
           {/* Details */}
@@ -176,20 +162,22 @@ export default async function HousePage({ params }: { params: Params }) {
               </p>
             </section>
 
-            <section>
-              <h2 className="font-serif text-2xl font-bold text-primary">{t('amenitiesTitle')}</h2>
-              <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {house.amenities.map((id) => {
-                  const Icon = amenityIcons[id] ?? Check;
-                  return (
-                    <li key={id} className="flex items-center gap-3 rounded-xl bg-white p-3">
-                      <Icon className="size-5 shrink-0 text-primary" strokeWidth={1.75} aria-hidden />
-                      <span>{tAmenity(id as 'wifi')}</span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
+            {house.amenities.length > 0 && (
+              <section>
+                <h2 className="font-serif text-2xl font-bold text-primary">{t('amenitiesTitle')}</h2>
+                <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {house.amenities.map((id) => {
+                    const Icon = amenityIcons[id] ?? Check;
+                    return (
+                      <li key={id} className="flex items-center gap-3 rounded-xl bg-white p-3">
+                        <Icon className="size-5 shrink-0 text-primary" strokeWidth={1.75} aria-hidden />
+                        <span>{tAmenity(id as 'wifi')}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            )}
 
             <section>
               <h2 className="font-serif text-2xl font-bold text-primary">{t('rulesTitle')}</h2>
@@ -202,6 +190,15 @@ export default async function HousePage({ params }: { params: Params }) {
                   <CalendarDays className="size-5 text-primary" aria-hidden />
                   {t('minNights', { count: house.pricing.minNights })}
                 </li>
+                {hasDayCapacity && (
+                  <li className="flex items-start gap-3">
+                    <Users className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
+                    {t('capacityNote', {
+                      sleeps: t('upTo', { count: house.capacity }),
+                      day: t('upTo', { count: house.dayCapacity! }),
+                    })}
+                  </li>
+                )}
                 {ruleItems.map(({ ok, label }) => (
                   <li key={label} className="flex items-center gap-3">
                     {ok ? (
@@ -238,7 +235,7 @@ export default async function HousePage({ params }: { params: Params }) {
           {/* Price + contact, sticks while scrolling on desktop */}
           <aside className="lg:col-span-5">
             <div className="lg:sticky lg:top-24">
-              <PriceCalculatorFromUrl house={house} destination={destination} />
+              <PriceCalculatorFromUrl house={house} />
             </div>
           </aside>
         </div>
@@ -259,7 +256,7 @@ export default async function HousePage({ params }: { params: Params }) {
       <div className="sticky bottom-0 z-40 border-t border-primary/10 bg-white/95 backdrop-blur px-4 py-3 lg:hidden">
         <div className="flex items-center justify-between gap-4">
           <span className="font-semibold text-primary">
-            {t('mobilePrice', { price: eur(house.pricing.weekdayPrice) })}
+            {t('mobilePrice', { price: eur(getLowestNightlyPrice(house)) })}
           </span>
           <a href="#cena" className="rounded-lg bg-accent-dark px-4 py-2.5 font-medium text-white">
             {t('mobileCta')}

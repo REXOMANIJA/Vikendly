@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { PartyPopper, Moon, PawPrint, WavesLadder, Users, BedDouble } from 'lucide-react';
+import { PartyPopper, Moon, PawPrint, WavesLadder, Users, BedDouble, Images } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { House, PriceCalculation } from '@/types';
+import { getLowestNightlyPrice } from '@/lib/pricing';
 import { Link } from '@/i18n/navigation';
 
 interface HouseCardProps {
@@ -32,7 +33,7 @@ export default function HouseCard({
   linkQuery,
 }: HouseCardProps) {
   const t = useTranslations('houseCard');
-  const { pricing, capacity, bedrooms, name, rules } = house;
+  const { capacity, name, rules } = house;
 
   // House rules are a core promise of Vikendly, so they're visible on every card
   const badges: Badge[] = [
@@ -58,6 +59,12 @@ export default function HouseCard({
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
+        {house.photos.length > 1 && (
+          <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-xs font-medium text-white">
+            <Images className="size-3.5" aria-hidden />
+            {house.photos.length}
+          </span>
+        )}
       </div>
       <div className="flex flex-col flex-1 p-5">
         {destinationName && (
@@ -74,15 +81,17 @@ export default function HouseCard({
             {name}
           </Link>
         </h3>
-        <div className="flex items-center gap-4 text-sm text-text/70 mb-3">
-          <span className="inline-flex items-center gap-1.5">
-            <Users className="size-4" aria-hidden />
-            {t('guests', { count: capacity })}
-          </span>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-text/70 mb-3">
           <span className="inline-flex items-center gap-1.5">
             <BedDouble className="size-4" aria-hidden />
-            {t('bedrooms', { count: bedrooms })}
+            {t('sleeps', { count: capacity })}
           </span>
+          {house.dayCapacity && house.dayCapacity > capacity && (
+            <span className="inline-flex items-center gap-1.5">
+              <Users className="size-4" aria-hidden />
+              {t('dayCapacity', { count: house.dayCapacity })}
+            </span>
+          )}
         </div>
 
         <ul className="flex flex-wrap gap-2 mb-4">
@@ -114,13 +123,13 @@ export default function HouseCard({
                 )}
               </p>
               <p className="text-xs text-text/60 mt-1">
-                {quoteLabel ?? t('nights', { count: quote.nights })} · {t('totalIncludes')}
+                {quoteLabel ?? t('nights', { count: quote.nights })}
               </p>
             </>
           ) : (
             <p>
               <span className="text-lg font-bold text-primary">
-                {t('from', { price: eur(pricing.weekdayPrice) })}
+                {t('from', { price: eur(getLowestNightlyPrice(house)) })}
               </span>
               <span className="text-sm text-text/70">{t('perNight')}</span>
             </p>

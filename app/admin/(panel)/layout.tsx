@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { Home, Inbox, ExternalLink, LogOut } from 'lucide-react';
+import { Home, Inbox, ExternalLink, LogOut, CalendarCheck } from 'lucide-react';
 import { createAdminClient, getAdminUser } from '@/lib/supabase/server';
+import { countNewBookingRequests } from '@/lib/admin-data';
 import { signOut } from '../actions';
 
 // Admin pages always show live data and are never cached
@@ -30,15 +31,24 @@ export default async function AdminPanelLayout({ children }: { children: React.R
   }
 
   const nav = 'inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-primary/10';
+  const newRequests = await countNewBookingRequests();
 
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-40 border-b border-primary/10 bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-3">
-          <Link href="/admin/kuce" className="mr-4 font-serif text-xl font-bold text-primary">
+          <Link href="/admin/upiti" className="mr-4 font-serif text-xl font-bold text-primary">
             Vikendly <span className="font-sans text-sm font-normal text-text/60">admin</span>
           </Link>
           <nav className="flex flex-1 flex-wrap gap-1">
+            <Link href="/admin/upiti" className={nav}>
+              <CalendarCheck className="size-4" aria-hidden /> Upiti
+              {newRequests > 0 && (
+                <span className="rounded-full bg-accent-dark px-1.5 py-0.5 text-xs font-semibold text-white" title="Novi upiti">
+                  {newRequests}
+                </span>
+              )}
+            </Link>
             <Link href="/admin/kuce" className={nav}><Home className="size-4" aria-hidden /> Kuće</Link>
             <Link href="/admin/prijave" className={nav}><Inbox className="size-4" aria-hidden /> Prijave vlasnika</Link>
             <a href="/sr" target="_blank" className={nav}><ExternalLink className="size-4" aria-hidden /> Sajt</a>

@@ -40,6 +40,7 @@ All data access goes through async functions in `lib/data.ts`, which read from *
 - All writes run with the admin's own session (`lib/supabase/server.ts`); permissions are enforced by RLS policies using `public.is_admin()`, not only by the app.
 - Houses: list with publish toggle, add/edit form (`components/admin/HouseForm.tsx`). Saving calls the SQL function `admin_save_house(jsonb)`, which saves the house with its categories, amenities and photos in one transaction. Saving refreshes the public site immediately (`revalidatePath`).
 - Photos are uploaded from the browser to the public Storage bucket `house-photos` (admins only, max 8 MB, JPG/PNG/WebP/AVIF). Removing a photo in the form doesn't delete the file from Storage; deleting a house does (needs the select policy from `0003_admin_photo_select.sql`).
+- Booking requests: `/admin/upiti` (admin home), newest first, status new → contacted → confirmed / declined, guest and owner phone side by side. The menu shows the number of new requests.
 - Owner applications: `/admin/prijave`, with status (new → contacted → visited → published / rejected).
 - Supabase clients: `lib/supabase/public.ts` (anonymous, public pages), `lib/supabase/server.ts` (admin session, server), `lib/supabase/browser.ts` (admin session, browser).
 - Owner form → server action `submitOwnerApplication` in `lib/actions.ts` (validation + honeypot spam trap).
@@ -53,19 +54,21 @@ calculateTotalPrice(house, checkIn, checkOut, guests)
 ```
 
 Returns:
-- Nightly total (weekday/weekend rates)
-- Cleaning fee
-- Tourist tax (per person per night, configurable per destination)
+- Total = nights × nightly price (weekday or weekend rate for the group size). There are **no extra fees**: no cleaning fee and no tourist tax (removed in 0005).
 
 **Weekend definition:** Friday and Saturday nights are weekend rate, other nights are weekday rate.
 
-**Tourist tax:** Configurable per destination (currently 1.5 EUR/person/night placeholder). TODO: Verify real rates per country/municipality.
+**Prices by group size:** the house's weekday/weekend price is the **whole-house price** (up to `capacity`). Optional `house_price_tiers` ("up to N guests") give cheaper prices for smaller groups; `getNightlyRates(house, guests)` picks the smallest tier the group fits in, otherwise the whole-house price. "From" prices use `getLowestNightlyPrice`. Nights are counted with `Math.round` so stays across a clock change aren't over-counted.
+
+**Capacity:** `capacity` = guests who can stay overnight ("Noćenje: do X osoba"). Optional `day_capacity` = guests allowed for a party or daytime gathering. Bedrooms and bathrooms are optional. Search and the price calculator use overnight capacity.
+
+**Booking requests:** guests never contact owners directly. The house page sends a request (`submitBookingRequest` in `lib/actions.ts`, which re-checks dates, min nights, capacity and recalculates the price on the server) into `booking_requests`. The team sees requests at `/admin/upiti` (newest first), calls the owner and gets back to the guest. Owner phone numbers are private: table `house_owner_contacts`, readable by admins only.
 
 ### TypeScript Types
 
 All types matching future database tables are defined in `/types/index.ts`:
 - `House` - Property details
-- `Destination` - Location with tourist tax
+- `Destination` - Location (country)
 - `Category` - House type
 - `Amenity` - Features
 - `PricingRule` - Pricing configuration
@@ -94,7 +97,7 @@ All types matching future database tables are defined in `/types/index.ts`:
 ### House pages
 
 - `app/[locale]/houses/[slug]/page.tsx`: photos, description, amenities, rules, location, similar houses; prerendered for every house
-- `components/house/PriceCalculator.tsx`: live price breakdown (weekday/weekend nights, cleaning, tourist tax, per person), min-nights and capacity warnings, owner contact (Viber, WhatsApp with a prefilled message, phone)
+- `components/house/PriceCalculator.tsx`: price breakdown (weekday/weekend nights, per person), min-nights and capacity warnings, and the booking request form (name, phone, optional email and message)
 - Dates/guests are passed in the URL (`?checkIn=yyyy-MM-dd&checkOut=…&guests=…`) from search and homepage cards so the calculator is prefilled
 
 ### Currency

@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ArrowRight, ImagePlus, Loader2, Trash2, X, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ImagePlus, Loader2, Trash2, X, Check, Plus } from 'lucide-react';
 import sr from '@/locales/sr/common.json';
 import { slugify } from '@/lib/slug';
 import { createBrowserAdminClient } from '@/lib/supabase/browser';
@@ -18,26 +18,30 @@ type Options = {
 // Numbers are edited as text so a field can be empty while typing
 type FormState = Omit<
   HouseInput,
-  'capacity' | 'bedrooms' | 'bathrooms' | 'weekday_price' | 'weekend_price' | 'cleaning_fee' | 'min_nights' | 'featured_rank'
+  | 'capacity' | 'day_capacity' | 'bedrooms' | 'bathrooms' | 'weekday_price' | 'weekend_price'
+  | 'min_nights' | 'featured_rank' | 'price_tiers'
 > & {
   capacity: string;
+  day_capacity: string;
   bedrooms: string;
   bathrooms: string;
   weekday_price: string;
   weekend_price: string;
-  cleaning_fee: string;
   min_nights: string;
   featured_rank: string;
+  price_tiers: TierRow[];
 };
+
+type TierRow = { key: string; max_guests: string; weekday_price: string; weekend_price: string };
 
 const empty: FormState = {
   slug: '', name: '', destination_id: '',
-  capacity: '', bedrooms: '', bathrooms: '',
-  weekday_price: '', weekend_price: '', cleaning_fee: '0', min_nights: '2',
+  capacity: '', day_capacity: '', bedrooms: '', bathrooms: '', price_tiers: [],
+  weekday_price: '', weekend_price: '', min_nights: '2',
   description_sr: '', description_en: '',
   parties_allowed: false, pets_allowed: false, smoking_allowed: false,
   check_in_time: '15:00', check_out_time: '11:00',
-  address: '', contact_viber: '', contact_whatsapp: '', contact_phone: '',
+  address: '', owner_phone: '',
   is_published: false, featured_rank: '',
   category_ids: [], amenity_ids: [], photos: [],
 };
@@ -46,20 +50,25 @@ function fromHouse(h: AdminHouse): FormState {
   return {
     ...h,
     capacity: String(h.capacity),
-    bedrooms: String(h.bedrooms),
-    bathrooms: String(h.bathrooms),
+    day_capacity: h.day_capacity === null ? '' : String(h.day_capacity),
+    bedrooms: h.bedrooms === null ? '' : String(h.bedrooms),
+    bathrooms: h.bathrooms === null ? '' : String(h.bathrooms),
+    price_tiers: h.price_tiers.map((t) => ({
+      key: String(t.max_guests),
+      max_guests: String(t.max_guests),
+      weekday_price: String(t.weekday_price),
+      weekend_price: String(t.weekend_price),
+    })),
     weekday_price: String(h.weekday_price),
     weekend_price: String(h.weekend_price),
-    cleaning_fee: String(h.cleaning_fee),
     min_nights: String(h.min_nights),
     featured_rank: h.featured_rank === null ? '' : String(h.featured_rank),
-    contact_viber: h.contact_viber ?? '',
-    contact_whatsapp: h.contact_whatsapp ?? '',
-    contact_phone: h.contact_phone ?? '',
   };
 }
 
 const num = (v: string) => (v.trim() === '' ? NaN : Number(v.replace(',', '.')));
+/** Empty optional field → null, otherwise a number (NaN if not a number, caught by validation) */
+const optionalNum = (v: string) => (v.trim() === '' ? null : num(v));
 
 const input =
   'w-full h-11 px-3 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary';
@@ -133,11 +142,16 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
       ...form,
       id: house?.id,
       capacity: num(form.capacity),
-      bedrooms: num(form.bedrooms),
-      bathrooms: num(form.bathrooms),
+      day_capacity: optionalNum(form.day_capacity),
+      bedrooms: optionalNum(form.bedrooms),
+      bathrooms: optionalNum(form.bathrooms),
+      price_tiers: form.price_tiers.map((t) => ({
+        max_guests: num(t.max_guests),
+        weekday_price: num(t.weekday_price),
+        weekend_price: num(t.weekend_price),
+      })),
       weekday_price: num(form.weekday_price),
       weekend_price: num(form.weekend_price),
-      cleaning_fee: num(form.cleaning_fee),
       min_nights: num(form.min_nights),
       featured_rank: form.featured_rank.trim() === '' ? null : num(form.featured_rank),
     };
@@ -205,18 +219,39 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
         </div>
       </section>
 
-      {/* ── Kapacitet i cene ── */}
+      {/* ── Kapacitet ── */}
       <section className={box}>
-        <h2 className={h2}>Kapacitet i cene</h2>
+        <h2 className={h2}>Kapacitet</h2>
         <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
           {([
-            ['capacity', 'Broj gostiju'],
-            ['bedrooms', 'Spavaće sobe'],
-            ['bathrooms', 'Kupatila'],
+            ['capacity', 'Broj osoba za noćenje', true, 'Koliko ljudi može da prespava.'],
+            ['day_capacity', 'Za žurku / druženje', false, 'Opciono. Koliko ljudi sme da dođe tokom dana.'],
+            ['bedrooms', 'Spavaće sobe', false, 'Opciono.'],
+            ['bathrooms', 'Kupatila', false, 'Opciono.'],
+          ] as const).map(([key, text, required, hint]) => (
+            <div key={key} id={`field-${key}`}>
+              <label htmlFor={key} className={label}>{text}</label>
+              <input id={key} className={input} inputMode="numeric" value={form[key]}
+                placeholder={required ? '' : '—'}
+                onChange={(e) => set(key, e.target.value.replace(/\D/g, ''))} required={required} />
+              <p className="mt-1 text-xs text-text/60">{hint}</p>
+              {fieldError(key)}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Cene ── */}
+      <section className={box}>
+        <h2 className={h2}>Cene</h2>
+        <p className="text-sm text-text/70">
+          Cena cele kuće važi za grupu do {form.capacity || '…'} osoba.
+        </p>
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+          {([
+            ['weekday_price', 'Radnim danima (€/noć)'],
+            ['weekend_price', 'Petak i subota (€/noć)'],
             ['min_nights', 'Najmanje noći'],
-            ['weekday_price', 'Cena radnim danima (€/noć)'],
-            ['weekend_price', 'Cena petak i subota (€/noć)'],
-            ['cleaning_fee', 'Čišćenje (€)'],
           ] as const).map(([key, text]) => (
             <div key={key} id={`field-${key}`}>
               <label htmlFor={key} className={label}>{text}</label>
@@ -226,7 +261,62 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
             </div>
           ))}
         </div>
-        <p className="text-sm text-text/60">Boravišna taksa se računa automatski po destinaciji.</p>
+
+        {/* Optional cheaper prices for smaller groups */}
+        <div id="field-price_tiers" className="space-y-3 rounded-xl bg-background p-4">
+          <div>
+            <h3 className="font-semibold text-primary">Cene za manje grupe <span className="font-normal text-text/60">(opciono)</span></h3>
+            <p className="text-sm text-text/70">
+              Npr. „do 4 osobe: €80 / €110“. Sajt automatski bira najmanju grupu u koju gosti staju,
+              a za veće grupe važi cena cele kuće.
+            </p>
+          </div>
+          {form.price_tiers.map((tier, i) => (
+            <div key={tier.key} className="grid grid-cols-[1fr_1fr_1fr_auto] items-end gap-2">
+              {([
+                ['max_guests', 'Do koliko osoba', 'numeric'],
+                ['weekday_price', 'Radnim danima €', 'decimal'],
+                ['weekend_price', 'Pet. i sub. €', 'decimal'],
+              ] as const).map(([key, text, mode]) => (
+                <div key={key}>
+                  <label htmlFor={`tier-${tier.key}-${key}`} className="mb-1 block text-xs font-medium">{text}</label>
+                  <input
+                    id={`tier-${tier.key}-${key}`}
+                    className={input}
+                    inputMode={mode}
+                    value={tier[key]}
+                    onChange={(e) =>
+                      set('price_tiers', form.price_tiers.map((t, j) => (j === i ? { ...t, [key]: e.target.value } : t)))
+                    }
+                    required
+                  />
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => set('price_tiers', form.price_tiers.filter((_, j) => j !== i))}
+                className="mb-1 rounded-lg p-2.5 text-accent-dark hover:bg-accent/10"
+                aria-label="Uklonite ovu cenu"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              set('price_tiers', [
+                ...form.price_tiers,
+                { key: crypto.randomUUID(), max_guests: '', weekday_price: '', weekend_price: '' },
+              ])
+            }
+            className="inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-white px-3 py-2 text-sm font-medium text-primary hover:bg-primary/5"
+          >
+            <Plus className="size-4" aria-hidden /> Dodajte cenu za manju grupu
+          </button>
+          {fieldError('price_tiers')}
+        </div>
+        <p className="text-sm text-text/60">Boravišna taksa se računa automatski po destinaciji i broju osoba.</p>
       </section>
 
       {/* ── Opis ── */}
@@ -356,20 +446,13 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
           <input id="address" className={input} value={form.address} onChange={(e) => set('address', e.target.value)} required />
           {fieldError('address')}
         </div>
-        <div className="grid gap-4 md:grid-cols-3" id="field-contact_phone">
-          {([
-            ['contact_viber', 'Viber'],
-            ['contact_whatsapp', 'WhatsApp'],
-            ['contact_phone', 'Telefon'],
-          ] as const).map(([key, text]) => (
-            <div key={key}>
-              <label htmlFor={key} className={label}>{text}</label>
-              <input id={key} type="tel" className={input} placeholder="+381 6x xxx xxxx" value={form[key]}
-                onChange={(e) => set(key, e.target.value)} />
-            </div>
-          ))}
+        <div id="field-owner_phone" className="md:max-w-sm">
+          <label htmlFor="owner_phone" className={label}>Telefon vlasnika</label>
+          <input id="owner_phone" type="tel" className={input} placeholder="+381 6x xxx xxxx" required
+            value={form.owner_phone} onChange={(e) => set('owner_phone', e.target.value)} />
+          <p className="mt-1 text-xs text-text/60">Ne prikazuje se na sajtu. Vidite ga samo vi, i u upitima za rezervaciju.</p>
+          {fieldError('owner_phone')}
         </div>
-        {fieldError('contact_phone')}
       </section>
 
       {/* ── Objava ── */}

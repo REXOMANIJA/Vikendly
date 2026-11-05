@@ -49,13 +49,7 @@ export default async function SearchPage({
       house,
       quote:
         canQuote && checkIn && checkOut
-          ? calculateTotalPrice(
-              house,
-              checkIn,
-              checkOut,
-              guests ?? 1,
-              destinationOf(house.destinationId)
-            )
+          ? calculateTotalPrice(house, checkIn, checkOut, guests ?? 1)
           : undefined,
     }))
     // Budget is for the whole stay, so it only applies once dates are known

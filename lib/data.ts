@@ -22,11 +22,11 @@ type HouseRow = {
   name: string;
   destination_id: string;
   capacity: number;
-  bedrooms: number;
-  bathrooms: number;
+  day_capacity: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
   weekday_price: number;
   weekend_price: number;
-  cleaning_fee: number;
   min_nights: number;
   description_sr: string;
   description_en: string;
@@ -38,13 +38,11 @@ type HouseRow = {
   address: string;
   lat: number | null;
   lng: number | null;
-  contact_viber: string | null;
-  contact_whatsapp: string | null;
-  contact_phone: string | null;
   featured_rank: number | null;
   house_photos: { url: string; sort_order: number }[];
   house_categories: { category_id: string }[];
   house_amenities: { amenity_id: string }[];
+  house_price_tiers: { max_guests: number; weekday_price: number; weekend_price: number }[];
 };
 
 type DestinationRow = {
@@ -52,7 +50,6 @@ type DestinationRow = {
   slug: string;
   name: string;
   country: Destination['country'];
-  tourist_tax_per_person_per_night: number;
 };
 
 function toHouse(row: HouseRow): House & { featuredRank: number | null } {
@@ -63,14 +60,21 @@ function toHouse(row: HouseRow): House & { featuredRank: number | null } {
     destinationId: row.destination_id,
     categoryIds: row.house_categories.map((c) => c.category_id),
     capacity: row.capacity,
-    bedrooms: row.bedrooms,
-    bathrooms: row.bathrooms,
+    dayCapacity: row.day_capacity ?? undefined,
+    bedrooms: row.bedrooms ?? undefined,
+    bathrooms: row.bathrooms ?? undefined,
     pricing: {
       // numeric columns come back as numbers or strings depending on size; normalise
       weekdayPrice: Number(row.weekday_price),
       weekendPrice: Number(row.weekend_price),
-      cleaningFee: Number(row.cleaning_fee),
       minNights: row.min_nights,
+      tiers: (row.house_price_tiers ?? [])
+        .map((t) => ({
+          maxGuests: t.max_guests,
+          weekdayPrice: Number(t.weekday_price),
+          weekendPrice: Number(t.weekend_price),
+        }))
+        .sort((a, b) => a.maxGuests - b.maxGuests),
     },
     amenities: row.house_amenities.map((a) => a.amenity_id),
     photos: [...row.house_photos].sort((a, b) => a.sort_order - b.sort_order).map((p) => p.url),
@@ -87,11 +91,6 @@ function toHouse(row: HouseRow): House & { featuredRank: number | null } {
       lat: row.lat ?? undefined,
       lng: row.lng ?? undefined,
     },
-    contact: {
-      viber: row.contact_viber ?? undefined,
-      whatsapp: row.contact_whatsapp ?? undefined,
-      phone: row.contact_phone ?? undefined,
-    },
     featuredRank: row.featured_rank,
   };
 }
@@ -102,7 +101,6 @@ function toDestination(row: DestinationRow): Destination {
     slug: row.slug,
     name: row.name,
     country: row.country,
-    touristTaxPerPersonPerNight: Number(row.tourist_tax_per_person_per_night),
   };
 }
 
@@ -115,7 +113,9 @@ const loadHouses = cache(async (): Promise<(House & { featuredRank: number | nul
   }
   const { data, error } = await getSupabase()
     .from('houses')
-    .select('*, house_photos(url, sort_order), house_categories(category_id), house_amenities(amenity_id)')
+    .select(
+      '*, house_photos(url, sort_order), house_categories(category_id), house_amenities(amenity_id), house_price_tiers(max_guests, weekday_price, weekend_price)'
+    )
     .eq('is_published', true)
     .order('name');
   if (error) throw new Error(`Could not load houses: ${error.message}`);
@@ -126,7 +126,7 @@ const loadDestinations = cache(async (): Promise<Destination[]> => {
   if (useSampleData) return (await import('@/data/destinations')).destinations;
   const { data, error } = await getSupabase()
     .from('destinations')
-    .select('id, slug, name, country, tourist_tax_per_person_per_night')
+    .select('id, slug, name, country')
     .order('sort_order');
   if (error) throw new Error(`Could not load destinations: ${error.message}`);
   return (data as DestinationRow[]).map(toDestination);

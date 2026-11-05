@@ -13,7 +13,6 @@ export const houses: House[] = [
     pricing: {
       weekdayPrice: 80,
       weekendPrice: 120,
-      cleaningFee: 50,
       minNights: 2,
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'terrace', 'tv', 'heating'],
@@ -32,10 +31,6 @@ export const houses: House[] = [
     location: {
       address: 'Ribničko jezero 12, Zlatibor',
     },
-    contact: {
-      viber: '+381641234567',
-      whatsapp: '+381641234567',
-    },
   },
   {
     id: 'house-02',
@@ -49,7 +44,6 @@ export const houses: House[] = [
     pricing: {
       weekdayPrice: 150,
       weekendPrice: 200,
-      cleaningFee: 80,
       minNights: 3,
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'terrace', 'tv', 'heating', 'bbq'],
@@ -68,10 +62,6 @@ export const houses: House[] = [
     location: {
       address: 'Pančićev vrh 5, Kopaonik',
     },
-    contact: {
-      viber: '+381639876543',
-      phone: '+381639876543',
-    },
   },
   {
     id: 'house-03',
@@ -85,7 +75,6 @@ export const houses: House[] = [
     pricing: {
       weekdayPrice: 70,
       weekendPrice: 100,
-      cleaningFee: 40,
       minNights: 2,
     },
     amenities: ['wifi', 'parking', 'kitchen', 'terrace', 'heating'],
@@ -104,9 +93,6 @@ export const houses: House[] = [
     location: {
       address: 'Bajina Bašta, Tara',
     },
-    contact: {
-      whatsapp: '+381651112223',
-    },
   },
   {
     id: 'house-04',
@@ -120,7 +106,6 @@ export const houses: House[] = [
     pricing: {
       weekdayPrice: 90,
       weekendPrice: 130,
-      cleaningFee: 50,
       minNights: 2,
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'terrace', 'tv', 'heating'],
@@ -139,9 +124,6 @@ export const houses: House[] = [
     location: {
       address: 'Divčibare 45, Maljen',
     },
-    contact: {
-      viber: '+381633334445',
-    },
   },
   {
     id: 'house-05',
@@ -155,7 +137,6 @@ export const houses: House[] = [
     pricing: {
       weekdayPrice: 200,
       weekendPrice: 280,
-      cleaningFee: 100,
       minNights: 2,
     },
     amenities: ['wifi', 'parking', 'kitchen', 'terrace', 'tv', 'ac', 'heating', 'washer', 'bbq'],
@@ -174,10 +155,6 @@ export const houses: House[] = [
     location: {
       address: 'Sremski Karlovci 23, Fruška Gora',
     },
-    contact: {
-      whatsapp: '+381645556667',
-      phone: '+381645556667',
-    },
   },
   {
     id: 'house-06',
@@ -191,7 +168,6 @@ export const houses: House[] = [
     pricing: {
       weekdayPrice: 250,
       weekendPrice: 350,
-      cleaningFee: 120,
       minNights: 2,
     },
     amenities: ['wifi', 'parking', 'kitchen', 'terrace', 'tv', 'ac', 'heating', 'bbq'],
@@ -210,9 +186,6 @@ export const houses: House[] = [
     location: {
       address: 'Perućac 8, Drina river',
     },
-    contact: {
-      viber: '+381627778889',
-    },
   },
   {
     id: 'house-07',
@@ -226,7 +199,6 @@ export const houses: House[] = [
     pricing: {
       weekdayPrice: 85,
       weekendPrice: 120,
-      cleaningFee: 45,
       minNights: 2,
     },
     amenities: ['wifi', 'parking', 'kitchen', 'terrace', 'tv', 'heating'],
@@ -245,9 +217,6 @@ export const houses: House[] = [
     location: {
       address: 'Vlasina 34, Surdulica',
     },
-    contact: {
-      whatsapp: '+381619990001',
-    },
   },
   {
     id: 'house-08',
@@ -261,7 +230,6 @@ export const houses: House[] = [
     pricing: {
       weekdayPrice: 100,
       weekendPrice: 150,
-      cleaningFee: 60,
       minNights: 2,
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'terrace', 'tv', 'heating'],
@@ -280,9 +248,6 @@ export const houses: House[] = [
     location: {
       address: 'Žabljak 15, Durmitor',
     },
-    contact: {
-      viber: '+382691112223',
-    },
   },
   {
     id: 'house-09',
@@ -296,7 +261,6 @@ export const houses: House[] = [
     pricing: {
       weekdayPrice: 180,
       weekendPrice: 250,
-      cleaningFee: 90,
       minNights: 3,
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'terrace', 'tv', 'heating', 'bbq'],
@@ -315,10 +279,6 @@ export const houses: House[] = [
     location: {
       address: 'Jahorina 7, Pale',
     },
-    contact: {
-      whatsapp: '+387613334445',
-      phone: '+387613334445',
-    },
   },
   {
     id: 'house-10',
@@ -332,7 +292,6 @@ export const houses: House[] = [
     pricing: {
       weekdayPrice: 75,
       weekendPrice: 110,
-      cleaningFee: 45,
       minNights: 2,
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'terrace', 'tv', 'heating'],
@@ -351,9 +310,6 @@ export const houses: House[] = [
     location: {
       address: 'Kraljeva Voda 8, Zlatibor',
     },
-    contact: {
-      viber: '+381645556668',
-    },
   },
   {
     id: 'house-11',
@@ -367,7 +323,6 @@ export const houses: House[] = [
     pricing: {
       weekdayPrice: 60,
       weekendPrice: 90,
-      cleaningFee: 30,
       minNights: 2,
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'tv', 'heating'],
@@ -386,9 +341,6 @@ export const houses: House[] = [
     location: {
       address: 'Kopaonik 3, Brzeće',
     },
-    contact: {
-      whatsapp: '+381627778890',
-    },
   },
   {
     id: 'house-12',
@@ -402,7 +354,6 @@ export const houses: House[] = [
     pricing: {
       weekdayPrice: 120,
       weekendPrice: 170,
-      cleaningFee: 70,
       minNights: 2,
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'terrace', 'tv', 'heating', 'bbq'],
@@ -420,10 +371,6 @@ export const houses: House[] = [
     },
     location: {
       address: 'Mitrovac 22, Tara',
-    },
-    contact: {
-      viber: '+381619990002',
-      phone: '+381619990002',
     },
   },
 ];
