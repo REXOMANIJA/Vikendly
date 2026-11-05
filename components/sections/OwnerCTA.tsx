@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { submitOwnerApplication } from '@/lib/actions';
 import { CircleCheck, Users, SlidersHorizontal, BadgeCheck } from 'lucide-react';
 
 const benefits = [
@@ -16,25 +17,21 @@ const labelClass = 'block text-sm font-medium text-text mb-1.5';
 
 export default function OwnerCTA() {
   const t = useTranslations('ownerCTA');
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    location: '',
-    description: '',
-  });
-  const [submitted, setSubmitted] = useState(false);
+  const locale = useLocale();
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'invalid' | 'error'>('idle');
 
-  const update = (field: keyof typeof formData) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => setFormData({ ...formData, [field]: e.target.value });
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: Integrate with backend to save the form submission
-    console.log('Form submitted:', formData);
-    setSubmitted(true);
-    setFormData({ name: '', phone: '', location: '', description: '' });
+    setStatus('sending');
+    try {
+      // Saved to Supabase → table owner_applications (see lib/actions.ts)
+      const result = await submitOwnerApplication(new FormData(e.currentTarget));
+      setStatus(result.ok ? 'sent' : result.error === 'invalid' ? 'invalid' : 'error');
+    } catch {
+      setStatus('error');
+    }
   };
+  const submitted = status === 'sent';
 
   return (
     <section id="list-your-house" className="py-16 md:py-20 bg-sand">
@@ -69,6 +66,12 @@ export default function OwnerCTA() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <p className="font-serif text-2xl font-bold text-primary mb-2">{t('form.heading')}</p>
+              <input type="hidden" name="locale" value={locale} />
+              {/* Spam trap: hidden from people, bots fill it in */}
+              <div aria-hidden="true" className="absolute -left-[9999px] h-0 overflow-hidden">
+                <label htmlFor="owner-website">Website</label>
+                <input id="owner-website" type="text" name="website" tabIndex={-1} autoComplete="off" />
+              </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="owner-name" className={labelClass}>
@@ -79,8 +82,9 @@ export default function OwnerCTA() {
                     type="text"
                     required
                     autoComplete="name"
-                    value={formData.name}
-                    onChange={update('name')}
+                    name="name"
+                    minLength={2}
+                    maxLength={120}
                     className={inputClass}
                   />
                 </div>
@@ -93,8 +97,9 @@ export default function OwnerCTA() {
                     type="tel"
                     required
                     autoComplete="tel"
-                    value={formData.phone}
-                    onChange={update('phone')}
+                    name="phone"
+                    minLength={6}
+                    maxLength={40}
                     placeholder="+381 6x xxx xxxx"
                     className={inputClass}
                   />
@@ -108,8 +113,9 @@ export default function OwnerCTA() {
                   id="owner-location"
                   type="text"
                   required
-                  value={formData.location}
-                  onChange={update('location')}
+                  name="location"
+                  minLength={2}
+                  maxLength={200}
                   placeholder={t('form.locationPlaceholder')}
                   className={inputClass}
                 />
@@ -122,17 +128,23 @@ export default function OwnerCTA() {
                   id="owner-description"
                   required
                   rows={4}
-                  value={formData.description}
-                  onChange={update('description')}
+                  name="description"
+                  maxLength={2000}
                   placeholder={t('form.descriptionPlaceholder')}
                   className={`${inputClass} resize-none`}
                 />
               </div>
+              {(status === 'invalid' || status === 'error') && (
+                <p role="alert" className="rounded-lg bg-accent/10 px-4 py-3 text-sm text-accent-dark">
+                  {t(status === 'invalid' ? 'form.errorInvalid' : 'form.errorServer')}
+                </p>
+              )}
               <button
                 type="submit"
-                className="w-full bg-accent-dark text-white py-3 rounded-lg font-medium hover:bg-primary transition-colors"
+                disabled={status === 'sending'}
+                className="w-full bg-accent-dark text-white py-3 rounded-lg font-medium hover:bg-primary transition-colors disabled:opacity-60 disabled:cursor-wait"
               >
-                {t('form.submit')}
+                {status === 'sending' ? t('form.sending') : t('form.submit')}
               </button>
             </form>
           )}

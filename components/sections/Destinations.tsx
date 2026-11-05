@@ -1,11 +1,17 @@
 import { useTranslations } from 'next-intl';
 import DestinationCard from '@/components/cards/DestinationCard';
 import SectionHeading from '@/components/SectionHeading';
-import { getDestinations, getHouseCountByDestination } from '@/lib/data';
+import type { Destination } from '@/types';
 
-export default function Destinations() {
+export default function Destinations({
+  destinations,
+  houseCounts,
+}: {
+  destinations: Destination[];
+  /** destination id → number of published houses */
+  houseCounts: Record<string, number>;
+}) {
   const t = useTranslations('destinations');
-  const destinations = getDestinations();
 
   return (
     <section id="destinations" className="py-16 bg-white">
@@ -25,7 +31,7 @@ export default function Destinations() {
               slug={destination.slug}
               image={`/images/destination-${destination.slug}.svg`}
               country={t(`countries.${destination.country}`)}
-              houseCount={t('houseCount', { count: getHouseCountByDestination(destination.id) })}
+              houseCount={t('houseCount', { count: houseCounts[destination.id] ?? 0 })}
               featured={i === 0}
               className={i === 0 ? 'col-span-2 min-h-64 lg:row-span-2' : ''}
             />

@@ -3,11 +3,12 @@ import { useTranslations } from 'next-intl';
 import { PartyPopper, Moon, PawPrint, WavesLadder, Users, BedDouble } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { House, PriceCalculation } from '@/types';
-import { getDestinationById } from '@/lib/data';
 import { Link } from '@/i18n/navigation';
 
 interface HouseCardProps {
   house: House;
+  /** e.g. "Zlatibor" (the page looks it up once and passes it in) */
+  destinationName?: string;
   /** When dates are known, show the full price for the stay instead of the nightly "from" price. */
   quote?: PriceCalculation;
   /** Short text under the total, e.g. "for the weekend · 2 guests". Defaults to the number of nights. */
@@ -22,10 +23,16 @@ const eur = (n: number) => `€${Math.round(n)}`;
 
 type Badge = { key: string; label: string; icon: LucideIcon; tone: 'accent' | 'primary' };
 
-export default function HouseCard({ house, quote, quoteLabel, guests, linkQuery }: HouseCardProps) {
+export default function HouseCard({
+  house,
+  destinationName,
+  quote,
+  quoteLabel,
+  guests,
+  linkQuery,
+}: HouseCardProps) {
   const t = useTranslations('houseCard');
   const { pricing, capacity, bedrooms, name, rules } = house;
-  const destination = getDestinationById(house.destinationId);
 
   // House rules are a core promise of Vikendly, so they're visible on every card
   const badges: Badge[] = [
@@ -53,9 +60,9 @@ export default function HouseCard({ house, quote, quoteLabel, guests, linkQuery 
         />
       </div>
       <div className="flex flex-col flex-1 p-5">
-        {destination && (
+        {destinationName && (
           <p className="text-xs font-semibold uppercase tracking-wide text-accent-dark mb-1">
-            {destination.name}
+            {destinationName}
           </p>
         )}
         <h3 className="font-serif text-xl font-bold text-primary mb-2">

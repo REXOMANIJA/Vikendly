@@ -26,7 +26,13 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { Link, getPathname } from '@/i18n/navigation';
 import { routing, type Locale } from '@/i18n/routing';
-import { getDestinationById, getHouseBySlug, getHouses, getSimilarHouses } from '@/lib/data';
+import {
+  getDestinationById,
+  getDestinations,
+  getHouseBySlug,
+  getHouses,
+  getSimilarHouses,
+} from '@/lib/data';
 import { PriceCalculatorFromUrl } from '@/components/house/PriceCalculator';
 import HouseCard from '@/components/cards/HouseCard';
 
@@ -47,16 +53,21 @@ const amenityIcons: Record<string, LucideIcon> = {
 
 const eur = (n: number) => `€${n}`;
 
-export function generateStaticParams() {
-  return getHouses().map((house) => ({ slug: house.slug }));
+// Pages are built ahead of time and refreshed from Supabase at most once an hour.
+// Houses added later are built on their first visit.
+export const revalidate = 3600;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  return (await getHouses()).map((house) => ({ slug: house.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale, slug } = await params;
-  const house = getHouseBySlug(slug);
+  const house = await getHouseBySlug(slug);
   if (!house) return {};
   const t = await getTranslations({ locale, namespace: 'house' });
-  const destination = getDestinationById(house.destinationId);
+  const destination = await getDestinationById(house.destinationId);
   const description = house.description[locale as Locale];
 
   // Each language has its own URL (/sr/kuce/… and /en/houses/…), so tell Google about both
@@ -76,14 +87,15 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function HousePage({ params }: { params: Params }) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
-  const house = getHouseBySlug(slug);
+  const house = await getHouseBySlug(slug);
   if (!house) notFound();
 
   const t = await getTranslations('house');
   const tAmenity = await getTranslations('amenities');
   const tCountry = await getTranslations('destinations.countries');
-  const destination = getDestinationById(house.destinationId);
-  const similar = getSimilarHouses(house);
+  const [destinations, similar] = await Promise.all([getDestinations(), getSimilarHouses(house)]);
+  const destinationOf = (id: string) => destinations.find((d) => d.id === id);
+  const destination = destinationOf(house.destinationId);
   const { rules } = house;
 
   const ruleItems = [
@@ -236,7 +248,7 @@ export default async function HousePage({ params }: { params: Params }) {
             <h2 className="font-serif text-2xl md:text-3xl font-bold text-primary mb-6">{t('similarTitle')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {similar.map((h) => (
-                <HouseCard key={h.id} house={h} />
+                <HouseCard key={h.id} house={h} destinationName={destinationOf(h.destinationId)?.name} />
               ))}
             </div>
           </section>

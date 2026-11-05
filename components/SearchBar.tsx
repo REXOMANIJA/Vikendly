@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Search, X } from 'lucide-react';
 import { useRouter } from '@/i18n/navigation';
-import { getDestinations } from '@/lib/data';
+import type { Destination } from '@/types';
 
 const budgetOptions = [200, 300, 500, 800];
 const today = () => new Date().toLocaleDateString('sv-SE'); // yyyy-MM-dd in local time
@@ -13,10 +13,9 @@ const fieldClass =
   'w-full h-11 px-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent';
 const labelClass = 'block text-sm font-medium mb-1.5';
 
-export default function SearchBar() {
+export default function SearchBar({ destinations }: { destinations: Destination[] }) {
   const t = useTranslations('hero.search');
   const router = useRouter();
-  const destinations = getDestinations();
 
   // On phones the form starts as a compact bar and opens on tap; on tablet/desktop it's always open
   const [expanded, setExpanded] = useState(false);

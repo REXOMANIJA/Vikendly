@@ -1,16 +1,22 @@
 import { useLocale, useTranslations } from 'next-intl';
 import HouseCard from '@/components/cards/HouseCard';
 import SectionHeading from '@/components/SectionHeading';
-import { getDestinationById, getFreeThisWeekend } from '@/lib/data';
 import { calculateTotalPrice } from '@/lib/pricing';
 import { formatDateRange, getUpcomingWeekend, toDateParam } from '@/lib/dates';
+import type { Destination, House } from '@/types';
 
 // Homepage prices are for a full house (the per-person price is what groups compare);
 // the search page uses the guest count the visitor entered.
-export default function FreeThisWeekend() {
+export default function FreeThisWeekend({
+  houses,
+  destinations,
+}: {
+  houses: House[];
+  destinations: Destination[];
+}) {
   const t = useTranslations('freeThisWeekend');
   const locale = useLocale();
-  const houses = getFreeThisWeekend();
+  const destinationOf = (house: House) => destinations.find((d) => d.id === house.destinationId);
   const { checkIn, checkOut } = getUpcomingWeekend();
   const dates = formatDateRange(checkIn, checkOut, locale);
 
@@ -34,13 +40,8 @@ export default function FreeThisWeekend() {
             <HouseCard
               key={house.id}
               house={house}
-              quote={calculateTotalPrice(
-                house,
-                checkIn,
-                checkOut,
-                house.capacity,
-                getDestinationById(house.destinationId)
-              )}
+              destinationName={destinationOf(house)?.name}
+              quote={calculateTotalPrice(house, checkIn, checkOut, house.capacity, destinationOf(house))}
               quoteLabel={t('quoteLabel', { count: house.capacity })}
               guests={house.capacity}
               linkQuery={{

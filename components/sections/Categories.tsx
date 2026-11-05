@@ -3,7 +3,7 @@ import { MountainSnow, PartyPopper, Sailboat, WavesLadder, Users, Heart } from '
 import type { LucideIcon } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import SectionHeading from '@/components/SectionHeading';
-import { getCategories } from '@/lib/data';
+import type { Category } from '@/types';
 
 const icons: Record<string, LucideIcon> = {
   mountain: MountainSnow,
@@ -14,9 +14,8 @@ const icons: Record<string, LucideIcon> = {
   romantic: Heart,
 };
 
-export default function Categories() {
+export default function Categories({ categories }: { categories: Category[] }) {
   const t = useTranslations('categories');
-  const categories = getCategories();
 
   return (
     <section id="categories" className="py-14 bg-background">

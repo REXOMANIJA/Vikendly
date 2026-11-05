@@ -1,10 +1,5 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import {
-  getHouses,
-  getDestinationBySlug,
-  getCategoryBySlug,
-  getDestinationById,
-} from '@/lib/data';
+import { getHouses, getDestinations, getCategoryBySlug } from '@/lib/data';
 import { calculateTotalPrice } from '@/lib/pricing';
 import { parseDateParam } from '@/lib/dates';
 import { Link } from '@/i18n/navigation';
@@ -32,8 +27,10 @@ export default async function SearchPage({
   const t = await getTranslations('search');
   const tCat = await getTranslations('categories');
 
-  const destination = sp.destination ? getDestinationBySlug(sp.destination) : undefined;
-  const category = sp.category ? getCategoryBySlug(sp.category) : undefined;
+  const [houses, destinations] = await Promise.all([getHouses(), getDestinations()]);
+  const destinationOf = (id: string) => destinations.find((d) => d.id === id);
+  const destination = sp.destination ? destinations.find((d) => d.slug === sp.destination) : undefined;
+  const category = sp.category ? await getCategoryBySlug(sp.category) : undefined;
   const guests = sp.guests ? parseInt(sp.guests, 10) || undefined : undefined;
   const budget = sp.budget ? parseInt(sp.budget, 10) || undefined : undefined;
   const checkIn = parseDateParam(sp.checkIn);
@@ -41,7 +38,7 @@ export default async function SearchPage({
   const invalidDates = Boolean(checkIn && checkOut && checkOut <= checkIn);
   const canQuote = Boolean(checkIn && checkOut && !invalidDates);
 
-  const results = getHouses()
+  const results = houses
     .filter((house) => {
       if (destination && house.destinationId !== destination.id) return false;
       if (category && !house.categoryIds.includes(category.id)) return false;
@@ -57,7 +54,7 @@ export default async function SearchPage({
               checkIn,
               checkOut,
               guests ?? 1,
-              getDestinationById(house.destinationId)
+              destinationOf(house.destinationId)
             )
           : undefined,
     }))
@@ -107,6 +104,7 @@ export default async function SearchPage({
             <HouseCard
               key={house.id}
               house={house}
+              destinationName={destinationOf(house.destinationId)?.name}
               quote={quote}
               guests={guests}
               linkQuery={stayQuery}

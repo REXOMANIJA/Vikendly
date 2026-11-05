@@ -144,7 +144,10 @@
       "success": "Hvala! Kontaktiraćemo vas uskoro.",
       "heading": "Prijavite svoju kuću",
       "locationPlaceholder": "npr. Zlatibor, Ribničko jezero",
-      "descriptionPlaceholder": "Broj soba, kapacitet, šta kuću čini posebnom…"
+      "descriptionPlaceholder": "Broj soba, kapacitet, šta kuću čini posebnom…",
+      "sending": "Šaljem…",
+      "errorInvalid": "Proverite polja: ime, telefon, lokacija i opis su obavezni.",
+      "errorServer": "Prijava nije poslata zbog greške kod nas. Pokušajte ponovo za par minuta."
     },
     "eyebrow": "Za vlasnike",
     "benefits": {

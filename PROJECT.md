@@ -17,13 +17,32 @@ Vikendly is a curated marketplace for renting weekend houses and vacation homes 
 
 ### Data Access Pattern
 
-All data access must go through functions in `/lib/data`. Currently these functions return mock data from `/data`, but they will be replaced with Supabase queries without touching the UI components.
+All data access goes through async functions in `lib/data.ts`, which read from **Supabase**. Components never query Supabase directly: pages fetch data and pass it down as props.
 
-**Functions:**
-- `getHouses()` - Returns all houses
-- `getDestinations()` - Returns all destinations
-- `getCategories()` - Returns all categories
-- `getFreeThisWeekend()` - Returns houses available this weekend
+- Published houses are loaded once per request (`react` `cache()`) and filtered in memory. Fine for a curated catalogue; switch to per-query filters if it grows into the thousands.
+- In tests (`NODE_ENV=test`) the same functions return the sample data in `/data` instead.
+- Pages revalidate every hour (`export const revalidate = 3600`), so changes in Supabase show up within an hour.
+
+**Functions:** `getHouses`, `getHouseBySlug`, `getFeaturedHouses` (houses with `featured_rank`), `getSimilarHouses`, `getHouseCountsByDestination`, `getDestinations`, `getDestinationById`, `getDestinationBySlug`, `getCategories`, `getCategoryBySlug`
+
+### Supabase
+
+- Keys live in `.env.local` (not committed; see `.env.example`): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Never use the secret/service-role key in this app.
+- Schema and security rules: `supabase/migrations/0001_init.sql`. Sample data: `supabase/seed.sql` (generated from `/data`). New schema changes go in new numbered files (`0002_…sql`), run in Supabase → SQL Editor.
+- Row Level Security: the public can read reference data and **published** houses only, and can insert into `owner_applications` but never read it. Applications are read in the Supabase dashboard.
+- A house appears on the site when `is_published = true`; `featured_rank` (1, 2, 3…) puts it in "Izdvojeno za ovaj vikend".
+
+### Admin panel (`/admin`, Serbian only)
+
+- Separate root layout in `app/admin/` (not under `[locale]`). `proxy.ts` sends `/admin/*` to Supabase session handling instead of next-intl and redirects visitors without a session to `/admin/login`.
+- Admins are Supabase Auth users listed in `public.admins` (`supabase/migrations/0002_admin.sql`). Add one: create the user in Supabase → Authentication, then
+  `insert into public.admins (user_id) select id from auth.users where email = '…';`
+- All writes run with the admin's own session (`lib/supabase/server.ts`); permissions are enforced by RLS policies using `public.is_admin()`, not only by the app.
+- Houses: list with publish toggle, add/edit form (`components/admin/HouseForm.tsx`). Saving calls the SQL function `admin_save_house(jsonb)`, which saves the house with its categories, amenities and photos in one transaction. Saving refreshes the public site immediately (`revalidatePath`).
+- Photos are uploaded from the browser to the public Storage bucket `house-photos` (admins only, max 8 MB, JPG/PNG/WebP/AVIF). Removing a photo in the form doesn't delete the file from Storage; deleting a house does (needs the select policy from `0003_admin_photo_select.sql`).
+- Owner applications: `/admin/prijave`, with status (new → contacted → visited → published / rejected).
+- Supabase clients: `lib/supabase/public.ts` (anonymous, public pages), `lib/supabase/server.ts` (admin session, server), `lib/supabase/browser.ts` (admin session, browser).
+- Owner form → server action `submitOwnerApplication` in `lib/actions.ts` (validation + honeypot spam trap).
 
 ### Pricing Logic
 
@@ -119,8 +138,8 @@ the `unoptimized` prop from `<Image>` so Next.js optimizes them.
 **Phase 1:** Landing page + foundation
 - Landing page with all sections
 - Search functionality (placeholder)
-- Mock data
-- No admin panel, authentication, payments, or real database
+- Data in Supabase; owner applications are saved
+- No admin panel, authentication or payments
 
 ## Future Phases (Not in Scope)
 
@@ -128,4 +147,4 @@ the `unoptimized` prop from `<Image>` so Next.js optimizes them.
 - User authentication
 - Booking flow and payments
 - Owner dashboard
-- Real database (Supabase)
+- Admin panel instead of Supabase Table Editor

@@ -144,7 +144,10 @@
       "success": "Thank you! We'll contact you soon.",
       "heading": "Submit your house",
       "locationPlaceholder": "e.g. Zlatibor, Ribnica lake",
-      "descriptionPlaceholder": "Rooms, capacity, what makes the house special…"
+      "descriptionPlaceholder": "Rooms, capacity, what makes the house special…",
+      "sending": "Sending…",
+      "errorInvalid": "Please check the fields: name, phone, location and description are required.",
+      "errorServer": "Your application could not be sent because of an error on our side. Please try again in a few minutes."
     },
     "eyebrow": "For owners",
     "benefits": {

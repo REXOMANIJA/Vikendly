@@ -2,6 +2,7 @@ import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Receipt, PartyPopper, BadgeCheck } from 'lucide-react';
 import SearchBar from '@/components/SearchBar';
+import type { Destination } from '@/types';
 
 // What makes Vikendly different, shown right under the search box
 const promises = [
@@ -10,7 +11,7 @@ const promises = [
   { key: 'verified', icon: BadgeCheck },
 ] as const;
 
-export default function Hero() {
+export default function Hero({ destinations }: { destinations: Destination[] }) {
   const t = useTranslations('hero');
 
   return (
@@ -37,7 +38,7 @@ export default function Hero() {
         </div>
 
         <div className="max-w-5xl mx-auto">
-          <SearchBar />
+          <SearchBar destinations={destinations} />
 
           <ul className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 text-white">
             {promises.map(({ key, icon: Icon }) => (
