@@ -1,12 +1,12 @@
 {
   "meta": {
-    "title": "Vikendly – Curated weekend houses in Serbia, Croatia, Bosnia and Montenegro",
-    "description": "Find your perfect weekend house. Curated houses in Zlatibor, Kopaonik, Tara and other destinations.",
-    "ogDescription": "Curated weekend houses in Serbia, Croatia, Bosnia and Montenegro"
+    "title": "Vikendly – Weekend houses in Serbia and the region, full price upfront",
+    "description": "Handpicked weekend houses in Zlatibor, Kopaonik, Tara and other mountains, lakes and rivers. Full price upfront and clear house rules.",
+    "ogDescription": "Handpicked weekend houses in Serbia and the region"
   },
   "header": {
     "logo": "Vikendly",
-    "homeLabel": "Go to home",
+    "homeLabel": "Vikendly – home",
     "nav": {
       "houses": "Houses",
       "destinations": "Destinations",
@@ -16,12 +16,12 @@
   },
   "languageSwitcher": {
     "label": "Language",
-    "sr": "Switch to Serbian",
-    "en": "Switch to English"
+    "sr": "Serbian",
+    "en": "English"
   },
   "hero": {
-    "headline": "Find your perfect weekend house",
-    "subheadline": "Curated weekend houses in Serbia, Croatia, Bosnia and Montenegro",
+    "headline": "A weekend away, with no surprises in the price",
+    "subheadline": "Handpicked weekend houses in Serbia and the region. See the full price before you send a request.",
     "imageAlt": "Weekend house in nature",
     "search": {
       "destination": "Destination",
@@ -46,10 +46,10 @@
     "title": "What kind of weekend do you want?",
     "mountain": "Mountain house",
     "party": "Party house",
-    "lake": "Lake/River house",
+    "lake": "By the water",
     "pool": "House with pool",
     "family": "Family house",
-    "romantic": "Romantic getaway"
+    "romantic": "Romantic weekend"
   },
   "destinations": {
     "title": "Where do you want to go?",
@@ -64,7 +64,7 @@
     }
   },
   "freeThisWeekend": {
-    "title": "Free this weekend",
+    "title": "Picks for this weekend",
     "seeAll": "See all houses",
     "subtitle": "Total weekend prices, for a full house.",
     "quoteLabel": "weekend for {count, plural, one {# guest} other {# guests}}"
@@ -104,7 +104,7 @@
     },
     "noiseRules": {
       "title": "Clear party rules",
-      "text": "Every house says whether parties are allowed or it is a quiet one."
+      "text": "Every house clearly says whether parties are allowed or it is a quiet house."
     },
     "verified": {
       "title": "Verified houses",
@@ -125,7 +125,7 @@
     },
     "step2": {
       "title": "Send a request",
-      "text": "The owner confirms the dates and you agree on details directly."
+      "text": "The owner confirms the dates and you arrange the details directly with them."
     },
     "step3": {
       "title": "Enjoy",
@@ -133,14 +133,14 @@
     }
   },
   "ownerCTA": {
-    "title": "Own a house? List it with us",
-    "description": "Join the platform and increase your earnings",
+    "title": "Own a weekend house? List it with us",
+    "description": "Send us the basics about your house and we will call you to talk it through.",
     "form": {
       "name": "Full name",
       "phone": "Phone",
       "location": "House location",
       "description": "Short description",
-      "submit": "Submit request",
+      "submit": "Send application",
       "success": "Thank you! We'll contact you soon.",
       "heading": "Submit your house",
       "locationPlaceholder": "e.g. Zlatibor, Ribnica lake",
@@ -163,7 +163,7 @@
     }
   },
   "footer": {
-    "tagline": "Curated weekend houses in Serbia, Croatia, Bosnia and Montenegro.",
+    "tagline": "Handpicked weekend houses in Serbia and the region.",
     "linksTitle": "Links",
     "languageTitle": "Language",
     "links": {

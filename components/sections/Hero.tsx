@@ -24,7 +24,8 @@ export default function Hero() {
           priority
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-primary/55" />
+        {/* Darker behind the headline, lighter in the middle so the image keeps its color */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary/30 to-primary/70" />
       </div>
 
       <div className="relative container mx-auto px-4">

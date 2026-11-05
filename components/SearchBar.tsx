@@ -63,7 +63,7 @@ export default function SearchBar() {
             <span className="block font-semibold text-primary">{t('compactTitle')}</span>
             <span className="block truncate text-sm text-text/60">{t('compactHint')}</span>
           </span>
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-accent text-white">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-accent-dark text-white">
             <Search className="size-5" aria-hidden />
           </span>
         </button>
@@ -180,7 +180,7 @@ export default function SearchBar() {
               aria-pressed={budget === String(amount)}
               className={`px-3 py-1 rounded-full text-sm transition-colors ${
                 budget === String(amount)
-                  ? 'bg-accent text-white'
+                  ? 'bg-accent-dark text-white'
                   : 'bg-background text-text hover:bg-accent/20'
               }`}
             >
@@ -192,7 +192,7 @@ export default function SearchBar() {
 
         <button
           type="submit"
-          className="flex w-full items-center justify-center gap-2 bg-primary text-white py-3 rounded-lg font-medium hover:bg-accent transition-colors"
+          className="flex w-full items-center justify-center gap-2 bg-primary text-white py-3 rounded-lg font-medium hover:bg-accent-dark transition-colors"
         >
           <Search className="size-4" aria-hidden />
           {t('searchButton')}

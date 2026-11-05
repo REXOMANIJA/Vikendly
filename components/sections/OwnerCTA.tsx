@@ -37,22 +37,22 @@ export default function OwnerCTA() {
   };
 
   return (
-    <section id="list-your-house" className="py-16 md:py-20 bg-primary text-white">
+    <section id="list-your-house" className="py-16 md:py-20 bg-sand">
       <div className="container mx-auto px-4 grid gap-10 lg:grid-cols-2 lg:gap-16 items-center">
         {/* Left: why list with us */}
         <div>
-          <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-accent">{t('eyebrow')}</p>
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-balance">{t('title')}</h2>
-          <p className="mt-4 text-white/80 leading-relaxed">{t('description')}</p>
+          <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-accent-dark">{t('eyebrow')}</p>
+          <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary text-balance">{t('title')}</h2>
+          <p className="mt-4 text-text/75 leading-relaxed">{t('description')}</p>
           <ul className="mt-8 space-y-5">
             {benefits.map(({ key, icon: Icon }) => (
               <li key={key} className="flex gap-4">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-accent">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-primary">
                   <Icon className="size-5" strokeWidth={1.75} aria-hidden />
                 </span>
                 <div>
-                  <h3 className="font-semibold">{t(`benefits.${key}.title`)}</h3>
-                  <p className="text-sm text-white/70">{t(`benefits.${key}.text`)}</p>
+                  <h3 className="font-semibold text-primary">{t(`benefits.${key}.title`)}</h3>
+                  <p className="text-sm text-text/70">{t(`benefits.${key}.text`)}</p>
                 </div>
               </li>
             ))}
@@ -60,10 +60,10 @@ export default function OwnerCTA() {
         </div>
 
         {/* Right: the form, as a light card */}
-        <div className="rounded-2xl bg-white p-6 md:p-8 shadow-2xl">
+        <div className="rounded-2xl bg-white p-6 md:p-8 shadow-xl">
           {submitted ? (
             <div className="py-10 text-center" role="status">
-              <CircleCheck className="mx-auto mb-4 size-14 text-accent" strokeWidth={1.5} aria-hidden />
+              <CircleCheck className="mx-auto mb-4 size-14 text-accent-dark" strokeWidth={1.5} aria-hidden />
               <p className="font-serif text-2xl font-bold text-primary">{t('form.success')}</p>
             </div>
           ) : (
@@ -130,7 +130,7 @@ export default function OwnerCTA() {
               </div>
               <button
                 type="submit"
-                className="w-full bg-accent text-white py-3 rounded-lg font-medium hover:bg-primary transition-colors"
+                className="w-full bg-accent-dark text-white py-3 rounded-lg font-medium hover:bg-primary transition-colors"
               >
                 {t('form.submit')}
               </button>

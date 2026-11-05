@@ -17,7 +17,7 @@ export default function Header() {
         <div className="flex items-center justify-between gap-4 h-16">
           <Link
             href="/"
-            className="font-serif text-2xl font-bold text-primary hover:text-accent transition-colors"
+            className="font-serif text-2xl font-bold text-primary hover:text-accent-dark transition-colors"
             aria-label={t('homeLabel')}
           >
             {t('logo')}
@@ -28,7 +28,7 @@ export default function Header() {
               <Link
                 key={item.key}
                 href={{ pathname: '/', hash: item.hash }}
-                className="text-text hover:text-accent transition-colors font-medium"
+                className="text-text hover:text-accent-dark transition-colors font-medium"
               >
                 {t(`nav.${item.key}`)}
               </Link>
@@ -39,7 +39,7 @@ export default function Header() {
             <LanguageSwitcher />
             <Link
               href={{ pathname: '/', hash: 'list-your-house' }}
-              className="hidden sm:block bg-accent text-white px-4 py-2 rounded-lg font-medium hover:bg-primary transition-colors"
+              className="hidden sm:block bg-accent-dark text-white px-4 py-2 rounded-lg font-medium hover:bg-primary transition-colors"
             >
               {t('listYourHouse')}
             </Link>
@@ -52,14 +52,14 @@ export default function Header() {
             <Link
               key={item.key}
               href={{ pathname: '/', hash: item.hash }}
-              className="whitespace-nowrap text-text hover:text-accent font-medium"
+              className="whitespace-nowrap text-text hover:text-accent-dark font-medium"
             >
               {t(`nav.${item.key}`)}
             </Link>
           ))}
           <Link
             href={{ pathname: '/', hash: 'list-your-house' }}
-            className="whitespace-nowrap text-accent font-medium sm:hidden"
+            className="whitespace-nowrap text-accent-dark font-medium sm:hidden"
           >
             {t('listYourHouse')}
           </Link>

@@ -79,14 +79,14 @@ export default async function SearchPage({
           <p className="text-text/70 mt-2">{t('found', { count: results.length })}</p>
         </div>
         {hasAnyFilter && (
-          <Link href="/search" className="text-accent font-medium hover:underline">
+          <Link href="/search" className="text-accent-dark font-medium hover:underline">
             {t('clearFilters')}
           </Link>
         )}
       </div>
 
       {invalidDates && (
-        <p className="mb-6 rounded-lg bg-accent/10 text-accent px-4 py-3">{t('invalidDates')}</p>
+        <p className="mb-6 rounded-lg bg-accent/10 text-accent-dark px-4 py-3">{t('invalidDates')}</p>
       )}
 
       {results.length === 0 ? (

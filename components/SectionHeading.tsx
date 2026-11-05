@@ -32,7 +32,7 @@ export default function SectionHeading({
     >
       <div className={centered ? 'max-w-2xl' : 'max-w-2xl'}>
         {eyebrow && (
-          <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-accent">{eyebrow}</p>
+          <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-accent-dark">{eyebrow}</p>
         )}
         <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary text-balance">{title}</h2>
         {subtitle && <p className="mt-3 text-text/70">{subtitle}</p>}
@@ -40,7 +40,7 @@ export default function SectionHeading({
       {action && (
         <Link
           href={action.href}
-          className="group inline-flex shrink-0 items-center gap-1.5 font-medium text-primary hover:text-accent transition-colors"
+          className="group inline-flex shrink-0 items-center gap-1.5 font-medium text-primary hover:text-accent-dark transition-colors"
         >
           {action.label}
           <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />

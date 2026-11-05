@@ -3,7 +3,7 @@ import { House } from '@/types';
 export const houses: House[] = [
   {
     id: 'house-01',
-    name: 'Vila Zlatibor Peace',
+    name: 'Vila Ribnica',
     destinationId: 'zlatibor',
     categoryIds: ['mountain', 'family'],
     capacity: 8,
@@ -35,7 +35,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-02',
-    name: 'Kopaonik Ski Lodge',
+    name: 'Planinska kuća Pančić',
     destinationId: 'kopaonik',
     categoryIds: ['mountain', 'family'],
     capacity: 10,
@@ -67,7 +67,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-03',
-    name: 'Tara Riverside Cabin',
+    name: 'Brvnara na Drini',
     destinationId: 'tara',
     categoryIds: ['lake', 'romantic'],
     capacity: 4,
@@ -98,7 +98,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-04',
-    name: 'Divčibare Hill House',
+    name: 'Kuća na Maljenu',
     destinationId: 'divcibare',
     categoryIds: ['mountain', 'romantic'],
     capacity: 6,
@@ -129,7 +129,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-05',
-    name: 'Fruška Gora Villa',
+    name: 'Vila Vinogradi',
     destinationId: 'fruska-gora',
     categoryIds: ['family', 'pool'],
     capacity: 12,
@@ -161,7 +161,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-06',
-    name: 'Drina Party House',
+    name: 'Kuća za ekipu Perućac',
     destinationId: 'drina',
     categoryIds: ['party', 'lake'],
     capacity: 15,
@@ -192,7 +192,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-07',
-    name: 'Vlasina Lake Retreat',
+    name: 'Kuća kod Vlasinskog jezera',
     destinationId: 'vlasina',
     categoryIds: ['lake', 'romantic'],
     capacity: 5,
@@ -223,7 +223,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-08',
-    name: 'Durmitor Mountain Home',
+    name: 'Kuća pod Durmitorom',
     destinationId: 'durmitor',
     categoryIds: ['mountain', 'family'],
     capacity: 8,
@@ -254,7 +254,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-09',
-    name: 'Jahorina Ski Chalet',
+    name: 'Šale Jahorina',
     destinationId: 'jahorina',
     categoryIds: ['mountain', 'party'],
     capacity: 14,
@@ -286,7 +286,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-10',
-    name: 'Zlatibor Family Cottage',
+    name: 'Porodična kuća Kraljeva Voda',
     destinationId: 'zlatibor',
     categoryIds: ['family', 'mountain'],
     capacity: 6,
@@ -317,7 +317,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-11',
-    name: 'Kopaonik Romantic Suite',
+    name: 'Apartman za dvoje Brzeće',
     destinationId: 'kopaonik',
     categoryIds: ['romantic', 'mountain'],
     capacity: 2,
@@ -348,7 +348,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-12',
-    name: 'Tara Adventure House',
+    name: 'Kuća Mitrovac',
     destinationId: 'tara',
     categoryIds: ['mountain', 'family'],
     capacity: 10,

@@ -51,7 +51,7 @@ export default function HouseCard({ house, quote, quoteLabel, guests }: HouseCar
       </div>
       <div className="flex flex-col flex-1 p-5">
         {destination && (
-          <p className="text-xs font-semibold uppercase tracking-wide text-accent mb-1">
+          <p className="text-xs font-semibold uppercase tracking-wide text-accent-dark mb-1">
             {destination.name}
           </p>
         )}
@@ -72,7 +72,7 @@ export default function HouseCard({ house, quote, quoteLabel, guests }: HouseCar
             <li
               key={key}
               className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${
-                tone === 'accent' ? 'bg-accent/15 text-[#a8472d]' : 'bg-primary/8 text-primary'
+                tone === 'accent' ? 'bg-accent/15 text-accent-dark' : 'bg-primary/8 text-primary'
               }`}
             >
               <Icon className="size-3.5" aria-hidden />
@@ -90,7 +90,7 @@ export default function HouseCard({ house, quote, quoteLabel, guests }: HouseCar
                   <span className="text-sm text-text/70"> {t('totalWord')}</span>
                 </span>
                 {guests && guests > 1 && (
-                  <span className="text-sm font-medium text-accent">
+                  <span className="text-sm font-medium text-accent-dark">
                     {t('perPerson', { price: eur(quote.total / guests) })}
                   </span>
                 )}

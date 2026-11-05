@@ -1,27 +1,27 @@
 {
   "meta": {
-    "title": "Vikendly – Kurirane vikend kuće u Srbiji, Hrvatskoj, Bosni i Crnoj Gori",
-    "description": "Pronađite savršenu vikend kuću za vaš odmor. Kurirane kuće na Zlatiboru, Kopaoniku, Tari i drugim destinacijama.",
-    "ogDescription": "Kurirane vikend kuće u Srbiji, Hrvatskoj, Bosni i Crnoj Gori"
+    "title": "Vikendly – Vikend kuće u Srbiji i regionu, sa ukupnom cenom unapred",
+    "description": "Pažljivo odabrane vikend kuće na Zlatiboru, Kopaoniku, Tari i drugim planinama, jezerima i rekama. Ukupna cena unapred i jasna pravila kuće.",
+    "ogDescription": "Pažljivo odabrane vikend kuće u Srbiji i regionu"
   },
   "header": {
     "logo": "Vikendly",
-    "homeLabel": "Idi na početnu",
+    "homeLabel": "Vikendly – početna strana",
     "nav": {
       "houses": "Kuće",
       "destinations": "Destinacije",
       "howItWorks": "Kako radi"
     },
-    "listYourHouse": "Iznajmi svoju kuću"
+    "listYourHouse": "Izdajte svoju kuću"
   },
   "languageSwitcher": {
     "label": "Jezik",
-    "sr": "Prebaci na srpski",
-    "en": "Prebaci na engleski"
+    "sr": "Srpski",
+    "en": "Engleski"
   },
   "hero": {
-    "headline": "Pronađite savršenu vikend kuću",
-    "subheadline": "Kurirane vikend kuće u Srbiji, Hrvatskoj, Bosni i Crnoj Gori",
+    "headline": "Vikend van grada, bez iznenađenja u ceni",
+    "subheadline": "Pažljivo odabrane vikend kuće u Srbiji i regionu. Ukupnu cenu vidite pre nego što pošaljete upit.",
     "imageAlt": "Vikend kuća u prirodi",
     "search": {
       "destination": "Destinacija",
@@ -31,10 +31,10 @@
       "guests": "Gosti",
       "budget": "Budžet (€)",
       "budgetHint": "Budžet važi za ceo boravak, kada izaberete datume",
-      "searchButton": "Pretraži",
+      "searchButton": "Pretražite",
       "compactTitle": "Gde idete?",
       "compactHint": "Destinacija · Datumi · Gosti",
-      "close": "Zatvori pretragu"
+      "close": "Zatvorite pretragu"
     },
     "promises": {
       "totalPrice": "Ukupna cena unapred, bez skrivenih troškova",
@@ -46,10 +46,10 @@
     "title": "Kakav vikend želite?",
     "mountain": "Planinska kuća",
     "party": "Kuća za žurke",
-    "lake": "Kuća pored jezera/reke",
+    "lake": "Kuća na vodi",
     "pool": "Kuća sa bazenom",
     "family": "Porodična kuća",
-    "romantic": "Romantični izlet"
+    "romantic": "Romantični vikend"
   },
   "destinations": {
     "title": "Gde želite da idete?",
@@ -64,8 +64,8 @@
     }
   },
   "freeThisWeekend": {
-    "title": "Slobodno ovog vikenda",
-    "seeAll": "Pogledaj sve kuće",
+    "title": "Izdvojeno za ovaj vikend",
+    "seeAll": "Pogledajte sve kuće",
     "subtitle": "Ukupne cene za vikend, za punu kuću.",
     "quoteLabel": "vikend za {count, plural, one {# osobu} few {# osobe} other {# osoba}}"
   },
@@ -89,7 +89,7 @@
     "title": "Rezultati pretrage",
     "found": "{count, plural, one {Pronađena je # kuća} few {Pronađene su # kuće} other {Pronađeno je # kuća}}",
     "noResults": "Nema kuća koje odgovaraju vašoj pretrazi.",
-    "clearFilters": "Obriši filtere",
+    "clearFilters": "Obrišite filtere",
     "invalidDates": "Datum odlaska mora biti posle datuma dolaska."
   },
   "whyVikendly": {
@@ -104,7 +104,7 @@
     },
     "noiseRules": {
       "title": "Jasna pravila o žurkama",
-      "text": "Na svakoj kući piše da li su žurke dozvoljene ili je mirna."
+      "text": "Za svaku kuću jasno piše da li su žurke dozvoljene ili je to mirna kuća."
     },
     "verified": {
       "title": "Proverene kuće",
@@ -125,7 +125,7 @@
     },
     "step2": {
       "title": "Pošaljite zahtev",
-      "text": "Vlasnik potvrđuje termin i dogovarate detalje direktno."
+      "text": "Vlasnik potvrđuje termin, a detalje dogovarate direktno sa njim."
     },
     "step3": {
       "title": "Uživajte",
@@ -133,14 +133,14 @@
     }
   },
   "ownerCTA": {
-    "title": "Imate kuću? Iznajmite je kod nas",
-    "description": "Pridružite se platformi i povećajte svoju zaradu",
+    "title": "Imate vikend kuću? Izdajte je kod nas",
+    "description": "Pošaljite nam osnovne podatke o kući, a mi ćemo vas pozvati da se dogovorimo.",
     "form": {
       "name": "Ime i prezime",
       "phone": "Telefon",
       "location": "Lokacija kuće",
       "description": "Kratak opis",
-      "submit": "Pošalji zahtev",
+      "submit": "Pošaljite prijavu",
       "success": "Hvala! Kontaktiraćemo vas uskoro.",
       "heading": "Prijavite svoju kuću",
       "locationPlaceholder": "npr. Zlatibor, Ribničko jezero",
@@ -163,7 +163,7 @@
     }
   },
   "footer": {
-    "tagline": "Kurirane vikend kuće u Srbiji, Hrvatskoj, Bosni i Crnoj Gori.",
+    "tagline": "Pažljivo odabrane vikend kuće u Srbiji i regionu.",
     "linksTitle": "Linkovi",
     "languageTitle": "Jezik",
     "links": {

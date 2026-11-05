@@ -4,7 +4,10 @@
 @theme {
   --color-primary: #1a3c34;
   --color-background: #f5f1e8;
-  --color-accent: #e07a5f;
+  --color-accent: #e07a5f; /* decoration only: icons, tints */
+  /* Use for orange text and for buttons with white text (meets WCAG AA on white and cream) */
+  --color-accent-dark: #a84b2e;
+  --color-sand: #ece4d3;
   --color-text: #2d2d2d;
 
   --font-serif: var(--font-playfair), Georgia, serif;

@@ -18,7 +18,7 @@ export default function WhyVikendly() {
       <div className="container mx-auto px-4 grid gap-10 lg:grid-cols-12 lg:gap-16 items-center">
         {/* Left: the pitch */}
         <div className="lg:col-span-5">
-          <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-accent">{t('eyebrow')}</p>
+          <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-accent-dark">{t('eyebrow')}</p>
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary text-balance">{t('title')}</h2>
           <p className="mt-4 text-text/70 leading-relaxed">{t('intro')}</p>
           <div className="relative mt-8 hidden aspect-[4/3] overflow-hidden rounded-2xl lg:block">
