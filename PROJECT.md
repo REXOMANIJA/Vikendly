@@ -69,6 +69,14 @@ All types matching future database tables are defined in `/types/index.ts`:
 - Setup (next-intl v4): `i18n/routing.ts` (locales), `i18n/request.ts` (loads messages), `i18n/navigation.ts` (locale-aware `Link`/`useRouter`), `proxy.ts` (Next 16 name for middleware; redirects `/` → `/sr` or `/en`)
 - Always import `Link`, `useRouter`, `usePathname` from `@/i18n/navigation`, not from `next/link` / `next/navigation`
 - Next 16: `params` and `searchParams` are Promises — `await` them in pages/layouts
+- Localized URLs are defined in `pathnames` in `i18n/routing.ts`. The folder is `app/[locale]/houses/[slug]`, visitors see `/sr/kuce/vila-ribnica` and `/en/houses/vila-ribnica`. Link with the internal name: `{ pathname: '/houses/[slug]', params: { slug } }`
+- Text stored per house in both languages uses `LocalizedText` (`{ sr, en }`), e.g. `house.description`
+
+### House pages
+
+- `app/[locale]/houses/[slug]/page.tsx`: photos, description, amenities, rules, location, similar houses; prerendered for every house
+- `components/house/PriceCalculator.tsx`: live price breakdown (weekday/weekend nights, cleaning, tourist tax, per person), min-nights and capacity warnings, owner contact (Viber, WhatsApp with a prefilled message, phone)
+- Dates/guests are passed in the URL (`?checkIn=yyyy-MM-dd&checkOut=…&guests=…`) from search and homepage cards so the calculator is prefilled
 
 ### Currency
 

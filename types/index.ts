@@ -25,8 +25,16 @@ export interface PricingRule {
   minNights: number;
 }
 
+/** Text stored in both site languages (maps to sr/en columns in the database later) */
+export interface LocalizedText {
+  sr: string;
+  en: string;
+}
+
 export interface House {
   id: string;
+  /** URL name, e.g. "vila-ribnica" → /sr/kuce/vila-ribnica */
+  slug: string;
   name: string;
   destinationId: string;
   categoryIds: string[];
@@ -36,7 +44,7 @@ export interface House {
   pricing: PricingRule;
   amenities: string[];
   photos: string[];
-  description: string;
+  description: LocalizedText;
   rules: {
     partiesAllowed: boolean;
     petsAllowed: boolean;

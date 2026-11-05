@@ -43,6 +43,11 @@ export default function FreeThisWeekend() {
               )}
               quoteLabel={t('quoteLabel', { count: house.capacity })}
               guests={house.capacity}
+              linkQuery={{
+                checkIn: toDateParam(checkIn),
+                checkOut: toDateParam(checkOut),
+                guests: house.capacity,
+              }}
             />
           ))}
         </div>

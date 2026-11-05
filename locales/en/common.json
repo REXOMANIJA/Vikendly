@@ -173,5 +173,68 @@
       "privacy": "Privacy"
     },
     "copyright": "© 2026 Vikendly. All rights reserved."
+  },
+  "amenities": {
+    "wifi": "WiFi",
+    "parking": "Parking",
+    "kitchen": "Kitchen",
+    "fireplace": "Fireplace",
+    "bbq": "Barbecue",
+    "terrace": "Terrace",
+    "tv": "TV",
+    "ac": "Air conditioning",
+    "heating": "Heating",
+    "washer": "Washing machine"
+  },
+  "house": {
+    "back": "Back",
+    "metaTitle": "{name}, {destination} | Vikendly",
+    "guests": "{count, plural, one {# guest} other {# guests}}",
+    "bedrooms": "{count, plural, one {# bedroom} other {# bedrooms}}",
+    "bathrooms": "{count, plural, one {# bathroom} other {# bathrooms}}",
+    "aboutTitle": "About the house",
+    "amenitiesTitle": "What the house has",
+    "rulesTitle": "House rules",
+    "checkInTime": "Check-in from {time}",
+    "checkOutTime": "Check-out by {time}",
+    "partiesAllowed": "Parties are allowed",
+    "partiesNotAllowed": "No parties, quiet house",
+    "petsAllowed": "Pets are welcome",
+    "petsNotAllowed": "No pets",
+    "smokingAllowed": "Smoking is allowed",
+    "smokingNotAllowed": "No smoking inside",
+    "minNights": "Minimum stay: {count, plural, one {# night} other {# nights}}",
+    "locationTitle": "Location",
+    "openMap": "Open in maps",
+    "similarTitle": "Similar houses",
+    "photoAlt": "{name}, photo {n}",
+    "mobilePrice": "from {price} / night",
+    "mobileCta": "Calculate price",
+    "calculator": {
+      "title": "Calculate the price",
+      "weekdayRate": "Weekdays",
+      "weekendRate": "Friday and Saturday",
+      "perNight": "{price} / night",
+      "weekdayLine": "{count, plural, one {# weekday night} other {# weekday nights}} × {price}",
+      "weekendLine": "{count, plural, one {# weekend night} other {# weekend nights}} × {price}",
+      "cleaning": "Cleaning",
+      "touristTax": "Tourist tax",
+      "touristTaxDetail": "{price} per person per night",
+      "total": "Total",
+      "perPerson": "{price} per person",
+      "pickDates": "Pick dates and guests to see the total price.",
+      "tooFewNights": "This house is rented for at least {count, plural, one {# night} other {# nights}}.",
+      "tooManyGuests": "The house sleeps at most {count, plural, one {# guest} other {# guests}}.",
+      "invalidDates": "Check-out must be after check-in."
+    },
+    "contact": {
+      "title": "Send the owner a request",
+      "note": "You arrange everything directly with the owner, who confirms whether the dates are free.",
+      "viber": "Viber",
+      "whatsapp": "WhatsApp",
+      "call": "Call",
+      "messageWithDates": "Hi, is {house} available from {checkIn} to {checkOut}, for {guests, plural, one {# guest} other {# guests}}? (Vikendly)",
+      "messageNoDates": "Hi, I am interested in {house}. Which dates are available? (Vikendly)"
+    }
   }
 }

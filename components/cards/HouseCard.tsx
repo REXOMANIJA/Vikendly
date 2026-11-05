@@ -4,6 +4,7 @@ import { PartyPopper, Moon, PawPrint, WavesLadder, Users, BedDouble } from 'luci
 import type { LucideIcon } from 'lucide-react';
 import { House, PriceCalculation } from '@/types';
 import { getDestinationById } from '@/lib/data';
+import { Link } from '@/i18n/navigation';
 
 interface HouseCardProps {
   house: House;
@@ -13,13 +14,15 @@ interface HouseCardProps {
   quoteLabel?: string;
   /** Number of guests the quote is for; enables the per-person price. */
   guests?: number;
+  /** Dates/guests to carry to the house page so its price calculator is prefilled */
+  linkQuery?: Record<string, string | number>;
 }
 
 const eur = (n: number) => `€${Math.round(n)}`;
 
 type Badge = { key: string; label: string; icon: LucideIcon; tone: 'accent' | 'primary' };
 
-export default function HouseCard({ house, quote, quoteLabel, guests }: HouseCardProps) {
+export default function HouseCard({ house, quote, quoteLabel, guests, linkQuery }: HouseCardProps) {
   const t = useTranslations('houseCard');
   const { pricing, capacity, bedrooms, name, rules } = house;
   const destination = getDestinationById(house.destinationId);
@@ -38,7 +41,7 @@ export default function HouseCard({ house, quote, quoteLabel, guests }: HouseCar
   }
 
   return (
-    <article className="group flex flex-col bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow">
+    <article className="group relative flex flex-col bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow focus-within:ring-2 focus-within:ring-accent-dark">
       <div className="relative aspect-[4/3] overflow-hidden">
         <Image
           src={house.photos[0]}
@@ -55,7 +58,15 @@ export default function HouseCard({ house, quote, quoteLabel, guests }: HouseCar
             {destination.name}
           </p>
         )}
-        <h3 className="font-serif text-xl font-bold text-primary mb-2">{name}</h3>
+        <h3 className="font-serif text-xl font-bold text-primary mb-2">
+          {/* The link covers the whole card (after:inset-0), so anywhere on the card opens the house */}
+          <Link
+            href={{ pathname: '/houses/[slug]', params: { slug: house.slug }, query: linkQuery }}
+            className="after:absolute after:inset-0 focus:outline-none group-hover:text-accent-dark transition-colors"
+          >
+            {name}
+          </Link>
+        </h3>
         <div className="flex items-center gap-4 text-sm text-text/70 mb-3">
           <span className="inline-flex items-center gap-1.5">
             <Users className="size-4" aria-hidden />

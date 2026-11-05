@@ -173,5 +173,68 @@
       "privacy": "Privatnost"
     },
     "copyright": "© 2026 Vikendly. Sva prava zadržana."
+  },
+  "amenities": {
+    "wifi": "WiFi",
+    "parking": "Parking",
+    "kitchen": "Kuhinja",
+    "fireplace": "Kamin",
+    "bbq": "Roštilj",
+    "terrace": "Terasa",
+    "tv": "TV",
+    "ac": "Klima",
+    "heating": "Grejanje",
+    "washer": "Veš mašina"
+  },
+  "house": {
+    "back": "Nazad",
+    "metaTitle": "{name}, {destination} | Vikendly",
+    "guests": "{count, plural, one {# gost} few {# gosta} other {# gostiju}}",
+    "bedrooms": "{count, plural, one {# spavaća soba} few {# spavaće sobe} other {# spavaćih soba}}",
+    "bathrooms": "{count, plural, one {# kupatilo} few {# kupatila} other {# kupatila}}",
+    "aboutTitle": "O kući",
+    "amenitiesTitle": "Šta kuća ima",
+    "rulesTitle": "Pravila kuće",
+    "checkInTime": "Dolazak od {time}",
+    "checkOutTime": "Odlazak do {time}",
+    "partiesAllowed": "Žurke su dozvoljene",
+    "partiesNotAllowed": "Bez žurki, mirna kuća",
+    "petsAllowed": "Kućni ljubimci su dobrodošli",
+    "petsNotAllowed": "Bez kućnih ljubimaca",
+    "smokingAllowed": "Pušenje je dozvoljeno",
+    "smokingNotAllowed": "Zabranjeno pušenje u kući",
+    "minNights": "Najkraći boravak: {count, plural, one {# noć} few {# noći} other {# noći}}",
+    "locationTitle": "Lokacija",
+    "openMap": "Otvorite na mapi",
+    "similarTitle": "Slične kuće",
+    "photoAlt": "{name}, fotografija {n}",
+    "mobilePrice": "od {price} / noć",
+    "mobileCta": "Izračunajte cenu",
+    "calculator": {
+      "title": "Izračunajte cenu",
+      "weekdayRate": "Radnim danima",
+      "weekendRate": "Petak i subota",
+      "perNight": "{price} / noć",
+      "weekdayLine": "{count, plural, one {# noć} few {# noći} other {# noći}} radnim danima × {price}",
+      "weekendLine": "{count, plural, one {# noć} few {# noći} other {# noći}} vikendom × {price}",
+      "cleaning": "Čišćenje",
+      "touristTax": "Boravišna taksa",
+      "touristTaxDetail": "{price} po osobi po noći",
+      "total": "Ukupno",
+      "perPerson": "{price} po osobi",
+      "pickDates": "Izaberite datume i broj gostiju da vidite ukupnu cenu.",
+      "tooFewNights": "Ova kuća se izdaje na najmanje {count, plural, one {# noć} few {# noći} other {# noći}}.",
+      "tooManyGuests": "Kuća prima najviše {count, plural, one {# gosta} few {# gosta} other {# gostiju}}.",
+      "invalidDates": "Datum odlaska mora biti posle datuma dolaska."
+    },
+    "contact": {
+      "title": "Pošaljite upit vlasniku",
+      "note": "Dogovarate se direktno sa vlasnikom. On potvrđuje da li je termin slobodan.",
+      "viber": "Viber",
+      "whatsapp": "WhatsApp",
+      "call": "Pozovite",
+      "messageWithDates": "Zdravo, zanima me da li je {house} slobodna od {checkIn} do {checkOut}, za {guests, plural, one {# osobu} few {# osobe} other {# osoba}}. (Vikendly)",
+      "messageNoDates": "Zdravo, zanima me {house}. Koji termini su slobodni? (Vikendly)"
+    }
   }
 }

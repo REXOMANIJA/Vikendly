@@ -1,0 +1,259 @@
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import { notFound } from 'next/navigation';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
+import {
+  ArrowLeft,
+  Wifi,
+  Car,
+  CookingPot,
+  Flame,
+  Beef,
+  Armchair,
+  Tv,
+  AirVent,
+  Heater,
+  WashingMachine,
+  Check,
+  X,
+  Clock,
+  MapPin,
+  Users,
+  BedDouble,
+  Bath,
+  CalendarDays,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { Link, getPathname } from '@/i18n/navigation';
+import { routing, type Locale } from '@/i18n/routing';
+import { getDestinationById, getHouseBySlug, getHouses, getSimilarHouses } from '@/lib/data';
+import { PriceCalculatorFromUrl } from '@/components/house/PriceCalculator';
+import HouseCard from '@/components/cards/HouseCard';
+
+type Params = Promise<{ locale: string; slug: string }>;
+
+const amenityIcons: Record<string, LucideIcon> = {
+  wifi: Wifi,
+  parking: Car,
+  kitchen: CookingPot,
+  fireplace: Flame,
+  bbq: Beef,
+  terrace: Armchair,
+  tv: Tv,
+  ac: AirVent,
+  heating: Heater,
+  washer: WashingMachine,
+};
+
+const eur = (n: number) => `€${n}`;
+
+export function generateStaticParams() {
+  return getHouses().map((house) => ({ slug: house.slug }));
+}
+
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const house = getHouseBySlug(slug);
+  if (!house) return {};
+  const t = await getTranslations({ locale, namespace: 'house' });
+  const destination = getDestinationById(house.destinationId);
+  const description = house.description[locale as Locale];
+
+  // Each language has its own URL (/sr/kuce/… and /en/houses/…), so tell Google about both
+  const url = (l: Locale) => getPathname({ locale: l, href: { pathname: '/houses/[slug]', params: { slug } } });
+
+  return {
+    title: t('metaTitle', { name: house.name, destination: destination?.name ?? '' }),
+    description,
+    openGraph: { title: house.name, description, images: house.photos.slice(0, 1) },
+    alternates: {
+      canonical: url(locale as Locale),
+      languages: { sr: url('sr'), en: url('en'), 'x-default': url(routing.defaultLocale) },
+    },
+  };
+}
+
+export default async function HousePage({ params }: { params: Params }) {
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
+  const house = getHouseBySlug(slug);
+  if (!house) notFound();
+
+  const t = await getTranslations('house');
+  const tAmenity = await getTranslations('amenities');
+  const tCountry = await getTranslations('destinations.countries');
+  const destination = getDestinationById(house.destinationId);
+  const similar = getSimilarHouses(house);
+  const { rules } = house;
+
+  const ruleItems = [
+    { ok: rules.partiesAllowed, label: rules.partiesAllowed ? t('partiesAllowed') : t('partiesNotAllowed') },
+    { ok: rules.petsAllowed, label: rules.petsAllowed ? t('petsAllowed') : t('petsNotAllowed') },
+    { ok: rules.smokingAllowed, label: rules.smokingAllowed ? t('smokingAllowed') : t('smokingNotAllowed') },
+  ];
+
+  return (
+    <>
+      <div className="container mx-auto px-4 pt-6 pb-16">
+        <Link
+          href="/search"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-text/70 hover:text-primary"
+        >
+          <ArrowLeft className="size-4" aria-hidden />
+          {t('back')}
+        </Link>
+
+        {/* Title */}
+        <header className="mt-4 mb-6">
+          {destination && (
+            <p className="text-sm font-semibold uppercase tracking-wider text-accent-dark">
+              {destination.name} · {tCountry(destination.country)}
+            </p>
+          )}
+          <h1 className="mt-1 font-serif text-3xl md:text-5xl font-bold text-primary text-balance">
+            {house.name}
+          </h1>
+          <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-text/80">
+            <li className="inline-flex items-center gap-1.5">
+              <Users className="size-4" aria-hidden /> {t('guests', { count: house.capacity })}
+            </li>
+            <li className="inline-flex items-center gap-1.5">
+              <BedDouble className="size-4" aria-hidden /> {t('bedrooms', { count: house.bedrooms })}
+            </li>
+            <li className="inline-flex items-center gap-1.5">
+              <Bath className="size-4" aria-hidden /> {t('bathrooms', { count: house.bathrooms })}
+            </li>
+          </ul>
+        </header>
+
+        {/* Photos: first one large, up to four more beside it */}
+        <div
+          className={`grid gap-2 overflow-hidden rounded-2xl ${
+            house.photos.length > 1 ? 'md:grid-cols-4 md:grid-rows-2' : ''
+          }`}
+        >
+          {house.photos.slice(0, 5).map((photo, i) => (
+            <div
+              key={photo}
+              className={`relative ${
+                i === 0
+                  ? `aspect-[4/3] ${house.photos.length > 1 ? 'md:col-span-2 md:row-span-2' : 'md:aspect-[21/9]'}`
+                  : 'hidden md:block aspect-[4/3]'
+              }`}
+            >
+              <Image
+                src={photo}
+                alt={t('photoAlt', { name: house.name, n: i + 1 })}
+                fill
+                unoptimized
+                priority={i === 0}
+                sizes={i === 0 ? '(min-width: 768px) 50vw, 100vw' : '25vw'}
+                className="object-cover"
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-10 grid gap-10 lg:grid-cols-12">
+          {/* Details */}
+          <div className="space-y-10 lg:col-span-7">
+            <section>
+              <h2 className="font-serif text-2xl font-bold text-primary">{t('aboutTitle')}</h2>
+              <p className="mt-3 text-lg leading-relaxed text-text/85">
+                {house.description[locale as Locale]}
+              </p>
+            </section>
+
+            <section>
+              <h2 className="font-serif text-2xl font-bold text-primary">{t('amenitiesTitle')}</h2>
+              <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {house.amenities.map((id) => {
+                  const Icon = amenityIcons[id] ?? Check;
+                  return (
+                    <li key={id} className="flex items-center gap-3 rounded-xl bg-white p-3">
+                      <Icon className="size-5 shrink-0 text-primary" strokeWidth={1.75} aria-hidden />
+                      <span>{tAmenity(id as 'wifi')}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="font-serif text-2xl font-bold text-primary">{t('rulesTitle')}</h2>
+              <ul className="mt-4 space-y-3">
+                <li className="flex items-center gap-3">
+                  <Clock className="size-5 text-primary" aria-hidden />
+                  {t('checkInTime', { time: rules.checkInTime })} · {t('checkOutTime', { time: rules.checkOutTime })}
+                </li>
+                <li className="flex items-center gap-3">
+                  <CalendarDays className="size-5 text-primary" aria-hidden />
+                  {t('minNights', { count: house.pricing.minNights })}
+                </li>
+                {ruleItems.map(({ ok, label }) => (
+                  <li key={label} className="flex items-center gap-3">
+                    {ok ? (
+                      <Check className="size-5 text-primary" aria-hidden />
+                    ) : (
+                      <X className="size-5 text-accent-dark" aria-hidden />
+                    )}
+                    {label}
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="font-serif text-2xl font-bold text-primary">{t('locationTitle')}</h2>
+              <p className="mt-3 flex items-start gap-3">
+                <MapPin className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
+                <span>
+                  {house.location.address}
+                  <br />
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(house.location.address)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-accent-dark hover:underline"
+                  >
+                    {t('openMap')}
+                  </a>
+                </span>
+              </p>
+            </section>
+          </div>
+
+          {/* Price + contact, sticks while scrolling on desktop */}
+          <aside className="lg:col-span-5">
+            <div className="lg:sticky lg:top-24">
+              <PriceCalculatorFromUrl house={house} destination={destination} />
+            </div>
+          </aside>
+        </div>
+
+        {similar.length > 0 && (
+          <section className="mt-16">
+            <h2 className="font-serif text-2xl md:text-3xl font-bold text-primary mb-6">{t('similarTitle')}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {similar.map((h) => (
+                <HouseCard key={h.id} house={h} />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+
+      {/* Phones: price and a shortcut to the calculator always at hand */}
+      <div className="sticky bottom-0 z-40 border-t border-primary/10 bg-white/95 backdrop-blur px-4 py-3 lg:hidden">
+        <div className="flex items-center justify-between gap-4">
+          <span className="font-semibold text-primary">
+            {t('mobilePrice', { price: eur(house.pricing.weekdayPrice) })}
+          </span>
+          <a href="#cena" className="rounded-lg bg-accent-dark px-4 py-2.5 font-medium text-white">
+            {t('mobileCta')}
+          </a>
+        </div>
+      </div>
+    </>
+  );
+}

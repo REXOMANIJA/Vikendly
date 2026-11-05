@@ -3,6 +3,7 @@ import { House } from '@/types';
 export const houses: House[] = [
   {
     id: 'house-01',
+    slug: 'vila-ribnica',
     name: 'Vila Ribnica',
     destinationId: 'zlatibor',
     categoryIds: ['mountain', 'family'],
@@ -17,7 +18,10 @@ export const houses: House[] = [
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'terrace', 'tv', 'heating'],
     photos: ['/images/house-01.svg'],
-    description: 'Cozy mountain villa with stunning views of Zlatibor. Perfect for families and groups.',
+    description: {
+      sr: "Prostrana planinska vila na par minuta hoda od Ribničkog jezera. Velika terasa gleda na borovu šumu, a kamin u dnevnoj sobi okuplja celu ekipu uveče. Idealna za porodice i grupe prijatelja koji žele miran vikend.",
+      en: "Spacious mountain villa a few minutes walk from Ribnica lake. The large terrace overlooks the pine forest, and the fireplace in the living room brings everyone together in the evening. Ideal for families and groups of friends who want a quiet weekend.",
+    },
     rules: {
       partiesAllowed: false,
       petsAllowed: true,
@@ -35,6 +39,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-02',
+    slug: 'planinska-kuca-pancic',
     name: 'Planinska kuća Pančić',
     destinationId: 'kopaonik',
     categoryIds: ['mountain', 'family'],
@@ -49,7 +54,10 @@ export const houses: House[] = [
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'terrace', 'tv', 'heating', 'bbq'],
     photos: ['/images/house-02.svg'],
-    description: 'Modern ski lodge near the slopes. Spacious and comfortable for large groups.',
+    description: {
+      sr: "Moderna planinska kuća blizu staza na Kopaoniku. Pet spavaćih soba, tri kupatila i roštilj na terasi, sve što treba većoj ekipi za skijaški vikend.",
+      en: "Modern mountain house close to the Kopaonik slopes. Five bedrooms, three bathrooms and a barbecue on the terrace: everything a bigger group needs for a ski weekend.",
+    },
     rules: {
       partiesAllowed: true,
       petsAllowed: false,
@@ -67,6 +75,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-03',
+    slug: 'brvnara-na-drini',
     name: 'Brvnara na Drini',
     destinationId: 'tara',
     categoryIds: ['lake', 'romantic'],
@@ -81,7 +90,10 @@ export const houses: House[] = [
     },
     amenities: ['wifi', 'parking', 'kitchen', 'terrace', 'heating'],
     photos: ['/images/house-03.svg'],
-    description: 'Charming cabin right by the Drina river. Ideal for romantic getaways.',
+    description: {
+      sr: "Mala brvnara tik uz Drinu, u podnožju Tare. Jutarnja kafa na terasi uz šum reke i potpuna tišina. Savršena za par ili malu porodicu.",
+      en: "A small log cabin right on the Drina, at the foot of Tara. Morning coffee on the terrace with the sound of the river and complete quiet. Perfect for a couple or a small family.",
+    },
     rules: {
       partiesAllowed: false,
       petsAllowed: true,
@@ -98,6 +110,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-04',
+    slug: 'kuca-na-maljenu',
     name: 'Kuća na Maljenu',
     destinationId: 'divcibare',
     categoryIds: ['mountain', 'romantic'],
@@ -112,7 +125,10 @@ export const houses: House[] = [
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'terrace', 'tv', 'heating'],
     photos: ['/images/house-04.svg'],
-    description: 'Traditional wooden house with modern amenities. Great for couples and small families.',
+    description: {
+      sr: "Tradicionalna drvena kuća na Divčibarama, uređena sa modernim detaljima. Kamin, terasa sa pogledom na Maljen i livade za šetnju odmah ispred vrata.",
+      en: "A traditional wooden house in Divčibare with modern touches. Fireplace, a terrace overlooking Maljen and meadows for walks right outside the door.",
+    },
     rules: {
       partiesAllowed: false,
       petsAllowed: true,
@@ -129,6 +145,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-05',
+    slug: 'vila-vinogradi',
     name: 'Vila Vinogradi',
     destinationId: 'fruska-gora',
     categoryIds: ['family', 'pool'],
@@ -143,7 +160,10 @@ export const houses: House[] = [
     },
     amenities: ['wifi', 'parking', 'kitchen', 'terrace', 'tv', 'ac', 'heating', 'washer', 'bbq'],
     photos: ['/images/house-05.svg'],
-    description: 'Luxury villa with pool in the heart of Fruška Gora. Perfect for celebrations.',
+    description: {
+      sr: "Velika vila sa bazenom među vinogradima Fruške gore, blizu Sremskih Karlovaca. Napravljena za proslave i duža druženja: šest soba, roštilj i klima u celoj kući.",
+      en: "A large villa with a pool among the Fruška Gora vineyards, near Sremski Karlovci. Built for celebrations and long get-togethers: six bedrooms, a barbecue and air conditioning throughout.",
+    },
     rules: {
       partiesAllowed: true,
       petsAllowed: false,
@@ -161,6 +181,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-06',
+    slug: 'kuca-za-ekipu-perucac',
     name: 'Kuća za ekipu Perućac',
     destinationId: 'drina',
     categoryIds: ['party', 'lake'],
@@ -175,7 +196,10 @@ export const houses: House[] = [
     },
     amenities: ['wifi', 'parking', 'kitchen', 'terrace', 'tv', 'ac', 'heating', 'bbq'],
     photos: ['/images/house-06.svg'],
-    description: 'Spacious house designed for parties and group gatherings. River view.',
+    description: {
+      sr: "Kuća za velike ekipe sa pogledom na Drinu u Perućcu. Žurke su dozvoljene, a najbliži komšije su dovoljno daleko. Sedam soba i velika terasa za roštilj.",
+      en: "A house for big groups with a view of the Drina in Perućac. Parties are allowed, and the nearest neighbours are far enough away. Seven bedrooms and a large terrace for barbecues.",
+    },
     rules: {
       partiesAllowed: true,
       petsAllowed: false,
@@ -192,6 +216,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-07',
+    slug: 'kuca-kod-vlasinskog-jezera',
     name: 'Kuća kod Vlasinskog jezera',
     destinationId: 'vlasina',
     categoryIds: ['lake', 'romantic'],
@@ -206,7 +231,10 @@ export const houses: House[] = [
     },
     amenities: ['wifi', 'parking', 'kitchen', 'terrace', 'tv', 'heating'],
     photos: ['/images/house-07.svg'],
-    description: 'Peaceful retreat by Vlasina lake. Great for nature lovers.',
+    description: {
+      sr: "Mirna kuća na obali Vlasinskog jezera, daleko od gužve. Za ljubitelje prirode, pecanja i dugih šetnji oko jezera.",
+      en: "A quiet house on the shore of Vlasina lake, far from the crowds. For lovers of nature, fishing and long walks around the lake.",
+    },
     rules: {
       partiesAllowed: false,
       petsAllowed: true,
@@ -223,6 +251,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-08',
+    slug: 'kuca-pod-durmitorom',
     name: 'Kuća pod Durmitorom',
     destinationId: 'durmitor',
     categoryIds: ['mountain', 'family'],
@@ -237,7 +266,10 @@ export const houses: House[] = [
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'terrace', 'tv', 'heating'],
     photos: ['/images/house-08.svg'],
-    description: 'Authentic mountain home in Durmitor National Park. Adventure awaits.',
+    description: {
+      sr: "Autentična planinska kuća u Žabljaku, na ulazu u nacionalni park Durmitor. Odlična baza za planinarenje, Crno jezero i rafting na Tari.",
+      en: "An authentic mountain house in Žabljak, at the entrance to Durmitor National Park. A great base for hiking, Black Lake and rafting on the Tara.",
+    },
     rules: {
       partiesAllowed: false,
       petsAllowed: true,
@@ -254,6 +286,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-09',
+    slug: 'sale-jahorina',
     name: 'Šale Jahorina',
     destinationId: 'jahorina',
     categoryIds: ['mountain', 'party'],
@@ -268,7 +301,10 @@ export const houses: House[] = [
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'terrace', 'tv', 'heating', 'bbq'],
     photos: ['/images/house-09.svg'],
-    description: 'Large chalet near Jahorina ski resort. Perfect for ski trips.',
+    description: {
+      sr: "Veliki šale blizu ski centra Jahorina. Šest soba, kamin i prostor za celu ekipu posle dana na stazi.",
+      en: "A large chalet close to the Jahorina ski resort. Six bedrooms, a fireplace and room for the whole group after a day on the slopes.",
+    },
     rules: {
       partiesAllowed: true,
       petsAllowed: false,
@@ -286,6 +322,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-10',
+    slug: 'porodicna-kuca-kraljeva-voda',
     name: 'Porodična kuća Kraljeva Voda',
     destinationId: 'zlatibor',
     categoryIds: ['family', 'mountain'],
@@ -300,7 +337,10 @@ export const houses: House[] = [
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'terrace', 'tv', 'heating'],
     photos: ['/images/house-10.svg'],
-    description: 'Cozy family cottage with playground for kids. Safe and peaceful.',
+    description: {
+      sr: "Udobna porodična kuća na Kraljevoj Vodi, sa ograđenim dvorištem i ljuljaškama za decu. Mirno okruženje, a centar Zlatibora je blizu.",
+      en: "A comfortable family house in Kraljeva Voda, with a fenced yard and swings for the kids. Quiet surroundings, with the centre of Zlatibor close by.",
+    },
     rules: {
       partiesAllowed: false,
       petsAllowed: true,
@@ -317,6 +357,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-11',
+    slug: 'apartman-za-dvoje-brzece',
     name: 'Apartman za dvoje Brzeće',
     destinationId: 'kopaonik',
     categoryIds: ['romantic', 'mountain'],
@@ -331,7 +372,10 @@ export const houses: House[] = [
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'tv', 'heating'],
     photos: ['/images/house-11.svg'],
-    description: 'Intimate suite with jacuzzi and mountain views. Perfect for couples.',
+    description: {
+      sr: "Apartman za dvoje u Brzeću sa đakuzijem i pogledom na planinu. Kamin, tišina i ništa što vas ometa.",
+      en: "A two-person apartment in Brzeće with a jacuzzi and mountain views. A fireplace, peace and quiet, and nothing to distract you.",
+    },
     rules: {
       partiesAllowed: false,
       petsAllowed: false,
@@ -348,6 +392,7 @@ export const houses: House[] = [
   },
   {
     id: 'house-12',
+    slug: 'kuca-mitrovac',
     name: 'Kuća Mitrovac',
     destinationId: 'tara',
     categoryIds: ['mountain', 'family'],
@@ -362,7 +407,10 @@ export const houses: House[] = [
     },
     amenities: ['wifi', 'parking', 'kitchen', 'fireplace', 'terrace', 'tv', 'heating', 'bbq'],
     photos: ['/images/house-12.svg'],
-    description: 'Large house for adventure groups. Close to hiking trails and river activities.',
+    description: {
+      sr: "Velika kuća na Mitrovcu, usred Nacionalnog parka Tara. Blizu planinarskih staza, vidikovaca i reke, idealna za aktivne grupe.",
+      en: "A large house in Mitrovac, in the middle of Tara National Park. Close to hiking trails, viewpoints and the river, ideal for active groups.",
+    },
     rules: {
       partiesAllowed: false,
       petsAllowed: true,

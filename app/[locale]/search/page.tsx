@@ -69,6 +69,14 @@ export default async function SearchPage({
     .join(' · ');
   const hasAnyFilter = Object.values(sp).some(Boolean);
 
+  // Passed on to the house page so its calculator starts with the same stay
+  const stayQuery: Record<string, string> = {};
+  if (canQuote && sp.checkIn && sp.checkOut) {
+    stayQuery.checkIn = sp.checkIn;
+    stayQuery.checkOut = sp.checkOut;
+  }
+  if (guests) stayQuery.guests = String(guests);
+
   return (
     <div className="container mx-auto px-4 py-10">
       <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
@@ -96,7 +104,13 @@ export default async function SearchPage({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {results.map(({ house, quote }) => (
-            <HouseCard key={house.id} house={house} quote={quote} guests={guests} />
+            <HouseCard
+              key={house.id}
+              house={house}
+              quote={quote}
+              guests={guests}
+              linkQuery={stayQuery}
+            />
           ))}
         </div>
       )}

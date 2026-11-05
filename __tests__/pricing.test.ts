@@ -18,7 +18,8 @@ describe('calculateTotalPrice', () => {
     },
     amenities: [],
     photos: [],
-    description: '',
+    slug: 'test-house',
+    description: { sr: '', en: '' },
     rules: {
       partiesAllowed: false,
       petsAllowed: false,

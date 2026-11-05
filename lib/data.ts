@@ -11,6 +11,24 @@ export function getHouseById(id: string): House | undefined {
   return houses.find((house) => house.id === id);
 }
 
+export function getHouseBySlug(slug: string): House | undefined {
+  return houses.find((house) => house.slug === slug);
+}
+
+/** Other houses in the same destination, for "more houses nearby" */
+export function getSimilarHouses(house: House, limit = 3): House[] {
+  const sameDestination = houses.filter(
+    (h) => h.id !== house.id && h.destinationId === house.destinationId
+  );
+  const sameCategory = houses.filter(
+    (h) =>
+      h.id !== house.id &&
+      h.destinationId !== house.destinationId &&
+      h.categoryIds.some((c) => house.categoryIds.includes(c))
+  );
+  return [...sameDestination, ...sameCategory].slice(0, limit);
+}
+
 export function getDestinations(): Destination[] {
   return destinations;
 }
