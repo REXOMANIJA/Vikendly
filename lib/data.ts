@@ -50,6 +50,7 @@ type DestinationRow = {
   slug: string;
   name: string;
   country: Destination['country'];
+  image_url: string | null;
 };
 
 function toHouse(row: HouseRow): House & { featuredRank: number | null } {
@@ -101,6 +102,7 @@ function toDestination(row: DestinationRow): Destination {
     slug: row.slug,
     name: row.name,
     country: row.country,
+    imageUrl: row.image_url ?? undefined,
   };
 }
 
@@ -126,7 +128,7 @@ const loadDestinations = cache(async (): Promise<Destination[]> => {
   if (useSampleData) return (await import('@/data/destinations')).destinations;
   const { data, error } = await getSupabase()
     .from('destinations')
-    .select('id, slug, name, country')
+    .select('id, slug, name, country, image_url')
     .order('sort_order');
   if (error) throw new Error(`Could not load destinations: ${error.message}`);
   return (data as DestinationRow[]).map(toDestination);

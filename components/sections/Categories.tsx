@@ -1,19 +1,13 @@
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { MountainSnow, PartyPopper, Sailboat, WavesLadder, Users, Heart } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import SectionHeading from '@/components/SectionHeading';
 import type { Category } from '@/types';
 
-const icons: Record<string, LucideIcon> = {
-  mountain: MountainSnow,
-  party: PartyPopper,
-  lake: Sailboat,
-  pool: WavesLadder,
-  family: Users,
-  romantic: Heart,
-};
-
+/**
+ * "Kakav vikend želite?" tiles. Each category has a photo in /public/images/categories/<id>.jpg
+ * (free Unsplash photos, see PHOTO_CREDITS.md). Replace a file to change its picture.
+ */
 export default function Categories({ categories }: { categories: Category[] }) {
   const t = useTranslations('categories');
 
@@ -22,26 +16,30 @@ export default function Categories({ categories }: { categories: Category[] }) {
       <div className="container mx-auto px-4">
         <SectionHeading title={t('title')} className="mb-8" />
 
-        {/* Phones: one swipeable row. Desktop: all six in a row. */}
-        <ul className="-mx-4 flex gap-3 overflow-x-auto no-scrollbar px-4 pb-2 lg:mx-0 lg:grid lg:grid-cols-6 lg:overflow-visible lg:px-0">
-          {categories.map((category) => {
-            const Icon = icons[category.id] ?? MountainSnow;
-            return (
-              <li key={category.id} className="shrink-0">
-                <Link
-                  href={{ pathname: '/search', query: { category: category.slug } }}
-                  className="group flex h-full w-36 flex-col items-start gap-4 rounded-2xl border border-primary/10 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-lg lg:w-auto"
-                >
-                  <span className="flex size-11 items-center justify-center rounded-xl bg-primary/8 text-primary transition-colors group-hover:bg-accent group-hover:text-white">
-                    <Icon className="size-5" strokeWidth={1.75} aria-hidden />
-                  </span>
-                  <span className="font-medium leading-snug text-text">
-                    {t(category.id as 'mountain')}
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
+        {/* Phones: 2 per row so all six are visible at once. Tablet and desktop: 3 per row. */}
+        <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6">
+          {categories.map((category) => (
+            <li key={category.id}>
+              <Link
+                href={{ pathname: '/search', query: { category: category.slug } }}
+                className="group block h-full overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-primary/10 transition-all hover:-translate-y-1 hover:shadow-xl focus-visible:outline-2 focus-visible:outline-accent-dark md:rounded-2xl"
+              >
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <Image
+                    src={`/images/categories/${category.id}.jpg`}
+                    alt=""
+                    fill
+                    sizes="(min-width: 768px) 33vw, 50vw"
+                    quality={70}
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <p className="px-3 py-2.5 font-serif text-base font-bold leading-tight text-primary group-hover:text-accent-dark sm:text-lg md:px-5 md:py-4 md:text-xl">
+                  {t(category.id as 'mountain')}
+                </p>
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
     </section>

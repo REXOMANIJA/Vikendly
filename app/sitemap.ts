@@ -35,6 +35,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily' as const,
       priority: 0.8,
     })),
+    ...locales.map((locale) => ({
+      // /sr/destinacije, /en/destinations
+      url: baseUrl + getPathname({ locale, href: '/destinations' }),
+      lastModified: now,
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    })),
     ...housePages,
   ];
 }

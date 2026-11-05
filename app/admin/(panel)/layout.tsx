@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Home, Inbox, ExternalLink, LogOut, CalendarCheck } from 'lucide-react';
+import { Home, Inbox, ExternalLink, LogOut, CalendarCheck, MapPin } from 'lucide-react';
 import { createAdminClient, getAdminUser } from '@/lib/supabase/server';
 import { countNewBookingRequests } from '@/lib/admin-data';
 import { signOut } from '../actions';
@@ -50,6 +50,7 @@ export default async function AdminPanelLayout({ children }: { children: React.R
               )}
             </Link>
             <Link href="/admin/kuce" className={nav}><Home className="size-4" aria-hidden /> Kuće</Link>
+            <Link href="/admin/destinacije" className={nav}><MapPin className="size-4" aria-hidden /> Destinacije</Link>
             <Link href="/admin/prijave" className={nav}><Inbox className="size-4" aria-hidden /> Prijave vlasnika</Link>
             <a href="/sr" target="_blank" className={nav}><ExternalLink className="size-4" aria-hidden /> Sajt</a>
           </nav>

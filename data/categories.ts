@@ -6,5 +6,5 @@ export const categories: Category[] = [
   { id: 'lake', name: 'Lake/River house', slug: 'lake' },
   { id: 'pool', name: 'House with pool', slug: 'pool' },
   { id: 'family', name: 'Family house', slug: 'family' },
-  { id: 'romantic', name: 'Romantic getaway', slug: 'romantic' },
+  { id: 'apartment', name: 'Apartment', slug: 'apartment' },
 ];

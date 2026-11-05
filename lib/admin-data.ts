@@ -41,6 +41,8 @@ export type AdminHouse = {
   check_in_time: string;
   check_out_time: string;
   address: string;
+  lat: number | null;
+  lng: number | null;
   /** Private: only admins can read it (table house_owner_contacts) */
   owner_phone: string;
   is_published: boolean;
@@ -156,6 +158,28 @@ export async function getHouseForAdmin(id: string): Promise<AdminHouse | null> {
 }
 
 /** Destinations, categories and amenities for the dropdowns and checkboxes */
+export type AdminDestination = {
+  id: string;
+  name: string;
+  country: 'SR' | 'HR' | 'BA' | 'ME';
+  image_url: string | null;
+  sort_order: number;
+  /** All houses there, published or not */
+  house_count: number;
+};
+
+export async function listDestinationsForAdmin(): Promise<AdminDestination[]> {
+  const supabase = await createAdminClient();
+  const [destinations, houses] = await Promise.all([
+    supabase.from('destinations').select('id, name, country, image_url, sort_order').order('sort_order').order('name'),
+    supabase.from('houses').select('destination_id'),
+  ]);
+  if (destinations.error) throw new Error(destinations.error.message);
+  const counts: Record<string, number> = {};
+  for (const h of houses.data ?? []) counts[h.destination_id] = (counts[h.destination_id] ?? 0) + 1;
+  return (destinations.data as Omit<AdminDestination, 'house_count'>[]).map((d) => ({ ...d, house_count: counts[d.id] ?? 0 }));
+}
+
 export async function getAdminOptions() {
   const supabase = await createAdminClient();
   const [destinations, categories, amenities] = await Promise.all([

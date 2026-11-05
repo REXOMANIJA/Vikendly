@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Search, X } from 'lucide-react';
 import { useRouter } from '@/i18n/navigation';
+import { groupByCountry } from '@/lib/destinations';
 import type { Destination } from '@/types';
 
 const budgetOptions = [200, 300, 500, 800];
@@ -15,6 +16,8 @@ const labelClass = 'block text-sm font-medium mb-1.5';
 
 export default function SearchBar({ destinations }: { destinations: Destination[] }) {
   const t = useTranslations('hero.search');
+  const tCountry = useTranslations('destinations.countries');
+  const locale = useLocale();
   const router = useRouter();
 
   // On phones the form starts as a compact bar and opens on tap; on tablet/desktop it's always open
@@ -99,10 +102,15 @@ export default function SearchBar({ destinations }: { destinations: Destination[
               className={fieldClass}
             >
               <option value="">{t('anyDestination')}</option>
-              {destinations.map((dest) => (
-                <option key={dest.id} value={dest.slug}>
-                  {dest.name}
-                </option>
+              {/* Grouped by country and alphabetical, so a long list stays easy to scan */}
+              {groupByCountry([...destinations].sort((a, b) => a.name.localeCompare(b.name, locale))).map((group) => (
+                <optgroup key={group.country} label={tCountry(group.country)}>
+                  {group.destinations.map((dest) => (
+                    <option key={dest.id} value={dest.slug}>
+                      {dest.name}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
           </div>

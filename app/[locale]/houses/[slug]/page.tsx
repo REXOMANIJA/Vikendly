@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Gallery from '@/components/house/Gallery';
+import HouseMap from '@/components/house/HouseMap';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import {
@@ -17,7 +18,6 @@ import {
   Check,
   X,
   Clock,
-  MapPin,
   Users,
   BedDouble,
   Bath,
@@ -213,22 +213,14 @@ export default async function HousePage({ params }: { params: Params }) {
             </section>
 
             <section>
-              <h2 className="font-serif text-2xl font-bold text-primary">{t('locationTitle')}</h2>
-              <p className="mt-3 flex items-start gap-3">
-                <MapPin className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
-                <span>
-                  {house.location.address}
-                  <br />
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(house.location.address)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-accent-dark hover:underline"
-                  >
-                    {t('openMap')}
-                  </a>
-                </span>
-              </p>
+              <h2 className="mb-4 font-serif text-2xl font-bold text-primary">{t('locationTitle')}</h2>
+              <HouseMap
+                name={house.name}
+                address={house.location.address}
+                lat={house.location.lat}
+                lng={house.location.lng}
+                placeLabel={destination ? `${destination.name}, ${tCountry(destination.country)}` : undefined}
+              />
             </section>
           </div>
 

@@ -2,11 +2,12 @@
 
 import { useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ArrowRight, ImagePlus, Loader2, Trash2, X, Check, Plus } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ImagePlus, Loader2, Trash2, X, Check, Plus, MapPin } from 'lucide-react';
 import sr from '@/locales/sr/common.json';
 import { slugify } from '@/lib/slug';
 import { createBrowserAdminClient } from '@/lib/supabase/browser';
-import { deleteHouse, saveHouse, type HouseInput } from '@/app/admin/actions';
+import { deleteHouse, resolveMapsLink, saveHouse, type HouseInput } from '@/app/admin/actions';
+import { mapEmbedUrl } from '@/lib/maps';
 import type { AdminHouse } from '@/lib/admin-data';
 
 type Options = {
@@ -19,7 +20,7 @@ type Options = {
 type FormState = Omit<
   HouseInput,
   | 'capacity' | 'day_capacity' | 'bedrooms' | 'bathrooms' | 'weekday_price' | 'weekend_price'
-  | 'min_nights' | 'featured_rank' | 'price_tiers'
+  | 'min_nights' | 'featured_rank' | 'price_tiers' | 'lat' | 'lng'
 > & {
   capacity: string;
   day_capacity: string;
@@ -30,6 +31,8 @@ type FormState = Omit<
   min_nights: string;
   featured_rank: string;
   price_tiers: TierRow[];
+  lat: string;
+  lng: string;
 };
 
 type TierRow = { key: string; max_guests: string; weekday_price: string; weekend_price: string };
@@ -41,7 +44,7 @@ const empty: FormState = {
   description_sr: '', description_en: '',
   parties_allowed: false, pets_allowed: false, smoking_allowed: false,
   check_in_time: '15:00', check_out_time: '11:00',
-  address: '', owner_phone: '',
+  address: '', lat: '', lng: '', owner_phone: '',
   is_published: false, featured_rank: '',
   category_ids: [], amenity_ids: [], photos: [],
 };
@@ -53,6 +56,8 @@ function fromHouse(h: AdminHouse): FormState {
     day_capacity: h.day_capacity === null ? '' : String(h.day_capacity),
     bedrooms: h.bedrooms === null ? '' : String(h.bedrooms),
     bathrooms: h.bathrooms === null ? '' : String(h.bathrooms),
+    lat: h.lat === null ? '' : String(h.lat),
+    lng: h.lng === null ? '' : String(h.lng),
     price_tiers: h.price_tiers.map((t) => ({
       key: String(t.max_guests),
       max_guests: String(t.max_guests),
@@ -84,6 +89,25 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
   const [uploading, setUploading] = useState(0);
   const [pending, startTransition] = useTransition();
   const fileInput = useRef<HTMLInputElement>(null);
+  const [mapLink, setMapLink] = useState('');
+  const [mapError, setMapError] = useState('');
+  const [findingOnMap, setFindingOnMap] = useState(false);
+
+  const findOnMap = async () => {
+    setFindingOnMap(true);
+    setMapError('');
+    try {
+      const result = await resolveMapsLink(mapLink);
+      if (!result.ok) return setMapError(result.error);
+      setSaved(false);
+      setForm((f) => ({ ...f, lat: String(result.data.lat), lng: String(result.data.lng) }));
+      setMapLink('');
+    } catch {
+      setMapError('Lokacija nije pronađena. Pokušajte ponovo.');
+    } finally {
+      setFindingOnMap(false);
+    }
+  };
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setSaved(false);
@@ -143,6 +167,8 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
       id: house?.id,
       capacity: num(form.capacity),
       day_capacity: optionalNum(form.day_capacity),
+      lat: optionalNum(form.lat),
+      lng: optionalNum(form.lng),
       bedrooms: optionalNum(form.bedrooms),
       bathrooms: optionalNum(form.bathrooms),
       price_tiers: form.price_tiers.map((t) => ({
@@ -445,6 +471,63 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
           <label htmlFor="address" className={label}>Adresa</label>
           <input id="address" className={input} value={form.address} onChange={(e) => set('address', e.target.value)} required />
           {fieldError('address')}
+        </div>
+
+        {/* Map pin: paste a Google Maps link (or coordinates) and we read the location from it */}
+        <div id="field-lat" className="space-y-3 rounded-xl bg-background p-4">
+          <div>
+            <h3 className="font-semibold text-primary">Lokacija na mapi</h3>
+            <p className="text-sm text-text/70">
+              Na Google mapama nađite kuću, dodirnite tačno mesto (pojaviće se crveni pin), pa
+              <strong> Podeli → Kopiraj link</strong> i nalepite ga ovde. Mogu i koordinate, npr. 43.7213, 19.7064.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              aria-label="Link sa Google mapa ili koordinate"
+              className={input}
+              placeholder="https://maps.app.goo.gl/…"
+              value={mapLink}
+              onChange={(e) => { setMapLink(e.target.value); setMapError(''); }}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); findOnMap(); } }}
+            />
+            <button type="button" onClick={findOnMap} disabled={!mapLink.trim() || findingOnMap}
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 font-medium text-white hover:bg-accent-dark disabled:opacity-50">
+              {findingOnMap ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <MapPin className="size-4" aria-hidden />}
+              Pronađi
+            </button>
+          </div>
+          {mapError && <p role="alert" className="text-sm text-accent-dark">{mapError}</p>}
+          <div className="grid grid-cols-2 gap-3 md:max-w-sm">
+            {(['lat', 'lng'] as const).map((key) => (
+              <div key={key}>
+                <label htmlFor={key} className="mb-1 block text-xs font-medium">
+                  {key === 'lat' ? 'Geografska širina' : 'Geografska dužina'}
+                </label>
+                <input id={key} className={input} inputMode="decimal" placeholder="—" value={form[key]}
+                  onChange={(e) => set(key, e.target.value.replace(',', '.'))} />
+              </div>
+            ))}
+          </div>
+          {fieldError('lat')}
+          {form.lat && form.lng && Number.isFinite(Number(form.lat)) && Number.isFinite(Number(form.lng)) ? (
+            <div className="overflow-hidden rounded-lg ring-1 ring-primary/10">
+              <iframe
+                title="Pregled lokacije"
+                src={mapEmbedUrl({ lat: Number(form.lat), lng: Number(form.lng), address: form.address }, 'sr', 14)}
+                loading="lazy"
+                className="h-56 w-full border-0"
+              />
+            </div>
+          ) : (
+            <p className="text-sm text-text/60">Bez pina, mapa na sajtu prikazuje približnu lokaciju po adresi.</p>
+          )}
+          {(form.lat || form.lng) && (
+            <button type="button" onClick={() => { set('lat', ''); setForm((f) => ({ ...f, lng: '' })); }}
+              className="text-sm font-medium text-accent-dark hover:underline">
+              Uklonite pin
+            </button>
+          )}
         </div>
         <div id="field-owner_phone" className="md:max-w-sm">
           <label htmlFor="owner_phone" className={label}>Telefon vlasnika</label>

@@ -3,9 +3,10 @@ import { Link } from '@/i18n/navigation';
 import LanguageSwitcher from './LanguageSwitcher';
 
 const navItems = [
-  { key: 'houses', hash: 'houses' },
-  { key: 'destinations', hash: 'destinations' },
-  { key: 'howItWorks', hash: 'how-it-works' },
+  { key: 'houses', href: { pathname: '/', hash: 'houses' } },
+  // Own page: lists every destination, however many there are
+  { key: 'destinations', href: { pathname: '/destinations' } },
+  { key: 'howItWorks', href: { pathname: '/', hash: 'how-it-works' } },
 ] as const;
 
 export default function Header() {
@@ -27,7 +28,7 @@ export default function Header() {
             {navItems.map((item) => (
               <Link
                 key={item.key}
-                href={{ pathname: '/', hash: item.hash }}
+                href={item.href}
                 className="text-text hover:text-accent-dark transition-colors font-medium"
               >
                 {t(`nav.${item.key}`)}
@@ -51,7 +52,7 @@ export default function Header() {
           {navItems.map((item) => (
             <Link
               key={item.key}
-              href={{ pathname: '/', hash: item.hash }}
+              href={item.href}
               className="whitespace-nowrap text-text hover:text-accent-dark font-medium"
             >
               {t(`nav.${item.key}`)}

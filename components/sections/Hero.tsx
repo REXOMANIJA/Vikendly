@@ -17,12 +17,15 @@ export default function Hero({ destinations }: { destinations: Destination[] }) 
   return (
     <section className="relative flex items-center min-h-[480px] md:min-h-[680px] py-14 md:py-24">
       <div className="absolute inset-0">
+        {/* Photo: A-frame weekend house with a fire pit (Unsplash, free license, see PHOTO_CREDITS.md).
+            Next.js serves resized versions per screen. */}
         <Image
-          src="/images/hero.svg"
+          src="/images/hero-weekend-house.jpg"
           alt={t('imageAlt')}
           fill
-          unoptimized
           priority
+          sizes="100vw"
+          quality={70}
           className="object-cover"
         />
         {/* Darker behind the headline, lighter in the middle so the image keeps its color */}

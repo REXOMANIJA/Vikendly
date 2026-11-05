@@ -49,19 +49,25 @@
     "lake": "Kuća na vodi",
     "pool": "Kuća sa bazenom",
     "family": "Porodična kuća",
-    "romantic": "Romantični vikend"
+    "apartment": "Apartman"
   },
   "destinations": {
     "title": "Gde želite da idete?",
     "subtitle": "Planine, jezera i reke, od Fruške gore do Durmitora.",
-    "seeAll": "Sve kuće",
+    "seeAll": "Sve destinacije ({count})",
     "houseCount": "{count, plural, one {# kuća} few {# kuće} other {# kuća}}",
     "countries": {
       "SR": "Srbija",
       "HR": "Hrvatska",
       "BA": "Bosna i Hercegovina",
       "ME": "Crna Gora"
-    }
+    },
+    "allTitle": "Sve destinacije",
+    "allSubtitle": "{count, plural, one {# destinacija} few {# destinacije} other {# destinacija}} u Srbiji i regionu. Izaberite mesto i pogledajte kuće.",
+    "filterLabel": "Pronađite destinaciju",
+    "filterPlaceholder": "npr. Zlatibor, Tara…",
+    "noMatch": "Nijedna destinacija ne odgovara pretrazi.",
+    "comingSoon": "Uskoro"
   },
   "freeThisWeekend": {
     "title": "Izdvojeno za ovaj vikend",
@@ -209,7 +215,6 @@
     "smokingNotAllowed": "Zabranjeno pušenje u kući",
     "minNights": "Najkraći boravak: {count, plural, one {# noć} few {# noći} other {# noći}}",
     "locationTitle": "Lokacija",
-    "openMap": "Otvorite na mapi",
     "similarTitle": "Slične kuće",
     "photoAlt": "{name}, fotografija {n}",
     "mobilePrice": "od {price} / noć",
@@ -273,6 +278,12 @@
         "house": "Ova kuća trenutno nije dostupna.",
         "server": "Upit nije poslat zbog greške kod nas. Pokušajte ponovo za par minuta."
       }
+    },
+    "map": {
+      "iframeTitle": "Mapa: {name}",
+      "directions": "Kako stići",
+      "open": "Google mape",
+      "approximate": "Prikazana je približna lokacija na osnovu adrese."
     }
   }
 }

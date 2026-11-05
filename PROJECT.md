@@ -94,6 +94,13 @@ All types matching future database tables are defined in `/types/index.ts`:
 - Localized URLs are defined in `pathnames` in `i18n/routing.ts`. The folder is `app/[locale]/houses/[slug]`, visitors see `/sr/kuce/vila-ribnica` and `/en/houses/vila-ribnica`. Link with the internal name: `{ pathname: '/houses/[slug]', params: { slug } }`
 - Text stored per house in both languages uses `LocalizedText` (`{ sr, en }`), e.g. `house.description`
 
+### Destinations on the homepage
+
+- The homepage shows at most 9 destinations (`HOMEPAGE_DESTINATIONS` in `lib/destinations.ts`): the ones with the most **published** houses; destinations without houses are never shown there; ties follow the admin order (sort_order). Rule: `pickHomepageDestinations`, covered by tests.
+- Every destination is on `/sr/destinacije` / `/en/destinations` (`app/[locale]/destinations`), grouped by country with a filter box. The header "Destinacije" link and the homepage "Sve destinacije (N)" link go there.
+- The search dropdown groups destinations by country (`groupByCountry`).
+- Admin → Destinacije marks the ones currently on the homepage with "Na početnoj".
+
 ### House pages
 
 - `app/[locale]/houses/[slug]/page.tsx`: photos, description, amenities, rules, location, similar houses; prerendered for every house

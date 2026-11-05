@@ -15,6 +15,8 @@ export interface Destination {
   name: string;
   slug: string;
   country: 'SR' | 'HR' | 'BA' | 'ME';
+  /** Picture for the homepage tile ('/images/…' or a Supabase Storage URL) */
+  imageUrl?: string;
 }
 
 /** A cheaper price for a smaller group: "up to maxGuests people" */

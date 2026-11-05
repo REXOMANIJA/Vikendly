@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createAdminClient, getAdminUser } from '@/lib/supabase/server';
-import { SLUG_PATTERN } from '@/lib/slug';
+import { SLUG_PATTERN, slugify } from '@/lib/slug';
+import { parseCoordinates, type LatLng } from '@/lib/maps';
 
 export type HouseInput = {
   id?: string;
@@ -28,6 +29,9 @@ export type HouseInput = {
   check_in_time: string;
   check_out_time: string;
   address: string;
+  /** Map pin (optional; without it the map uses the address) */
+  lat: number | null;
+  lng: number | null;
   /** Private owner phone (not shown on the site) */
   owner_phone: string;
   is_published: boolean;
@@ -102,6 +106,12 @@ function validateHouse(h: HouseInput): ActionResult<never> | null {
   }
   if (h.owner_phone.replace(/\D/g, '').length < 6 || h.owner_phone.trim().length > 40) {
     return fail('Unesite telefon vlasnika.', 'owner_phone');
+  }
+  if ((h.lat === null) !== (h.lng === null)) return fail('Unesite obe koordinate ili nijednu.', 'lat');
+  if (h.lat !== null && h.lng !== null) {
+    if (!Number.isFinite(h.lat) || Math.abs(h.lat) > 90 || !Number.isFinite(h.lng) || Math.abs(h.lng) > 180) {
+      return fail('Koordinate nisu ispravne.', 'lat');
+    }
   }
   if (h.is_published && h.photos.length === 0) return fail('Dodajte bar jednu fotografiju pre objavljivanja.', 'photos');
   return null;
@@ -199,6 +209,116 @@ export async function deleteApplication(id: string): Promise<ActionResult> {
   const { error } = await supabase.from('owner_applications').delete().eq('id', id);
   if (error) return fail(error.message);
   revalidatePath('/admin/prijave');
+  return { ok: true };
+}
+
+// ───────────── Maps ─────────────
+
+const GOOGLE_HOSTS = /^(maps\.app\.goo\.gl|goo\.gl|(www\.|maps\.)?google\.[a-z.]+|consent\.google\.[a-z.]+)$/i;
+
+/**
+ * Gets coordinates from a Google Maps link, including short links from the phone app
+ * (maps.app.goo.gl/…), which only reveal coordinates after following their redirect.
+ * Only Google addresses are ever fetched.
+ */
+export async function resolveMapsLink(input: string): Promise<{ ok: true; data: LatLng } | { ok: false; error: string }> {
+  await requireAdmin();
+  const direct = parseCoordinates(input);
+  if (direct) return { ok: true, data: direct };
+
+  let url: URL;
+  try {
+    url = new URL(input.trim());
+  } catch {
+    return { ok: false, error: 'To nije link sa Google mapa niti koordinate (npr. 43.72, 19.70).' };
+  }
+
+  for (let hop = 0; hop < 5; hop++) {
+    if (url.protocol !== 'https:' || !GOOGLE_HOSTS.test(url.hostname)) {
+      return { ok: false, error: 'Prihvataju se samo linkovi sa Google mapa.' };
+    }
+    // Google's cookie-consent page wraps the real link in ?continue=
+    const wrapped = url.hostname.startsWith('consent.') ? url.searchParams.get('continue') : null;
+    if (wrapped) {
+      url = new URL(wrapped);
+      continue;
+    }
+    const found = parseCoordinates(url.toString());
+    if (found) return { ok: true, data: found };
+
+    const response = await fetch(url, { redirect: 'manual', cache: 'no-store' }).catch(() => null);
+    const next = response?.headers.get('location');
+    if (!next) break;
+    url = new URL(next, url);
+  }
+  return {
+    ok: false,
+    error: 'U ovom linku nema lokacije. Na Google mapama dodirnite tačno mesto kuće (da se pojavi pin), pa kopirajte link.',
+  };
+}
+
+// ───────────── Destinations ─────────────
+
+export type DestinationInput = {
+  /** Empty for a new destination */
+  id?: string;
+  name: string;
+  country: 'SR' | 'HR' | 'BA' | 'ME';
+  image_url: string;
+  sort_order: number;
+};
+
+export async function saveDestination(input: DestinationInput): Promise<ActionResult<{ id: string }>> {
+  await requireAdmin();
+  const name = input.name.trim();
+  if (name.length < 2 || name.length > 60) return { ok: false, error: 'Unesite naziv destinacije.' };
+  if (!['SR', 'HR', 'BA', 'ME'].includes(input.country)) return { ok: false, error: 'Izaberite državu.' };
+  if (!Number.isInteger(input.sort_order) || input.sort_order < 0) return { ok: false, error: 'Redosled mora biti ceo broj.' };
+
+  const supabase = await createAdminClient();
+  // New destinations without a picture get a neutral landscape until one is uploaded
+  const image_url = input.image_url.trim() || '/images/hero.svg';
+
+  if (input.id) {
+    const { error } = await supabase
+      .from('destinations')
+      .update({ name, country: input.country, image_url, sort_order: input.sort_order })
+      .eq('id', input.id);
+    if (error) return { ok: false, error: `Čuvanje nije uspelo: ${error.message}` };
+    refreshPublicSite();
+    revalidatePath('/admin', 'layout');
+    return { ok: true, data: { id: input.id } };
+  }
+
+  // The id doubles as the URL name (?destination=…), so it's fixed once created
+  const id = slugify(name);
+  if (!id) return { ok: false, error: 'Naziv mora sadržati bar jedno slovo.' };
+  const { error } = await supabase
+    .from('destinations')
+    .insert({ id, slug: id, name, country: input.country, image_url, sort_order: input.sort_order });
+  if (error) {
+    if (error.code === '23505') return { ok: false, error: `Destinacija „${name}“ već postoji.` };
+    return { ok: false, error: `Čuvanje nije uspelo: ${error.message}` };
+  }
+  refreshPublicSite();
+  revalidatePath('/admin', 'layout');
+  return { ok: true, data: { id } };
+}
+
+export async function deleteDestination(id: string): Promise<ActionResult> {
+  await requireAdmin();
+  const supabase = await createAdminClient();
+  const { count } = await supabase
+    .from('houses')
+    .select('id', { count: 'exact', head: true })
+    .eq('destination_id', id);
+  if (count) {
+    return { ok: false, error: `Na ovoj destinaciji ima kuća (${count}). Prvo ih premestite na drugu destinaciju ili obrišite.` };
+  }
+  const { error } = await supabase.from('destinations').delete().eq('id', id);
+  if (error) return { ok: false, error: error.message };
+  refreshPublicSite();
+  revalidatePath('/admin', 'layout');
   return { ok: true };
 }
 
