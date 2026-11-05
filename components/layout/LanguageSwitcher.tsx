@@ -28,11 +28,11 @@ function Switcher({ variant }: { variant: 'light' | 'dark' }) {
   const inactive =
     variant === 'dark'
       ? 'text-white/80 hover:bg-white/10'
-      : 'text-text hover:bg-primary/10';
+      : 'text-text/70 hover:text-primary';
   const active = variant === 'dark' ? 'bg-white text-primary' : 'bg-primary text-white';
 
   return (
-    <div className="flex gap-1" role="group" aria-label={t('label')}>
+    <div className={`flex gap-0.5 rounded-full p-1 ${variant === 'dark' ? 'bg-white/10' : 'bg-white ring-1 ring-primary/10'}`} role="group" aria-label={t('label')}>
       {routing.locales.map((loc) => (
         <button
           key={loc}
@@ -40,7 +40,7 @@ function Switcher({ variant }: { variant: 'light' | 'dark' }) {
           onClick={() => switchLocale(loc)}
           aria-pressed={locale === loc}
           aria-label={t(loc)}
-          className={`px-2.5 py-1 rounded text-sm font-medium transition-colors ${
+          className={`rounded-full px-3 py-1 text-sm font-semibold transition-colors ${
             locale === loc ? active : inactive
           }`}
         >

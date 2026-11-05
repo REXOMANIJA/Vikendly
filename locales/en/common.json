@@ -12,7 +12,11 @@
       "destinations": "Destinations",
       "howItWorks": "How it works"
     },
-    "listYourHouse": "List your house"
+    "listYourHouse": "List your house",
+    "menu": "Open menu",
+    "closeMenu": "Close menu",
+    "menuTagline": "Weekend houses in Serbia and the region, with the full price up front.",
+    "language": "Language"
   },
   "languageSwitcher": {
     "label": "Language",

@@ -33,6 +33,7 @@ export default function Destinations({
           {shown.map((destination, i) => (
             <DestinationCard
               key={destination.id}
+              id={destination.id}
               name={destination.name}
               slug={destination.slug}
               image={destination.imageUrl ?? `/images/destination-${destination.slug}.svg`}

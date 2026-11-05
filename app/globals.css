@@ -116,3 +116,138 @@ a {
     --rdp-day_button-width: calc((100vw - 2rem) / 7 - 4px);
   }
 }
+
+/* ───── Page transitions (View Transitions, see app/[locale]/template.tsx) ───── */
+/* Clicks during an animation go to the new page instead of being lost */
+::view-transition {
+  pointer-events: none;
+}
+
+/* The header stays put while the page under it changes */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+/* Forward (opening a category, destination or house): old page drifts left, new one comes from the right */
+::view-transition-old(.nav-forward) {
+  --slide-offset: -48px;
+  animation:
+    160ms ease-in both vk-fade reverse,
+    380ms cubic-bezier(0.4, 0, 0.2, 1) both vk-slide reverse;
+}
+::view-transition-new(.nav-forward) {
+  --slide-offset: 48px;
+  animation:
+    240ms ease-out 120ms both vk-fade,
+    380ms cubic-bezier(0.4, 0, 0.2, 1) both vk-slide;
+}
+/* Back ("Nazad"): the same, mirrored */
+::view-transition-old(.nav-back) {
+  --slide-offset: 48px;
+  animation:
+    160ms ease-in both vk-fade reverse,
+    380ms cubic-bezier(0.4, 0, 0.2, 1) both vk-slide reverse;
+}
+::view-transition-new(.nav-back) {
+  --slide-offset: -48px;
+  animation:
+    240ms ease-out 120ms both vk-fade,
+    380ms cubic-bezier(0.4, 0, 0.2, 1) both vk-slide;
+}
+/* Everything else (menu links, browser back): soft fade with a small lift */
+::view-transition-old(.page-fade) {
+  animation: 150ms ease-in both vk-fade reverse;
+}
+::view-transition-new(.page-fade) {
+  animation:
+    260ms ease-out 100ms both vk-fade,
+    360ms ease-out both vk-lift;
+}
+
+/* The category / destination photo grows from its card into the banner on the next page */
+::view-transition-group(.vk-morph) {
+  animation-duration: 450ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 50;
+}
+::view-transition-image-pair(.vk-morph) {
+  animation-name: vk-morph-blur;
+}
+::view-transition-old(.vk-morph),
+::view-transition-new(.vk-morph) {
+  /* Keep the photo filling its box while it changes shape */
+  height: 100%;
+  object-fit: cover;
+}
+
+@keyframes vk-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes vk-slide {
+  from {
+    translate: var(--slide-offset);
+  }
+  to {
+    translate: 0;
+  }
+}
+@keyframes vk-lift {
+  from {
+    translate: 0 12px;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+@keyframes vk-morph-blur {
+  35% {
+    filter: blur(2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/* ───── Phone menu (components/layout/Header.tsx) ───── */
+.vk-menu-in {
+  animation: vk-menu-drop 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.vk-menu-item {
+  animation: vk-menu-item 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes vk-menu-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+@keyframes vk-menu-item {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vk-menu-in,
+  .vk-menu-item {
+    animation: none;
+  }
+}

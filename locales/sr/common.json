@@ -12,7 +12,11 @@
       "destinations": "Destinacije",
       "howItWorks": "Kako radi"
     },
-    "listYourHouse": "Izdajte svoju kuću"
+    "listYourHouse": "Izdajte svoju kuću",
+    "menu": "Otvorite meni",
+    "closeMenu": "Zatvorite meni",
+    "menuTagline": "Vikend kuće u Srbiji i regionu, sa ukupnom cenom unapred.",
+    "language": "Jezik"
   },
   "languageSwitcher": {
     "label": "Jezik",

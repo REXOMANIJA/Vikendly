@@ -78,6 +78,7 @@ export default function HouseCard({
           {/* The link covers the whole card (after:inset-0), so anywhere on the card opens the house */}
           <Link
             href={{ pathname: '/houses/[slug]', params: { slug: house.slug }, query: linkQuery }}
+            transitionTypes={['nav-forward']}
             className="after:absolute after:inset-0 focus:outline-none group-hover:text-accent-dark transition-colors"
           >
             {name}

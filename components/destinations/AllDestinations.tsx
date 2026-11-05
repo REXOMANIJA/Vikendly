@@ -73,6 +73,7 @@ export default function AllDestinations({ groups }: { groups: CountryGroup[] }) 
               {group.items.map((d) => (
                 <DestinationCard
                   key={d.id}
+                  id={d.id}
                   name={d.name}
                   slug={d.slug}
                   image={d.image}

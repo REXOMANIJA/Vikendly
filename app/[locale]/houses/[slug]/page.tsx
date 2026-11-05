@@ -117,6 +117,7 @@ export default async function HousePage({ params }: { params: Params }) {
       <div className="container mx-auto px-4 pt-6 pb-16">
         <Link
           href="/search"
+          transitionTypes={['nav-back']}
           className="inline-flex items-center gap-1.5 text-sm font-medium text-text/70 hover:text-primary"
         >
           <ArrowLeft className="size-4" aria-hidden />
