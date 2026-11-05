@@ -1,0 +1,177 @@
+{
+  "meta": {
+    "title": "Vikendly – Curated weekend houses in Serbia, Croatia, Bosnia and Montenegro",
+    "description": "Find your perfect weekend house. Curated houses in Zlatibor, Kopaonik, Tara and other destinations.",
+    "ogDescription": "Curated weekend houses in Serbia, Croatia, Bosnia and Montenegro"
+  },
+  "header": {
+    "logo": "Vikendly",
+    "homeLabel": "Go to home",
+    "nav": {
+      "houses": "Houses",
+      "destinations": "Destinations",
+      "howItWorks": "How it works"
+    },
+    "listYourHouse": "List your house"
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "sr": "Switch to Serbian",
+    "en": "Switch to English"
+  },
+  "hero": {
+    "headline": "Find your perfect weekend house",
+    "subheadline": "Curated weekend houses in Serbia, Croatia, Bosnia and Montenegro",
+    "imageAlt": "Weekend house in nature",
+    "search": {
+      "destination": "Destination",
+      "anyDestination": "All destinations",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "guests": "Guests",
+      "budget": "Max budget (€)",
+      "budgetHint": "Budget applies to the whole stay once you pick dates",
+      "searchButton": "Search",
+      "compactTitle": "Where to?",
+      "compactHint": "Destination · Dates · Guests",
+      "close": "Close search"
+    },
+    "promises": {
+      "totalPrice": "Full price upfront, no hidden fees",
+      "partyRules": "Clear party and noise rules",
+      "verified": "Only houses we checked in person"
+    }
+  },
+  "categories": {
+    "title": "What kind of weekend do you want?",
+    "mountain": "Mountain house",
+    "party": "Party house",
+    "lake": "Lake/River house",
+    "pool": "House with pool",
+    "family": "Family house",
+    "romantic": "Romantic getaway"
+  },
+  "destinations": {
+    "title": "Where do you want to go?",
+    "subtitle": "Mountains, lakes and rivers, from Fruška Gora to Durmitor.",
+    "seeAll": "All houses",
+    "houseCount": "{count, plural, one {# house} other {# houses}}",
+    "countries": {
+      "SR": "Serbia",
+      "HR": "Croatia",
+      "BA": "Bosnia and Herzegovina",
+      "ME": "Montenegro"
+    }
+  },
+  "freeThisWeekend": {
+    "title": "Free this weekend",
+    "seeAll": "See all houses",
+    "subtitle": "Total weekend prices, for a full house.",
+    "quoteLabel": "weekend for {count, plural, one {# guest} other {# guests}}"
+  },
+  "houseCard": {
+    "guests": "{count, plural, one {# guest} other {# guests}}",
+    "bedrooms": "{count, plural, one {# bedroom} other {# bedrooms}}",
+    "from": "From {price}",
+    "perNight": "/night",
+    "nights": "{count, plural, one {# night} other {# nights}}",
+    "totalIncludes": "incl. cleaning and tourist tax",
+    "totalWord": "total",
+    "badges": {
+      "partiesAllowed": "Parties allowed",
+      "quiet": "Quiet house",
+      "pool": "Pool",
+      "pets": "Pets OK"
+    },
+    "perPerson": "{price} per person"
+  },
+  "search": {
+    "title": "Search results",
+    "found": "{count, plural, one {# house found} other {# houses found}}",
+    "noResults": "No houses found matching your criteria.",
+    "clearFilters": "Clear filters",
+    "invalidDates": "Check-out must be after check-in."
+  },
+  "whyVikendly": {
+    "title": "Why Vikendly?",
+    "totalPrice": {
+      "title": "Total price, no surprises",
+      "text": "Cleaning and tourist tax are included in the price you see."
+    },
+    "pricePerPerson": {
+      "title": "Price per person",
+      "text": "See right away what the weekend costs each person in your group."
+    },
+    "noiseRules": {
+      "title": "Clear party rules",
+      "text": "Every house says whether parties are allowed or it is a quiet one."
+    },
+    "verified": {
+      "title": "Verified houses",
+      "text": "We check every house in person before it goes live."
+    },
+    "directContact": {
+      "title": "Direct contact",
+      "text": "Arrange everything directly with the owner on Viber or WhatsApp."
+    },
+    "eyebrow": "Why us",
+    "intro": "We are not another huge listings site. We pick fewer houses, check them in person and show everything you need to know before you go."
+  },
+  "howItWorks": {
+    "title": "How it works",
+    "step1": {
+      "title": "Search",
+      "text": "Pick a destination, dates and guests and see the total price instantly."
+    },
+    "step2": {
+      "title": "Send a request",
+      "text": "The owner confirms the dates and you agree on details directly."
+    },
+    "step3": {
+      "title": "Enjoy",
+      "text": "Pack up and go. No hidden costs when you arrive."
+    }
+  },
+  "ownerCTA": {
+    "title": "Own a house? List it with us",
+    "description": "Join the platform and increase your earnings",
+    "form": {
+      "name": "Full name",
+      "phone": "Phone",
+      "location": "House location",
+      "description": "Short description",
+      "submit": "Submit request",
+      "success": "Thank you! We'll contact you soon.",
+      "heading": "Submit your house",
+      "locationPlaceholder": "e.g. Zlatibor, Ribnica lake",
+      "descriptionPlaceholder": "Rooms, capacity, what makes the house special…"
+    },
+    "eyebrow": "For owners",
+    "benefits": {
+      "guests": {
+        "title": "We bring the guests",
+        "text": "Your house is shown to people looking for a weekend in your area."
+      },
+      "control": {
+        "title": "You decide",
+        "text": "You set your own prices, dates and house rules."
+      },
+      "visit": {
+        "title": "In-person visit",
+        "text": "We visit your house before it goes live, so guests know it is verified."
+      }
+    }
+  },
+  "footer": {
+    "tagline": "Curated weekend houses in Serbia, Croatia, Bosnia and Montenegro.",
+    "linksTitle": "Links",
+    "languageTitle": "Language",
+    "links": {
+      "about": "About",
+      "contact": "Contact",
+      "terms": "Terms of service",
+      "privacy": "Privacy"
+    },
+    "copyright": "© 2026 Vikendly. All rights reserved."
+  }
+}

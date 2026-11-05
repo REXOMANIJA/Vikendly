@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+
+# Next.js build output and caches
+.next/
+.swc/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# testing
+coverage/
+
+# env files (secrets: Supabase keys etc. go here, never commit them)
+.env
+.env*.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Vercel
+.vercel

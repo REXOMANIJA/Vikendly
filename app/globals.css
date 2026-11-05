@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+/* Design tokens (Tailwind v4 reads the theme from CSS, not tailwind.config.ts) */
+@theme {
+  --color-primary: #1a3c34;
+  --color-background: #f5f1e8;
+  --color-accent: #e07a5f;
+  --color-text: #2d2d2d;
+
+  --font-serif: var(--font-playfair), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+}
+
+@utility container {
+  margin-inline: auto;
+  max-width: 80rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Keep anchored sections from hiding under the sticky header */
+section[id] {
+  scroll-margin-top: 5rem;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+button,
+a {
+  cursor: pointer;
+}

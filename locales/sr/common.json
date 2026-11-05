@@ -1,0 +1,177 @@
+{
+  "meta": {
+    "title": "Vikendly – Kurirane vikend kuće u Srbiji, Hrvatskoj, Bosni i Crnoj Gori",
+    "description": "Pronađite savršenu vikend kuću za vaš odmor. Kurirane kuće na Zlatiboru, Kopaoniku, Tari i drugim destinacijama.",
+    "ogDescription": "Kurirane vikend kuće u Srbiji, Hrvatskoj, Bosni i Crnoj Gori"
+  },
+  "header": {
+    "logo": "Vikendly",
+    "homeLabel": "Idi na početnu",
+    "nav": {
+      "houses": "Kuće",
+      "destinations": "Destinacije",
+      "howItWorks": "Kako radi"
+    },
+    "listYourHouse": "Iznajmi svoju kuću"
+  },
+  "languageSwitcher": {
+    "label": "Jezik",
+    "sr": "Prebaci na srpski",
+    "en": "Prebaci na engleski"
+  },
+  "hero": {
+    "headline": "Pronađite savršenu vikend kuću",
+    "subheadline": "Kurirane vikend kuće u Srbiji, Hrvatskoj, Bosni i Crnoj Gori",
+    "imageAlt": "Vikend kuća u prirodi",
+    "search": {
+      "destination": "Destinacija",
+      "anyDestination": "Sve destinacije",
+      "checkIn": "Dolazak",
+      "checkOut": "Odlazak",
+      "guests": "Gosti",
+      "budget": "Budžet (€)",
+      "budgetHint": "Budžet važi za ceo boravak, kada izaberete datume",
+      "searchButton": "Pretraži",
+      "compactTitle": "Gde idete?",
+      "compactHint": "Destinacija · Datumi · Gosti",
+      "close": "Zatvori pretragu"
+    },
+    "promises": {
+      "totalPrice": "Ukupna cena unapred, bez skrivenih troškova",
+      "partyRules": "Jasna pravila za žurke i buku",
+      "verified": "Samo kuće koje smo lično proverili"
+    }
+  },
+  "categories": {
+    "title": "Kakav vikend želite?",
+    "mountain": "Planinska kuća",
+    "party": "Kuća za žurke",
+    "lake": "Kuća pored jezera/reke",
+    "pool": "Kuća sa bazenom",
+    "family": "Porodična kuća",
+    "romantic": "Romantični izlet"
+  },
+  "destinations": {
+    "title": "Gde želite da idete?",
+    "subtitle": "Planine, jezera i reke, od Fruške gore do Durmitora.",
+    "seeAll": "Sve kuće",
+    "houseCount": "{count, plural, one {# kuća} few {# kuće} other {# kuća}}",
+    "countries": {
+      "SR": "Srbija",
+      "HR": "Hrvatska",
+      "BA": "Bosna i Hercegovina",
+      "ME": "Crna Gora"
+    }
+  },
+  "freeThisWeekend": {
+    "title": "Slobodno ovog vikenda",
+    "seeAll": "Pogledaj sve kuće",
+    "subtitle": "Ukupne cene za vikend, za punu kuću.",
+    "quoteLabel": "vikend za {count, plural, one {# osobu} few {# osobe} other {# osoba}}"
+  },
+  "houseCard": {
+    "guests": "{count, plural, one {# gost} few {# gosta} other {# gostiju}}",
+    "bedrooms": "{count, plural, one {# spavaća soba} few {# spavaće sobe} other {# spavaćih soba}}",
+    "from": "Od {price}",
+    "perNight": "/noć",
+    "nights": "{count, plural, one {# noć} few {# noći} other {# noći}}",
+    "totalIncludes": "uklj. čišćenje i boravišnu taksu",
+    "totalWord": "ukupno",
+    "badges": {
+      "partiesAllowed": "Žurke dozvoljene",
+      "quiet": "Mirna kuća",
+      "pool": "Bazen",
+      "pets": "Ljubimci OK"
+    },
+    "perPerson": "{price} po osobi"
+  },
+  "search": {
+    "title": "Rezultati pretrage",
+    "found": "{count, plural, one {Pronađena je # kuća} few {Pronađene su # kuće} other {Pronađeno je # kuća}}",
+    "noResults": "Nema kuća koje odgovaraju vašoj pretrazi.",
+    "clearFilters": "Obriši filtere",
+    "invalidDates": "Datum odlaska mora biti posle datuma dolaska."
+  },
+  "whyVikendly": {
+    "title": "Zašto Vikendly?",
+    "totalPrice": {
+      "title": "Ukupna cena bez iznenađenja",
+      "text": "Čišćenje i boravišna taksa su uračunati u cenu koju vidite."
+    },
+    "pricePerPerson": {
+      "title": "Cena po osobi",
+      "text": "Odmah vidite koliko vikend košta svakog u ekipi."
+    },
+    "noiseRules": {
+      "title": "Jasna pravila o žurkama",
+      "text": "Na svakoj kući piše da li su žurke dozvoljene ili je mirna."
+    },
+    "verified": {
+      "title": "Proverene kuće",
+      "text": "Svaku kuću lično pregledamo pre nego što je objavimo."
+    },
+    "directContact": {
+      "title": "Direktan kontakt",
+      "text": "Dogovarate se direktno sa vlasnikom, preko Vibera ili WhatsAppa."
+    },
+    "eyebrow": "Zašto mi",
+    "intro": "Nismo još jedan veliki oglasnik. Biramo manji broj kuća, lično ih proveravamo i pokazujemo sve što treba da znate pre nego što krenete."
+  },
+  "howItWorks": {
+    "title": "Kako radi",
+    "step1": {
+      "title": "Pretražite",
+      "text": "Izaberite destinaciju, datume i broj gostiju i odmah vidite ukupnu cenu."
+    },
+    "step2": {
+      "title": "Pošaljite zahtev",
+      "text": "Vlasnik potvrđuje termin i dogovarate detalje direktno."
+    },
+    "step3": {
+      "title": "Uživajte",
+      "text": "Spakujte se i krenite. Bez skrivenih troškova po dolasku."
+    }
+  },
+  "ownerCTA": {
+    "title": "Imate kuću? Iznajmite je kod nas",
+    "description": "Pridružite se platformi i povećajte svoju zaradu",
+    "form": {
+      "name": "Ime i prezime",
+      "phone": "Telefon",
+      "location": "Lokacija kuće",
+      "description": "Kratak opis",
+      "submit": "Pošalji zahtev",
+      "success": "Hvala! Kontaktiraćemo vas uskoro.",
+      "heading": "Prijavite svoju kuću",
+      "locationPlaceholder": "npr. Zlatibor, Ribničko jezero",
+      "descriptionPlaceholder": "Broj soba, kapacitet, šta kuću čini posebnom…"
+    },
+    "eyebrow": "Za vlasnike",
+    "benefits": {
+      "guests": {
+        "title": "Mi dovodimo goste",
+        "text": "Vaša kuća se prikazuje ljudima koji traže baš vikend u vašem kraju."
+      },
+      "control": {
+        "title": "Vi odlučujete",
+        "text": "Sami birate cene, termine i pravila kuće."
+      },
+      "visit": {
+        "title": "Lični obilazak",
+        "text": "Pre objave obiđemo kuću, da gosti znaju da je proverena."
+      }
+    }
+  },
+  "footer": {
+    "tagline": "Kurirane vikend kuće u Srbiji, Hrvatskoj, Bosni i Crnoj Gori.",
+    "linksTitle": "Linkovi",
+    "languageTitle": "Jezik",
+    "links": {
+      "about": "O nama",
+      "contact": "Kontakt",
+      "terms": "Uslovi korišćenja",
+      "privacy": "Privatnost"
+    },
+    "copyright": "© 2026 Vikendly. Sva prava zadržana."
+  }
+}
