@@ -5,10 +5,10 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Search, X } from 'lucide-react';
 import { useRouter } from '@/i18n/navigation';
 import { groupByCountry } from '@/lib/destinations';
+import DateRangePicker from '@/components/DateRangePicker';
 import type { Destination } from '@/types';
 
 const budgetOptions = [200, 300, 500, 800];
-const today = () => new Date().toLocaleDateString('sv-SE'); // yyyy-MM-dd in local time
 
 const fieldClass =
   'w-full h-11 px-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent';
@@ -22,8 +22,9 @@ export default function SearchBar({ destinations }: { destinations: Destination[
 
   // On phones the form starts as a compact bar and opens on tap; on tablet/desktop it's always open
   const [expanded, setExpanded] = useState(false);
-  const destinationRef = useRef<HTMLSelectElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
 
+  const [name, setName] = useState('');
   const [destination, setDestination] = useState('');
   // Dates are kept as "yyyy-MM-dd" strings so they never shift because of timezones
   const [checkIn, setCheckIn] = useState('');
@@ -32,23 +33,19 @@ export default function SearchBar({ destinations }: { destinations: Destination[
   const [budget, setBudget] = useState('');
 
   useEffect(() => {
-    if (expanded) destinationRef.current?.focus();
+    if (expanded) nameRef.current?.focus();
   }, [expanded]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const query: Record<string, string> = {};
+    if (name.trim()) query.q = name.trim();
     if (destination) query.destination = destination;
     if (checkIn) query.checkIn = checkIn;
     if (checkOut) query.checkOut = checkOut;
     if (guests) query.guests = guests;
     if (budget) query.budget = budget;
     router.push({ pathname: '/search', query });
-  };
-
-  const onCheckInChange = (value: string) => {
-    setCheckIn(value);
-    if (checkOut && value && checkOut <= value) setCheckOut('');
   };
 
   return (
@@ -88,15 +85,33 @@ export default function SearchBar({ destinations }: { destinations: Destination[
           </button>
         </div>
 
-        {/* Phones: 2 columns (dates side by side, guests + budget side by side) to keep the form short */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
+        {/* Phones: name, destination and dates full width; guests + budget side by side */}
+        <div className="grid grid-cols-2 lg:grid-cols-[1.1fr_1fr_1.25fr_0.7fr_0.8fr] gap-3 md:gap-4">
+          <div className="col-span-2 lg:col-span-1">
+            <label htmlFor="house-name" className={labelClass}>
+              {t('name')}
+            </label>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text/40" aria-hidden />
+              <input
+                id="house-name"
+                ref={nameRef}
+                type="search"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={t('namePlaceholder')}
+                maxLength={80}
+                className={`${fieldClass} pl-9`}
+              />
+            </div>
+          </div>
+
           <div className="col-span-2 lg:col-span-1">
             <label htmlFor="destination" className={labelClass}>
               {t('destination')}
             </label>
             <select
               id="destination"
-              ref={destinationRef}
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
               className={fieldClass}
@@ -115,33 +130,17 @@ export default function SearchBar({ destinations }: { destinations: Destination[
             </select>
           </div>
 
-          <div>
-            <label htmlFor="checkIn" className={labelClass}>
-              {t('checkIn')}
-            </label>
-            <input
-              id="checkIn"
-              type="date"
-              min={today()}
-              value={checkIn}
-              onChange={(e) => onCheckInChange(e.target.value)}
-              className={fieldClass}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="checkOut" className={labelClass}>
-              {t('checkOut')}
-            </label>
-            <input
-              id="checkOut"
-              type="date"
-              min={checkIn || today()}
-              value={checkOut}
-              onChange={(e) => setCheckOut(e.target.value)}
-              className={fieldClass}
-            />
-          </div>
+          <DateRangePicker
+            id="dates"
+            label={t('dates')}
+            checkIn={checkIn}
+            checkOut={checkOut}
+            onChange={(nextIn, nextOut) => {
+              setCheckIn(nextIn);
+              setCheckOut(nextOut);
+            }}
+            className="col-span-2 lg:col-span-1"
+          />
 
           <div>
             <label htmlFor="guests" className={labelClass}>

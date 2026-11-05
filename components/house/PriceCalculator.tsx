@@ -8,6 +8,7 @@ import type { House } from '@/types';
 import { calculateTotalPrice, getNightlyRates } from '@/lib/pricing';
 import { formatDateRange, parseDateParam } from '@/lib/dates';
 import { submitBookingRequest, type BookingRequestResult } from '@/lib/actions';
+import DateRangePicker from '@/components/DateRangePicker';
 
 interface BookingBoxProps {
   house: House;
@@ -18,7 +19,6 @@ interface BookingBoxProps {
 }
 
 const eur = (n: number) => `€${Math.round(n * 100) / 100}`;
-const today = () => new Date().toLocaleDateString('sv-SE'); // yyyy-MM-dd local
 
 const fieldClass =
   'w-full h-11 px-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent';
@@ -36,6 +36,7 @@ export default function PriceCalculator({
 }: BookingBoxProps) {
   const t = useTranslations('house.calculator');
   const tb = useTranslations('house.booking');
+  const tDates = useTranslations('datePicker');
   const locale = useLocale();
   const { pricing, capacity } = house;
 
@@ -64,11 +65,6 @@ export default function PriceCalculator({
   const tooShort = quote && quote.nights < pricing.minNights;
   const canSend = Boolean(quote && !tooShort);
 
-  const onCheckInChange = (value: string) => {
-    setCheckIn(value);
-    setResult(null);
-    if (checkOut && value && checkOut <= value) setCheckOut('');
-  };
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,16 +173,18 @@ export default function PriceCalculator({
 
       {/* Stay */}
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <div>
-          <label htmlFor="calc-checkin" className={labelClass}><SearchLabel name="checkIn" /></label>
-          <input id="calc-checkin" type="date" min={today()} value={checkIn} required
-            onChange={(e) => onCheckInChange(e.target.value)} className={fieldClass} />
-        </div>
-        <div>
-          <label htmlFor="calc-checkout" className={labelClass}><SearchLabel name="checkOut" /></label>
-          <input id="calc-checkout" type="date" min={checkIn || today()} value={checkOut} required
-            onChange={(e) => { setCheckOut(e.target.value); setResult(null); }} className={fieldClass} />
-        </div>
+        <DateRangePicker
+          id="calc-dates"
+          label={tDates('label')}
+          checkIn={checkIn}
+          checkOut={checkOut}
+          onChange={(nextIn, nextOut) => {
+            setCheckIn(nextIn);
+            setCheckOut(nextOut);
+            setResult(null);
+          }}
+          className="col-span-2"
+        />
         <div className="col-span-2">
           <label htmlFor="calc-guests" className={labelClass}>{t('guestsLabel')}</label>
           <input id="calc-guests" type="number" min="1" max={capacity} inputMode="numeric" value={guests} required
@@ -324,7 +322,3 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-function SearchLabel({ name }: { name: 'checkIn' | 'checkOut' | 'guests' }) {
-  const t = useTranslations('hero.search');
-  return <>{t(name)}</>;
-}

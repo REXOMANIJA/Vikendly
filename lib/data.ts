@@ -39,6 +39,8 @@ type HouseRow = {
   lat: number | null;
   lng: number | null;
   featured_rank: number | null;
+  /** Missing until migration 0008 is run */
+  verified_at?: string | null;
   house_photos: { url: string; sort_order: number }[];
   house_categories: { category_id: string }[];
   house_amenities: { amenity_id: string }[];
@@ -92,6 +94,7 @@ function toHouse(row: HouseRow): House & { featuredRank: number | null } {
       lat: row.lat ?? undefined,
       lng: row.lng ?? undefined,
     },
+    verifiedAt: row.verified_at ?? undefined,
     featuredRank: row.featured_rank,
   };
 }

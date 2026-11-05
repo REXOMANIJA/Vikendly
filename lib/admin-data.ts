@@ -17,6 +17,7 @@ export type AdminHouseListItem = {
   weekday_price: number;
   is_published: boolean;
   featured_rank: number | null;
+  verified_at: string | null;
   updated_at: string;
   cover: string | null;
 };
@@ -47,6 +48,8 @@ export type AdminHouse = {
   owner_phone: string;
   is_published: boolean;
   featured_rank: number | null;
+  /** Day we visited the house ("yyyy-MM-dd"); null = not verified */
+  verified_at: string | null;
   category_ids: string[];
   amenity_ids: string[];
   photos: string[];
@@ -119,7 +122,7 @@ export async function listHousesForAdmin(): Promise<AdminHouseListItem[]> {
   const supabase = await createAdminClient();
   const { data, error } = await supabase
     .from('houses')
-    .select('id, slug, name, destination_id, address, capacity, day_capacity, weekday_price, is_published, featured_rank, updated_at, house_photos(url, sort_order)')
+    .select('id, slug, name, destination_id, address, capacity, day_capacity, weekday_price, is_published, featured_rank, verified_at, updated_at, house_photos(url, sort_order)')
     .order('name');
   if (error) throw new Error(error.message);
   return data.map(({ house_photos, ...h }) => ({

@@ -70,6 +70,8 @@ export interface House {
     lat?: number;
     lng?: number;
   };
+  /** Day the Vikendly team visited and checked the house ("yyyy-MM-dd"); missing = not verified */
+  verifiedAt?: string;
   // Owner contact is private (admin only, table house_owner_contacts); guests send booking requests instead.
 }
 

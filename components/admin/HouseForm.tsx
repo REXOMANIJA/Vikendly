@@ -2,12 +2,13 @@
 
 import { useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ArrowRight, ImagePlus, Loader2, Trash2, X, Check, Plus, MapPin } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ImagePlus, Loader2, Trash2, X, Check, Plus, MapPin, BadgeCheck } from 'lucide-react';
 import sr from '@/locales/sr/common.json';
 import { slugify } from '@/lib/slug';
 import { createBrowserAdminClient } from '@/lib/supabase/browser';
 import { deleteHouse, resolveMapsLink, saveHouse, type HouseInput } from '@/app/admin/actions';
 import { mapEmbedUrl } from '@/lib/maps';
+import { toDateParam } from '@/lib/dates';
 import type { AdminHouse } from '@/lib/admin-data';
 
 type Options = {
@@ -20,7 +21,7 @@ type Options = {
 type FormState = Omit<
   HouseInput,
   | 'capacity' | 'day_capacity' | 'bedrooms' | 'bathrooms' | 'weekday_price' | 'weekend_price'
-  | 'min_nights' | 'featured_rank' | 'price_tiers' | 'lat' | 'lng'
+  | 'min_nights' | 'featured_rank' | 'price_tiers' | 'lat' | 'lng' | 'verified_at'
 > & {
   capacity: string;
   day_capacity: string;
@@ -33,6 +34,8 @@ type FormState = Omit<
   price_tiers: TierRow[];
   lat: string;
   lng: string;
+  /** "yyyy-MM-dd" or '' = not verified */
+  verified_at: string;
 };
 
 type TierRow = { key: string; max_guests: string; weekday_price: string; weekend_price: string };
@@ -45,7 +48,7 @@ const empty: FormState = {
   parties_allowed: false, pets_allowed: false, smoking_allowed: false,
   check_in_time: '15:00', check_out_time: '11:00',
   address: '', lat: '', lng: '', owner_phone: '',
-  is_published: false, featured_rank: '',
+  is_published: false, featured_rank: '', verified_at: '',
   category_ids: [], amenity_ids: [], photos: [],
 };
 
@@ -68,6 +71,7 @@ function fromHouse(h: AdminHouse): FormState {
     weekend_price: String(h.weekend_price),
     min_nights: String(h.min_nights),
     featured_rank: h.featured_rank === null ? '' : String(h.featured_rank),
+    verified_at: h.verified_at ?? '',
   };
 }
 
@@ -180,6 +184,7 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
       weekend_price: num(form.weekend_price),
       min_nights: num(form.min_nights),
       featured_rank: form.featured_rank.trim() === '' ? null : num(form.featured_rank),
+      verified_at: form.verified_at || null,
     };
     startTransition(async () => {
       const result = await saveHouse(payload);
@@ -554,6 +559,31 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
           <input id="featured" className={input} inputMode="numeric" placeholder="prazno = ne prikazuj"
             value={form.featured_rank} onChange={(e) => set('featured_rank', e.target.value.replace(/\D/g, ''))} />
           <p className="mt-1 text-sm text-text/60">1 = prva. Prikazuje se do 6 kuća.</p>
+        </div>
+
+        {/* Verified badge: only for houses someone from Vikendly has actually visited */}
+        <div id="field-verified_at" className="space-y-3 rounded-xl bg-background p-4">
+          <label className="flex items-center gap-3">
+            <input type="checkbox" className="size-5 accent-primary" checked={form.verified_at !== ''}
+              onChange={(e) => set('verified_at', e.target.checked ? toDateParam(new Date()) : '')} />
+            <span>
+              <span className="inline-flex items-center gap-1.5 font-medium">
+                <BadgeCheck className="size-4 text-primary" aria-hidden /> Lično smo proverili ovu kuću
+              </span>
+              <span className="block text-sm text-text/60">
+                Štiklirajte samo ako je neko iz Vikendly tima bio u kući i proverio da je sve kao na oglasu.
+                Gosti tada vide oznaku „Provereno uživo“.
+              </span>
+            </span>
+          </label>
+          {form.verified_at !== '' && (
+            <div className="max-w-xs">
+              <label htmlFor="verified-at" className={label}>Datum posete</label>
+              <input id="verified-at" type="date" className={input} value={form.verified_at}
+                max={toDateParam(new Date())}
+                onChange={(e) => set('verified_at', e.target.value)} />
+            </div>
+          )}
         </div>
       </section>
 

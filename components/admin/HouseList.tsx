@@ -2,18 +2,20 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Pencil, ExternalLink, Star, Search, X } from 'lucide-react';
+import { Pencil, ExternalLink, Star, Search, X, BadgeCheck } from 'lucide-react';
 import { slugify } from '@/lib/slug';
 import PublishToggle from '@/components/admin/PublishToggle';
 import type { AdminHouseListItem } from '@/lib/admin-data';
 
-type Filter = 'all' | 'published' | 'hidden' | 'featured';
+type Filter = 'all' | 'published' | 'hidden' | 'featured' | 'verified' | 'unverified';
 
 const filters: { value: Filter; label: string }[] = [
   { value: 'all', label: 'Sve' },
   { value: 'published', label: 'Objavljene' },
   { value: 'hidden', label: 'Skrivene' },
   { value: 'featured', label: 'Izdvojene' },
+  { value: 'verified', label: 'Proverene' },
+  { value: 'unverified', label: 'Neproverene' },
 ];
 
 /** "Kuća Čađavica" → "kuca cadjavica", so searching works with or without č/ć/š/ž/đ */
@@ -36,6 +38,8 @@ export default function HouseList({
       if (filter === 'published' && !h.is_published) return false;
       if (filter === 'hidden' && h.is_published) return false;
       if (filter === 'featured' && h.featured_rank === null) return false;
+      if (filter === 'verified' && !h.verified_at) return false;
+      if (filter === 'unverified' && h.verified_at) return false;
       if (words.length === 0) return true;
       // Every word must appear in the name, destination or address
       const haystack = normalize(`${h.name} ${destinationName(h.destination_id)} ${h.address}`);
@@ -50,6 +54,8 @@ export default function HouseList({
     published: houses.filter((h) => h.is_published).length,
     hidden: houses.filter((h) => !h.is_published).length,
     featured: houses.filter((h) => h.featured_rank !== null).length,
+    verified: houses.filter((h) => h.verified_at).length,
+    unverified: houses.filter((h) => !h.verified_at).length,
   };
 
   return (
@@ -116,6 +122,14 @@ export default function HouseList({
                       title="Prikazuje se u „Izdvojeno za ovaj vikend“"
                     >
                       <Star className="size-3" aria-hidden /> Izdvojena #{h.featured_rank}
+                    </span>
+                  )}
+                  {h.verified_at && (
+                    <span
+                      className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+                      title={`Posetili smo je ${h.verified_at.split('-').reverse().join('.')}.`}
+                    >
+                      <BadgeCheck className="size-3" aria-hidden /> Proverena
                     </span>
                   )}
                 </p>

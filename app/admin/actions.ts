@@ -36,6 +36,8 @@ export type HouseInput = {
   owner_phone: string;
   is_published: boolean;
   featured_rank: number | null;
+  /** Day we visited the house ("yyyy-MM-dd"); null = not verified */
+  verified_at: string | null;
   category_ids: string[];
   amenity_ids: string[];
   photos: string[];
@@ -113,6 +115,12 @@ function validateHouse(h: HouseInput): ActionResult<never> | null {
       return fail('Koordinate nisu ispravne.', 'lat');
     }
   }
+  if (h.verified_at !== null) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(h.verified_at)) return fail('Datum provere nije ispravan.', 'verified_at');
+    // One day of slack: the server runs on UTC, Serbia is 1–2 hours ahead
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    if (h.verified_at > tomorrow) return fail('Datum provere ne može biti u budućnosti.', 'verified_at');
+  }
   if (h.is_published && h.photos.length === 0) return fail('Dodajte bar jednu fotografiju pre objavljivanja.', 'photos');
   return null;
 }
@@ -132,6 +140,7 @@ export async function saveHouse(input: HouseInput): Promise<ActionResult<{ id: s
       description_en: input.description_en.trim(),
       address: input.address.trim(),
       featured_rank: input.featured_rank ?? '',
+      verified_at: input.verified_at ?? '',
     },
   });
 

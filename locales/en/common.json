@@ -33,13 +33,16 @@
       "budgetHint": "Budget applies to the whole stay once you pick dates",
       "searchButton": "Search",
       "compactTitle": "Where to?",
-      "compactHint": "Destination · Dates · Guests",
-      "close": "Close search"
+      "compactHint": "Name · Destination · Dates",
+      "close": "Close search",
+      "name": "House name",
+      "namePlaceholder": "e.g. Vila Ribnica",
+      "dates": "Dates"
     },
     "promises": {
       "totalPrice": "Full price upfront, no hidden fees",
       "partyRules": "Clear party and noise rules",
-      "verified": "Only houses we checked in person"
+      "verified": "You know which houses we have visited"
     }
   },
   "categories": {
@@ -115,7 +118,7 @@
     },
     "verified": {
       "title": "Verified houses",
-      "text": "We check every house in person before it goes live."
+      "text": "When we visit a house, it gets a “Verified in person” badge. That way you always know what we have seen with our own eyes."
     },
     "directContact": {
       "title": "We arrange it for you",
@@ -168,7 +171,7 @@
       },
       "visit": {
         "title": "In-person visit",
-        "text": "We visit your house before it goes live, so guests know it is verified."
+        "text": "We stop by, meet you, and your house gets a “Verified in person” badge that gives guests confidence."
       }
     }
   },
@@ -285,5 +288,23 @@
       "open": "Google Maps",
       "approximate": "Approximate location based on the address."
     }
+  },
+  "datePicker": {
+    "label": "Dates",
+    "placeholder": "Choose dates",
+    "pickCheckIn": "Choose your check-in date",
+    "pickCheckOut": "Now choose your check-out date",
+    "nights": "{count, plural, one {# night} other {# nights}}",
+    "clear": "Clear",
+    "done": "Done",
+    "weekendLegend": "Friday and Saturday (weekend price)",
+    "close": "Close calendar"
+  },
+  "verified": {
+    "badge": "Verified in person",
+    "tooltip": "We have visited this house in person",
+    "title": "We have been here",
+    "text": "We stopped by in {month}. The house looks just like the photos, everything in the listing is really there, and we have met the host in person.",
+    "filter": "Verified in person only"
   }
 }

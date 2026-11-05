@@ -39,3 +39,80 @@ button,
 a {
   cursor: pointer;
 }
+
+/* ───── Date picker (react-day-picker) in Vikendly colors ───── */
+.vk-calendar .rdp-root {
+  --rdp-accent-color: var(--color-primary);
+  --rdp-accent-background-color: #e3ece8;
+  --rdp-day-height: 44px;
+  --rdp-day-width: 44px;
+  --rdp-day_button-height: 40px;
+  --rdp-day_button-width: 40px;
+  --rdp-day_button-border-radius: 10px;
+  --rdp-selected-border: 2px solid var(--color-primary);
+  --rdp-today-color: var(--color-accent-dark);
+  --rdp-months-gap: 2.5rem;
+  --rdp-nav-height: 2.75rem;
+  --rdp-range_middle-background-color: #e3ece8;
+  --rdp-range_start-date-background-color: var(--color-primary);
+  --rdp-range_end-date-background-color: var(--color-primary);
+  --rdp-disabled-opacity: 0.3;
+  font-family: var(--font-sans);
+  margin: 0 auto;
+}
+.vk-calendar .rdp-month_caption {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-transform: capitalize;
+}
+.vk-calendar .rdp-weekday {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: rgb(45 45 45 / 0.55);
+}
+.vk-calendar .rdp-chevron {
+  fill: var(--color-primary);
+}
+.vk-calendar .rdp-day_button {
+  font-weight: 500;
+  transition: background-color 0.15s;
+}
+.vk-calendar .rdp-day:not(.rdp-disabled):not(.rdp-selected) .rdp-day_button:hover {
+  background: var(--color-background);
+}
+.vk-calendar .rdp-today:not(.rdp-selected) .rdp-day_button {
+  font-weight: 700;
+  border-color: rgb(168 75 46 / 0.35);
+}
+.vk-calendar .rdp-selected .rdp-day_button {
+  font-weight: 700;
+}
+/* Small orange dot under Friday and Saturday: the nights with weekend prices */
+.vk-calendar .vk-weekend:not(.rdp-disabled) .rdp-day_button {
+  position: relative;
+}
+.vk-calendar .vk-weekend:not(.rdp-disabled) .rdp-day_button::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 9999px;
+  background: var(--color-accent);
+}
+.vk-calendar .rdp-range_start .rdp-day_button::after,
+.vk-calendar .rdp-range_end .rdp-day_button::after {
+  background: #fff;
+}
+/* Phones: one month fills the panel width */
+@media (max-width: 767px) {
+  .vk-calendar .rdp-root {
+    --rdp-day-width: calc((100vw - 2rem) / 7);
+    --rdp-day_button-width: calc((100vw - 2rem) / 7 - 4px);
+  }
+}

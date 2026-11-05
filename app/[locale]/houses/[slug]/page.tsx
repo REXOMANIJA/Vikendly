@@ -23,7 +23,10 @@ import {
   Bath,
   DoorOpen,
   CalendarDays,
+  BadgeCheck,
 } from 'lucide-react';
+import VerifiedBadge from '@/components/VerifiedBadge';
+import { formatVisitMonth, parseDateParam } from '@/lib/dates';
 import type { LucideIcon } from 'lucide-react';
 import { Link, getPathname } from '@/i18n/navigation';
 import { routing, type Locale } from '@/i18n/routing';
@@ -99,6 +102,8 @@ export default async function HousePage({ params }: { params: Params }) {
   const destinationOf = (id: string) => destinations.find((d) => d.id === id);
   const destination = destinationOf(house.destinationId);
   const { rules } = house;
+  const tVerified = await getTranslations('verified');
+  const verifiedOn = parseDateParam(house.verifiedAt);
   const hasDayCapacity = house.dayCapacity != null && house.dayCapacity > house.capacity;
 
   const ruleItems = [
@@ -128,6 +133,7 @@ export default async function HousePage({ params }: { params: Params }) {
           <h1 className="mt-1 font-serif text-3xl md:text-5xl font-bold text-primary text-balance">
             {house.name}
           </h1>
+          {verifiedOn && <VerifiedBadge className="mt-3" />}
           <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-text/80">
             <li className="inline-flex items-center gap-1.5">
               <BedDouble className="size-4" aria-hidden /> {t('sleeps', { count: house.capacity })}
@@ -155,6 +161,17 @@ export default async function HousePage({ params }: { params: Params }) {
         <div className="mt-10 grid gap-10 lg:grid-cols-12">
           {/* Details */}
           <div className="space-y-10 lg:col-span-7">
+            {verifiedOn && (
+              <section className="flex gap-4 rounded-2xl border border-primary/15 bg-primary/5 p-5">
+                <BadgeCheck className="size-8 shrink-0 text-primary" strokeWidth={1.75} aria-hidden />
+                <div>
+                  <h2 className="font-serif text-xl font-bold text-primary">{tVerified('title')}</h2>
+                  <p className="mt-1 text-text/85">
+                    {tVerified('text', { month: formatVisitMonth(verifiedOn, locale) })}
+                  </p>
+                </div>
+              </section>
+            )}
             <section>
               <h2 className="font-serif text-2xl font-bold text-primary">{t('aboutTitle')}</h2>
               <p className="mt-3 text-lg leading-relaxed text-text/85">

@@ -33,13 +33,16 @@
       "budgetHint": "Budžet važi za ceo boravak, kada izaberete datume",
       "searchButton": "Pretražite",
       "compactTitle": "Gde idete?",
-      "compactHint": "Destinacija · Datumi · Gosti",
-      "close": "Zatvorite pretragu"
+      "compactHint": "Naziv · Destinacija · Datumi",
+      "close": "Zatvorite pretragu",
+      "name": "Naziv kuće",
+      "namePlaceholder": "npr. Vila Ribnica",
+      "dates": "Datumi"
     },
     "promises": {
       "totalPrice": "Ukupna cena unapred, bez skrivenih troškova",
       "partyRules": "Jasna pravila za žurke i buku",
-      "verified": "Samo kuće koje smo lično proverili"
+      "verified": "Znate koje smo kuće lično obišli"
     }
   },
   "categories": {
@@ -115,7 +118,7 @@
     },
     "verified": {
       "title": "Proverene kuće",
-      "text": "Svaku kuću lično pregledamo pre nego što je objavimo."
+      "text": "Kad obiđemo kuću, ona dobija oznaku „Provereno uživo“. Tako uvek znate šta smo videli svojim očima."
     },
     "directContact": {
       "title": "Mi dogovaramo za vas",
@@ -168,7 +171,7 @@
       },
       "visit": {
         "title": "Lični obilazak",
-        "text": "Pre objave obiđemo kuću, da gosti znaju da je proverena."
+        "text": "Svratimo do vas, upoznamo se, a kuća dobija oznaku „Provereno uživo“ koja gostima uliva poverenje."
       }
     }
   },
@@ -285,5 +288,23 @@
       "open": "Google mape",
       "approximate": "Prikazana je približna lokacija na osnovu adrese."
     }
+  },
+  "datePicker": {
+    "label": "Datumi",
+    "placeholder": "Izaberite datume",
+    "pickCheckIn": "Izaberite datum dolaska",
+    "pickCheckOut": "Sada izaberite datum odlaska",
+    "nights": "{count, plural, one {# noć} few {# noći} other {# noći}}",
+    "clear": "Obrišite",
+    "done": "Gotovo",
+    "weekendLegend": "Petak i subota (vikend cena)",
+    "close": "Zatvorite kalendar"
+  },
+  "verified": {
+    "badge": "Provereno uživo",
+    "tooltip": "Lično smo obišli ovu kuću",
+    "title": "Bili smo ovde",
+    "text": "Svratili smo u {month}. Kuća izgleda baš kao na slikama, sve iz oglasa je na svom mestu, a domaćina smo upoznali lično.",
+    "filter": "Samo proverene uživo"
   }
 }

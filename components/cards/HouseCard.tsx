@@ -5,6 +5,7 @@ import type { LucideIcon } from 'lucide-react';
 import { House, PriceCalculation } from '@/types';
 import { getLowestNightlyPrice } from '@/lib/pricing';
 import { Link } from '@/i18n/navigation';
+import VerifiedBadge from '@/components/VerifiedBadge';
 
 interface HouseCardProps {
   house: House;
@@ -59,6 +60,7 @@ export default function HouseCard({
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
+        {house.verifiedAt && <VerifiedBadge variant="photo" className="absolute left-2 top-2" />}
         {house.photos.length > 1 && (
           <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-xs font-medium text-white">
             <Images className="size-3.5" aria-hidden />
