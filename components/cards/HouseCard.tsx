@@ -5,6 +5,7 @@ import type { LucideIcon } from 'lucide-react';
 import { House, PriceCalculation } from '@/types';
 import { getLowestNightlyPrice } from '@/lib/pricing';
 import { Link } from '@/i18n/navigation';
+import { isVector } from '@/lib/images';
 import VerifiedBadge from '@/components/VerifiedBadge';
 
 interface HouseCardProps {
@@ -56,7 +57,7 @@ export default function HouseCard({
           src={house.photos[0]}
           alt={name}
           fill
-          unoptimized
+          unoptimized={isVector(house.photos[0])}
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />

@@ -104,7 +104,10 @@
     "found": "{count, plural, one {# house found} other {# houses found}}",
     "noResults": "No houses found matching your criteria.",
     "clearFilters": "Clear filters",
-    "invalidDates": "Check-out must be after check-in."
+    "invalidDates": "Check-out must be after check-in.",
+    "metaDestination": "Weekend houses in {name} | Vikendly",
+    "metaCategory": "{name} – weekend houses | Vikendly",
+    "metaTitle": "Search weekend houses | Vikendly"
   },
   "whyVikendly": {
     "title": "Why Vikendly?",
@@ -161,7 +164,8 @@
       "descriptionPlaceholder": "Rooms, capacity, what makes the house special…",
       "sending": "Sending…",
       "errorInvalid": "Please check the fields: name, phone, location and description are required.",
-      "errorServer": "Your application could not be sent because of an error on our side. Please try again in a few minutes."
+      "errorServer": "Your application could not be sent because of an error on our side. Please try again in a few minutes.",
+      "errorTooMany": "You have sent several applications in a short time. Please try again in an hour."
     },
     "eyebrow": "For owners",
     "benefits": {
@@ -177,19 +181,21 @@
         "title": "In-person visit",
         "text": "We stop by, meet you, and your house gets a “Verified in person” badge that gives guests confidence."
       }
-    }
+    },
+    "moreLink": "All about listing with Vikendly"
   },
   "footer": {
     "tagline": "Handpicked weekend houses in Serbia and the region.",
-    "linksTitle": "Links",
+    "linksTitle": "Information",
     "languageTitle": "Language",
     "links": {
-      "about": "About",
       "contact": "Contact",
-      "terms": "Terms of service",
-      "privacy": "Privacy"
+      "terms": "Terms of use",
+      "privacy": "Privacy policy",
+      "owners": "For owners",
+      "destinations": "Destinations"
     },
-    "copyright": "© 2026 Vikendly. All rights reserved."
+    "copyright": "© {year} Vikendly. All rights reserved."
   },
   "amenities": {
     "wifi": "WiFi",
@@ -283,7 +289,8 @@
         "guests": "Please check the number of guests.",
         "contact": "Please check your name and phone (and email, if you entered one).",
         "house": "This house is not available right now.",
-        "server": "Your request could not be sent because of an error on our side. Please try again in a few minutes."
+        "server": "Your request could not be sent because of an error on our side. Please try again in a few minutes.",
+        "tooMany": "You have sent several requests in a short time. Please wait a little and try again."
       }
     },
     "map": {
@@ -310,5 +317,124 @@
     "title": "We have been here",
     "text": "We stopped by in {month}. The house looks just like the photos, everything in the listing is really there, and we have met the host in person.",
     "filter": "Verified in person only"
+  },
+  "privacyNote": {
+    "booking": "We use your name and phone only to get back to you about this request.",
+    "owner": "We use your details only to contact you about listing your house.",
+    "link": "Privacy policy"
+  },
+  "owners": {
+    "metaTitle": "List your weekend house | Vikendly",
+    "metaDescription": "List your weekend house with Vikendly: free listing, commission only on bookings we bring, an in-person visit and a “Verified in person” badge.",
+    "eyebrow": "For owners",
+    "title": "Rent out your weekend house to people looking for exactly that",
+    "intro": "Vikendly is a small, carefully chosen catalogue of weekend houses. Guests see the full price and clear house rules, and we find and check the guests for you.",
+    "ctaApply": "List your house",
+    "ctaHow": "How it works",
+    "stepsTitle": "How it works",
+    "steps": {
+      "apply": {
+        "title": "Apply",
+        "text": "Fill in a short form. We call you back within a few days."
+      },
+      "visit": {
+        "title": "We meet",
+        "text": "We visit the house, agree on the details and can help with photos."
+      },
+      "publish": {
+        "title": "We publish",
+        "text": "We add prices, capacity, rules and photos, and show you the listing before it goes live."
+      },
+      "guests": {
+        "title": "We send guests",
+        "text": "For every request we call you to check the dates. You confirm, we tell the guest."
+      }
+    },
+    "benefitsTitle": "What you get",
+    "benefits": {
+      "guests": {
+        "title": "Guests who know what they are booking",
+        "text": "Guests see the full price and house rules before asking, so there is no haggling and no surprises."
+      },
+      "control": {
+        "title": "You decide",
+        "text": "You set the prices, dates, minimum nights and whether parties and pets are allowed."
+      },
+      "verified": {
+        "title": "“Verified in person” badge",
+        "text": "Once we visit, your listing gets a badge that gives guests confidence."
+      },
+      "noHassle": {
+        "title": "No work with the listing",
+        "text": "We write the description, prepare the photos and answer guests’ questions."
+      }
+    },
+    "priceTitle": "What it costs",
+    "priceLead": "Listing is free.",
+    "priceText": "You only pay a commission on bookings we bring you. No monthly fee and nothing up front. We agree on the commission when we meet and put it in writing before the listing goes live.",
+    "pricePoints": {
+      "free": "Free listing and free changes",
+      "commission": "Commission only when a guest comes through us",
+      "noLockIn": "Remove your listing whenever you like"
+    },
+    "needTitle": "What we need from you",
+    "need": {
+      "photos": "Photos of the house (or we take them during the visit)",
+      "capacity": "How many people can stay overnight and, if allowed, for parties and gatherings",
+      "prices": "Weekday and weekend prices, and for smaller groups if you like",
+      "rules": "House rules: check-in, check-out, parties, pets, smoking",
+      "phone": "A phone number we call about requests (guests don’t see it)"
+    },
+    "faqTitle": "Frequently asked questions",
+    "faq": {
+      "exclusive": {
+        "q": "Can I also rent out the house on other websites?",
+        "a": "Yes. Just let us know when dates are taken, so we don’t offer them to guests."
+      },
+      "payment": {
+        "q": "How does the guest pay?",
+        "a": "You and the guest agree on payment and any deposit, on your terms. We pass on checked requests."
+      },
+      "visit": {
+        "q": "Is the visit required?",
+        "a": "We can publish a house without a visit, but it only gets the “Verified in person” badge once we have been there."
+      },
+      "change": {
+        "q": "Can I change prices and rules later?",
+        "a": "Of course. Tell us the changes and we update the listing, usually the same day."
+      },
+      "remove": {
+        "q": "How do I take my house off the site?",
+        "a": "Just tell us. We remove the listing straight away, at no cost."
+      }
+    },
+    "formTitle": "List your house",
+    "formText": "Send us the basics. We will call you to meet and agree on the details."
+  },
+  "contact": {
+    "metaTitle": "Contact | Vikendly",
+    "title": "Contact",
+    "intro": "A question about a house, a request or working with us? Get in touch.",
+    "email": "Email",
+    "phone": "Phone",
+    "instagram": "Instagram",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "viber": "Viber",
+    "guestsTitle": "For guests",
+    "guestsText": "The quickest way is to send a request from the house page. We check the dates with the owner and get back to you.",
+    "guestsLink": "Browse houses",
+    "ownersTitle": "For owners",
+    "ownersText": "Want to rent out your weekend house with Vikendly? See how it works and apply.",
+    "ownersLink": "For owners",
+    "noDirect": "Our contact details will be here soon. Until then, reach us through a request on a house page or the owner application."
+  },
+  "legal": {
+    "updated": "Last updated: {date}",
+    "privacyTitle": "Privacy policy",
+    "privacyMeta": "Privacy policy | Vikendly",
+    "termsTitle": "Terms of use",
+    "termsMeta": "Terms of use | Vikendly",
+    "contents": "Contents"
   }
 }

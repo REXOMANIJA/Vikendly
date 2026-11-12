@@ -9,6 +9,7 @@ import { calculateTotalPrice, getNightlyRates } from '@/lib/pricing';
 import { formatDateRange, parseDateParam } from '@/lib/dates';
 import { submitBookingRequest, type BookingRequestResult } from '@/lib/actions';
 import DateRangePicker from '@/components/DateRangePicker';
+import PrivacyNote from '@/components/PrivacyNote';
 
 interface BookingBoxProps {
   house: House;
@@ -282,6 +283,7 @@ export default function PriceCalculator({
         {pending ? tb('sending') : tb('submit')}
       </button>
       {!canSend && !pending && <p className="mt-2 text-center text-xs text-text/60">{tb('pickFirst')}</p>}
+      <PrivacyNote kind="booking" className="mt-3 text-center" />
     </form>
   );
 }

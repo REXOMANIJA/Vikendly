@@ -9,6 +9,7 @@ import { createBrowserAdminClient } from '@/lib/supabase/browser';
 import { deleteHouse, resolveMapsLink, saveHouse, type HouseInput } from '@/app/admin/actions';
 import { mapEmbedUrl } from '@/lib/maps';
 import { toDateParam } from '@/lib/dates';
+import { shrinkPhoto } from '@/lib/shrink-photo';
 import type { AdminHouse } from '@/lib/admin-data';
 
 type Options = {
@@ -132,9 +133,12 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
     const supabase = createBrowserAdminClient();
     const folder = form.slug || 'nova-kuca';
     setUploading((n) => n + files.length);
-    for (const file of Array.from(files)) {
+    for (const original of Array.from(files)) {
       try {
-        if (file.size > 8 * 1024 * 1024) throw new Error(`${file.name} je veći od 8 MB.`);
+        if (original.size > 40 * 1024 * 1024) throw new Error(`${original.name} je veći od 40 MB.`);
+        // Phone photos are shrunk to web size first (max 2000px), so pages load fast
+        const file = await shrinkPhoto(original);
+        if (file.size > 8 * 1024 * 1024) throw new Error(`${original.name} je i posle smanjivanja veći od 8 MB.`);
         const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
         const path = `${folder}/${crypto.randomUUID()}.${ext}`;
         const { error } = await supabase.storage.from('house-photos').upload(path, file, {
@@ -371,7 +375,7 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
       <section className={box} id="field-photos">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className={h2}>Fotografije</h2>
-          <p className="text-sm text-text/60">Prva fotografija je naslovna. JPG, PNG ili WebP, do 8 MB.</p>
+          <p className="text-sm text-text/60">Prva fotografija je naslovna. JPG, PNG ili WebP. Velike fotografije sa telefona se same smanje pre slanja.</p>
         </div>
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
           {form.photos.map((url, i) => (

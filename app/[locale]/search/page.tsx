@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { localizedAlternates } from '@/lib/seo';
 import { getHouses, getDestinations, getCategoryBySlug } from '@/lib/data';
 import { calculateTotalPrice } from '@/lib/pricing';
 import { parseDateParam } from '@/lib/dates';
@@ -8,6 +10,7 @@ import HouseCard from '@/components/cards/HouseCard';
 import { BadgeCheck } from 'lucide-react';
 import { ViewTransition } from 'react';
 import Image from 'next/image';
+import { isVector } from '@/lib/images';
 
 type SearchParams = {
   q?: string;
@@ -20,6 +23,38 @@ type SearchParams = {
   guests?: string;
   budget?: string;
 };
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<SearchParams>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const sp = await searchParams;
+  const t = await getTranslations({ locale, namespace: 'search' });
+  const tCat = await getTranslations({ locale, namespace: 'categories' });
+  const destination = sp.destination ? (await getDestinations()).find((d) => d.slug === sp.destination) : undefined;
+  const category = sp.category ? await getCategoryBySlug(sp.category) : undefined;
+
+  // Only plain destination or category pages are worth showing in Google; searches with
+  // dates, guests, budget or a name are one-off results, so Google follows their links but
+  // doesn't list them.
+  const onlyOneFilter = Object.keys(sp).filter((k) => sp[k as keyof SearchParams]).length <= 1;
+  const indexable = onlyOneFilter && (!!destination || !!category || Object.keys(sp).length === 0);
+  const query = destination ? `?destination=${destination.slug}` : category ? `?category=${category.slug}` : '';
+
+  return {
+    title: destination
+      ? t('metaDestination', { name: destination.name })
+      : category
+        ? t('metaCategory', { name: tCat(category.id as 'mountain') })
+        : t('metaTitle'),
+    alternates: localizedAlternates(locale, '/search', query),
+    robots: indexable ? undefined : { index: false, follow: true },
+  };
+}
 
 export default async function SearchPage({
   params,
@@ -86,10 +121,9 @@ export default async function SearchPage({
         name: `destination-${destination.id}`,
         image: destination.imageUrl ?? `/images/destination-${destination.slug}.svg`,
         eyebrow: tCountry(destination.country),
-        optimize: false,
       }
     : category
-      ? { name: `category-${category.id}`, image: `/images/categories/${category.id}.jpg`, eyebrow: undefined, optimize: true }
+      ? { name: `category-${category.id}`, image: `/images/categories/${category.id}.jpg`, eyebrow: undefined }
       : undefined;
 
   // Passed on to the house page so its calculator starts with the same stay
@@ -110,7 +144,7 @@ export default async function SearchPage({
               alt=""
               fill
               priority
-              unoptimized={!banner.optimize}
+              unoptimized={isVector(banner.image)}
               quality={70}
               sizes="(min-width: 1280px) 1280px, 100vw"
               className="object-cover"

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getDestinations, getHouseCountsByDestination } from '@/lib/data';
 import { groupByCountry } from '@/lib/destinations';
+import { localizedAlternates } from '@/lib/seo';
 import AllDestinations, { type CountryGroup } from '@/components/destinations/AllDestinations';
 
 // Refreshed at least hourly; saving in the admin refreshes it immediately
@@ -12,7 +13,7 @@ type Params = Promise<{ locale: string }>;
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'destinations' });
-  return { title: `${t('allTitle')} | Vikendly` };
+  return { title: `${t('allTitle')} | Vikendly`, alternates: localizedAlternates(locale, '/destinations') };
 }
 
 export default async function DestinationsPage({ params }: { params: Params }) {

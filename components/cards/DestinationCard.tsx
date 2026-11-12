@@ -2,6 +2,7 @@ import { ViewTransition } from 'react';
 import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
+import { isVector } from '@/lib/images';
 
 interface DestinationCardProps {
   /** Destination id, names the photo so it can grow into the search page banner */
@@ -39,7 +40,8 @@ export default function DestinationCard({
           src={image}
           alt=""
           fill
-          unoptimized
+          unoptimized={isVector(image)}
+          sizes="(min-width: 1024px) 50vw, (min-width: 768px) 33vw, 50vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
       </ViewTransition>

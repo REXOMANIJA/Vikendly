@@ -1,9 +1,10 @@
 import { MetadataRoute } from 'next';
+import { site } from '@/lib/site';
 import { locales } from '@/i18n/routing';
 import { getPathname } from '@/i18n/navigation';
 import { getHouses } from '@/lib/data';
 
-const baseUrl = 'https://vikendly.com';
+const baseUrl = site.url;
 
 export const revalidate = 3600;
 
@@ -42,6 +43,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     })),
+    // Owners, contact and legal pages
+    ...(['/owners', '/contact', '/terms', '/privacy'] as const).flatMap((href) =>
+      locales.map((locale) => ({
+        url: baseUrl + getPathname({ locale, href }),
+        lastModified: now,
+        changeFrequency: 'monthly' as const,
+        priority: href === '/owners' ? 0.8 : 0.3,
+      }))
+    ),
     ...housePages,
   ];
 }

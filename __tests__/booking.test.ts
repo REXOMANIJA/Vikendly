@@ -13,10 +13,27 @@ jest.mock('@/lib/supabase/public', () => ({
   }),
 }));
 
+// Telegram alert and per-visitor limit: recorded instead of calling Telegram / Supabase
+const alerts: string[] = [];
+let limitReached = false;
+jest.mock('@/lib/notify', () => ({
+  esc: (text: string) => text,
+  notifyTeam: async (html: string) => {
+    alerts.push(html);
+  },
+  withinRateLimit: async () => !limitReached,
+}));
+// `after()` only works inside a Next.js request; here it just runs the callback
+jest.mock('next/server', () => ({ after: (callback: () => unknown) => callback() }));
+
 // Fixed "today" so the tests don't depend on when they run: Thu 5 Nov 2026
 beforeAll(() => jest.useFakeTimers({ now: new Date('2026-11-05T10:00:00Z'), doNotFake: ['nextTick', 'setImmediate'] }));
 afterAll(() => jest.useRealTimers());
-beforeEach(() => (inserted.length = 0));
+beforeEach(() => {
+  inserted.length = 0;
+  alerts.length = 0;
+  limitReached = false;
+});
 
 // Vila Ribnica (sample data): sleeps 8, €80 weekday / €120 weekend, min 2 nights
 const valid: BookingRequestInput = {
@@ -76,5 +93,22 @@ describe('submitBookingRequest', () => {
   it('silently ignores spam bots that fill the hidden field', async () => {
     expect(await submitBookingRequest({ ...valid, website: 'http://spam' })).toEqual({ ok: true });
     expect(inserted).toHaveLength(0);
+  });
+
+  it('refuses a visitor who already sent too many requests', async () => {
+    limitReached = true;
+    expect(await submitBookingRequest(valid)).toEqual({ ok: false, error: 'tooMany' });
+    expect(inserted).toHaveLength(0);
+    expect(alerts).toHaveLength(0);
+  });
+
+  it('sends the team a Telegram alert with the stay, total and guest contact', async () => {
+    await submitBookingRequest({ ...valid, email: 'marko@example.com' });
+    expect(alerts).toHaveLength(1);
+    expect(alerts[0]).toContain('Vila Ribnica');
+    expect(alerts[0]).toContain('13.11. – 15.11.2026.');
+    expect(alerts[0]).toContain('€240');
+    expect(alerts[0]).toContain('+381 64 123 4567');
+    expect(alerts[0]).toContain('marko@example.com');
   });
 });

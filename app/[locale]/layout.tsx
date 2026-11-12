@@ -4,6 +4,7 @@ import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
+import { site } from '@/lib/site';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import '../globals.css';
@@ -33,7 +34,7 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: 'meta' });
 
   return {
-    metadataBase: new URL('https://vikendly.com'),
+    metadataBase: new URL(site.url),
     title: t('title'),
     description: t('description'),
     openGraph: {
@@ -43,14 +44,7 @@ export async function generateMetadata({
       locale,
       alternateLocale: routing.locales.filter((l) => l !== locale),
     },
-    alternates: {
-      canonical: `/${locale}`,
-      languages: {
-        sr: '/sr',
-        en: '/en',
-        'x-default': '/sr',
-      },
-    },
+    // Each page sets its own canonical / language links (lib/seo.ts)
   };
 }
 

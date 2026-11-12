@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { isVector } from '@/lib/images';
 import { useTranslations } from 'next-intl';
 import { ChevronLeft, ChevronRight, Images, X } from 'lucide-react';
 
@@ -44,7 +45,7 @@ export default function Gallery({ photos, name }: { photos: string[]; name: stri
               className="relative aspect-[4/3] w-full shrink-0 snap-center"
               aria-label={t('open', { n: i + 1 })}
             >
-              <Image src={photo} alt={alt(i)} fill unoptimized priority={i === 0} sizes="100vw" className="object-cover" />
+              <Image src={photo} alt={alt(i)} fill unoptimized={isVector(photo)} priority={i === 0} sizes="100vw" className="object-cover" />
             </button>
           ))}
         </div>
@@ -84,7 +85,7 @@ export default function Gallery({ photos, name }: { photos: string[]; name: stri
                 src={photo}
                 alt={alt(i)}
                 fill
-                unoptimized
+                unoptimized={isVector(photo)}
                 priority={i === 0}
                 sizes={i === 0 ? '50vw' : '25vw'}
                 className="object-cover transition duration-300 group-hover:scale-[1.03] group-hover:brightness-90"
@@ -247,7 +248,7 @@ function Lightbox({
                 src={photo}
                 alt={alt(i)}
                 fill
-                unoptimized
+                unoptimized={isVector(photo)}
                 sizes="100vw"
                 className="object-contain"
                 // Load neighbours first so swiping never shows an empty frame
@@ -292,7 +293,7 @@ function Lightbox({
                 i === index ? 'ring-2 ring-white' : 'opacity-50 hover:opacity-80'
               }`}
             >
-              <Image src={photo} alt="" fill unoptimized sizes="80px" className="object-cover" />
+              <Image src={photo} alt="" fill unoptimized={isVector(photo)} sizes="80px" className="object-cover" />
             </button>
           ))}
         </div>

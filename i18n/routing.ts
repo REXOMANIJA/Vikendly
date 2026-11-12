@@ -16,6 +16,22 @@ export const routing = defineRouting({
       sr: '/kuce/[slug]',
       en: '/houses/[slug]',
     },
+    '/owners': {
+      sr: '/za-vlasnike',
+      en: '/for-owners',
+    },
+    '/contact': {
+      sr: '/kontakt',
+      en: '/contact',
+    },
+    '/terms': {
+      sr: '/uslovi-koriscenja',
+      en: '/terms',
+    },
+    '/privacy': {
+      sr: '/privatnost',
+      en: '/privacy',
+    },
   },
 });
 

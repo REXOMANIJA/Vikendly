@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Home, ImagePlus, Loader2, MapPin, Pencil, Plus, Trash2 } from 'lucide-react';
 import { createBrowserAdminClient } from '@/lib/supabase/browser';
 import { slugify } from '@/lib/slug';
+import { shrinkPhoto } from '@/lib/shrink-photo';
 import { deleteDestination, saveDestination, type DestinationInput } from '@/app/admin/actions';
 import type { AdminDestination } from '@/lib/admin-data';
 
@@ -47,12 +48,13 @@ export default function DestinationManager({
     setEditing({ id: d.id, name: d.name, country: d.country, image_url: d.image_url ?? '', sort_order: d.sort_order, house_count: d.house_count });
   };
 
-  const upload = async (file: File | undefined) => {
-    if (!file || !editing) return;
+  const upload = async (original: File | undefined) => {
+    if (!original || !editing) return;
     setError('');
-    if (file.size > 8 * 1024 * 1024) return setError('Slika je veća od 8 MB.');
+    if (original.size > 40 * 1024 * 1024) return setError('Slika je veća od 40 MB.');
     setUploading(true);
     try {
+      const file = await shrinkPhoto(original); // max 2000px, so the homepage stays fast
       const supabase = createBrowserAdminClient();
       const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
       const path = `destinacije/${slugify(editing.name) || 'destinacija'}-${crypto.randomUUID()}.${ext}`;

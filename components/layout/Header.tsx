@@ -14,7 +14,8 @@ const navItems = [
   { key: 'howItWorks', href: { pathname: '/', hash: 'how-it-works' }, icon: Lightbulb },
 ] as const;
 
-const ownerHref = { pathname: '/', hash: 'list-your-house' } as const;
+// Full page for owners: how it works, what it costs, application form
+const ownerHref = '/owners';
 
 export default function Header() {
   const t = useTranslations('header');

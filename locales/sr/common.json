@@ -104,7 +104,10 @@
     "found": "{count, plural, one {Pronađena je # kuća} few {Pronađene su # kuće} other {Pronađeno je # kuća}}",
     "noResults": "Nema kuća koje odgovaraju vašoj pretrazi.",
     "clearFilters": "Obrišite filtere",
-    "invalidDates": "Datum odlaska mora biti posle datuma dolaska."
+    "invalidDates": "Datum odlaska mora biti posle datuma dolaska.",
+    "metaDestination": "Vikend kuće – {name} | Vikendly",
+    "metaCategory": "{name} – vikend kuće | Vikendly",
+    "metaTitle": "Pretraga vikend kuća | Vikendly"
   },
   "whyVikendly": {
     "title": "Zašto Vikendly?",
@@ -161,7 +164,8 @@
       "descriptionPlaceholder": "Broj soba, kapacitet, šta kuću čini posebnom…",
       "sending": "Šaljem…",
       "errorInvalid": "Proverite polja: ime, telefon, lokacija i opis su obavezni.",
-      "errorServer": "Prijava nije poslata zbog greške kod nas. Pokušajte ponovo za par minuta."
+      "errorServer": "Prijava nije poslata zbog greške kod nas. Pokušajte ponovo za par minuta.",
+      "errorTooMany": "Poslali ste više prijava za kratko vreme. Pokušajte ponovo za sat vremena."
     },
     "eyebrow": "Za vlasnike",
     "benefits": {
@@ -177,19 +181,21 @@
         "title": "Lični obilazak",
         "text": "Svratimo do vas, upoznamo se, a kuća dobija oznaku „Provereno uživo“ koja gostima uliva poverenje."
       }
-    }
+    },
+    "moreLink": "Sve o izdavanju preko Vikendly-ja"
   },
   "footer": {
     "tagline": "Pažljivo odabrane vikend kuće u Srbiji i regionu.",
-    "linksTitle": "Linkovi",
+    "linksTitle": "Informacije",
     "languageTitle": "Jezik",
     "links": {
-      "about": "O nama",
       "contact": "Kontakt",
       "terms": "Uslovi korišćenja",
-      "privacy": "Privatnost"
+      "privacy": "Politika privatnosti",
+      "owners": "Za vlasnike",
+      "destinations": "Destinacije"
     },
-    "copyright": "© 2026 Vikendly. Sva prava zadržana."
+    "copyright": "© {year} Vikendly. Sva prava zadržana."
   },
   "amenities": {
     "wifi": "WiFi",
@@ -283,7 +289,8 @@
         "guests": "Proverite broj osoba.",
         "contact": "Proverite ime i telefon (i email, ako ste ga upisali).",
         "house": "Ova kuća trenutno nije dostupna.",
-        "server": "Upit nije poslat zbog greške kod nas. Pokušajte ponovo za par minuta."
+        "server": "Upit nije poslat zbog greške kod nas. Pokušajte ponovo za par minuta.",
+        "tooMany": "Poslali ste više upita za kratko vreme. Sačekajte malo pa pokušajte ponovo, ili nas pozovite."
       }
     },
     "map": {
@@ -310,5 +317,124 @@
     "title": "Bili smo ovde",
     "text": "Svratili smo u {month}. Kuća izgleda baš kao na slikama, sve iz oglasa je na svom mestu, a domaćina smo upoznali lično.",
     "filter": "Samo proverene uživo"
+  },
+  "privacyNote": {
+    "booking": "Vaše ime i telefon koristimo samo da bismo vam se javili u vezi sa ovim upitom.",
+    "owner": "Vaše podatke koristimo samo da bismo vas kontaktirali u vezi sa izdavanjem kuće.",
+    "link": "Politika privatnosti"
+  },
+  "owners": {
+    "metaTitle": "Izdajte vikend kuću | Vikendly",
+    "metaDescription": "Izdajte vikend kuću preko Vikendly-ja: besplatna objava, provizija samo na rezervacije koje vam dovedemo, lični obilazak i oznaka „Provereno uživo“.",
+    "eyebrow": "Za vlasnike",
+    "title": "Izdajte vikend kuću ljudima koji traže baš nju",
+    "intro": "Vikendly je mali, pažljivo biran katalog vikend kuća. Gosti kod nas vide ukupnu cenu i jasna pravila, a mi za vas pronalazimo i proveravamo goste.",
+    "ctaApply": "Prijavite kuću",
+    "ctaHow": "Kako funkcioniše",
+    "stepsTitle": "Kako funkcioniše",
+    "steps": {
+      "apply": {
+        "title": "Prijavite kuću",
+        "text": "Popunite kratku prijavu. Javljamo vam se telefonom u roku od par dana."
+      },
+      "visit": {
+        "title": "Upoznamo se",
+        "text": "Svratimo do kuće, napravimo dogovor i, ako želite, pomognemo oko fotografija."
+      },
+      "publish": {
+        "title": "Objavimo oglas",
+        "text": "Unosimo cene, kapacitet, pravila i fotografije. Pre objave vam pokažemo oglas."
+      },
+      "guests": {
+        "title": "Šaljemo vam goste",
+        "text": "Za svaki upit vas zovemo da proverimo termin. Vi potvrđujete, mi javljamo gostu."
+      }
+    },
+    "benefitsTitle": "Šta dobijate",
+    "benefits": {
+      "guests": {
+        "title": "Gosti koji znaju šta biraju",
+        "text": "Gost vidi ukupnu cenu i pravila kuće pre upita, pa nema cenkanja ni iznenađenja."
+      },
+      "control": {
+        "title": "Vi odlučujete",
+        "text": "Sami određujete cene, termine, minimalan broj noći i da li su žurke i ljubimci dozvoljeni."
+      },
+      "verified": {
+        "title": "Oznaka „Provereno uživo“",
+        "text": "Kad obiđemo kuću, oglas dobija oznaku koja gostima uliva poverenje."
+      },
+      "noHassle": {
+        "title": "Bez posla oko oglasa",
+        "text": "Mi pišemo opis, sređujemo fotografije i odgovaramo na pitanja gostiju."
+      }
+    },
+    "priceTitle": "Koliko košta",
+    "priceLead": "Objava je besplatna.",
+    "priceText": "Plaćate samo proviziju na rezervacije koje vam mi dovedemo. Nema mesečne pretplate ni troškova unapred. Visinu provizije dogovaramo pri upoznavanju i zapisujemo je pre objave oglasa.",
+    "pricePoints": {
+      "free": "Besplatna objava i izmene oglasa",
+      "commission": "Provizija samo kada dođe gost preko nas",
+      "noLockIn": "Oglas možete ukloniti kad god poželite"
+    },
+    "needTitle": "Šta nam treba od vas",
+    "need": {
+      "photos": "Fotografije kuće (ili dogovor da ih napravimo pri obilasku)",
+      "capacity": "Broj osoba za noćenje i, ako je dozvoljeno, za žurke i druženja",
+      "prices": "Cene radnim danima i vikendom, po potrebi i za manje grupe",
+      "rules": "Pravila kuće: dolazak, odlazak, žurke, ljubimci, pušenje",
+      "phone": "Broj telefona na koji vas zovemo zbog upita (gosti ga ne vide)"
+    },
+    "faqTitle": "Česta pitanja",
+    "faq": {
+      "exclusive": {
+        "q": "Mogu li da izdajem kuću i preko drugih sajtova?",
+        "a": "Možete. Samo nam javite kada je termin zauzet, da gostima ne bismo nudili zauzete datume."
+      },
+      "payment": {
+        "q": "Kako gost plaća boravak?",
+        "a": "Plaćanje i eventualni depozit dogovarate vi i gost, po vašim uslovima. Mi vam prosleđujemo proverene upite."
+      },
+      "visit": {
+        "q": "Da li je obilazak obavezan?",
+        "a": "Kuću možemo objaviti i bez obilaska, ali oznaku „Provereno uživo“ dobija tek kada je obiđemo."
+      },
+      "change": {
+        "q": "Mogu li kasnije da menjam cene i pravila?",
+        "a": "Naravno. Javite nam izmene i ažuriramo oglas, obično istog dana."
+      },
+      "remove": {
+        "q": "Kako da uklonim kuću sa sajta?",
+        "a": "Dovoljno je da nam javite. Oglas sklanjamo odmah, bez ikakvih troškova."
+      }
+    },
+    "formTitle": "Prijavite svoju kuću",
+    "formText": "Pošaljite osnovne podatke. Javljamo vam se telefonom da se upoznamo i dogovorimo."
+  },
+  "contact": {
+    "metaTitle": "Kontakt | Vikendly",
+    "title": "Kontakt",
+    "intro": "Imate pitanje o kući, upitu ili saradnji? Javite nam se.",
+    "email": "Email",
+    "phone": "Telefon",
+    "instagram": "Instagram",
+    "call": "Pozovite",
+    "whatsapp": "WhatsApp",
+    "viber": "Viber",
+    "guestsTitle": "Za goste",
+    "guestsText": "Najbrže je da pošaljete upit sa stranice kuće. Proverimo termin sa vlasnikom i javimo vam se.",
+    "guestsLink": "Pogledajte kuće",
+    "ownersTitle": "Za vlasnike",
+    "ownersText": "Želite da izdajete vikend kuću preko Vikendly-ja? Pogledajte kako to funkcioniše i prijavite kuću.",
+    "ownersLink": "Za vlasnike",
+    "noDirect": "Kontakt podaci će uskoro biti ovde. Do tada nam pišite preko upita na stranici kuće ili prijave za vlasnike."
+  },
+  "legal": {
+    "updated": "Poslednja izmena: {date}",
+    "privacyTitle": "Politika privatnosti",
+    "privacyMeta": "Politika privatnosti | Vikendly",
+    "termsTitle": "Uslovi korišćenja",
+    "termsMeta": "Uslovi korišćenja | Vikendly",
+    "contents": "Sadržaj"
   }
 }

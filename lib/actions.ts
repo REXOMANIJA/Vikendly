@@ -3,9 +3,15 @@
 import { getSupabase } from '@/lib/supabase/public';
 import { getHouseBySlug } from '@/lib/data';
 import { calculateTotalPrice } from '@/lib/pricing';
-import { parseDateParam } from '@/lib/dates';
+import { after } from 'next/server';
+import { formatStay, parseDateParam } from '@/lib/dates';
+import { esc, notifyTeam, withinRateLimit } from '@/lib/notify';
+import { site } from '@/lib/site';
 
-export type OwnerApplicationResult = { ok: true } | { ok: false; error: 'invalid' | 'server' };
+export type OwnerApplicationResult = { ok: true } | { ok: false; error: 'invalid' | 'tooMany' | 'server' };
+
+/** Postgres error raised by the flood guard in migration 0009 */
+const isFloodGuard = (error: { code?: string }) => error.code === 'P0001';
 
 const limits = {
   name: [2, 120],
@@ -35,14 +41,33 @@ export async function submitOwnerApplication(formData: FormData): Promise<OwnerA
     if (length < min || length > max) return { ok: false, error: 'invalid' };
   }
 
+  // At most 3 applications per hour from one visitor
+  if (!(await withinRateLimit('owner', 3, 3600))) return { ok: false, error: 'tooMany' };
+
   const { error } = await getSupabase()
     .from('owner_applications')
     .insert({ ...values, locale });
 
   if (error) {
+    if (isFloodGuard(error)) return { ok: false, error: 'tooMany' };
     console.error('Owner application insert failed:', error.message);
     return { ok: false, error: 'server' };
   }
+
+  // Sent after the visitor already got the "thank you" answer, so it never slows the form down
+  after(() =>
+    notifyTeam(
+      [
+        '🏠 <b>Nova prijava vlasnika</b>',
+        `👤 ${esc(values.name)}`,
+        `📞 ${esc(values.phone)}`,
+        `📍 ${esc(values.location)}`,
+        `💬 ${esc(values.description.slice(0, 600))}`,
+        '',
+        `<a href="${site.url}/admin/prijave">Otvorite prijave u adminu</a>`,
+      ].join('\n')
+    )
+  );
   return { ok: true };
 }
 
@@ -62,7 +87,11 @@ export type BookingRequestInput = {
 
 export type BookingRequestResult =
   | { ok: true }
-  | { ok: false; error: 'dates' | 'past' | 'minNights' | 'guests' | 'contact' | 'house' | 'server'; minNights?: number };
+  | {
+      ok: false;
+      error: 'dates' | 'past' | 'minNights' | 'guests' | 'contact' | 'house' | 'tooMany' | 'server';
+      minNights?: number;
+    };
 
 const MAX_NIGHTS = 60;
 
@@ -103,6 +132,9 @@ export async function submitBookingRequest(input: BookingRequestInput): Promise<
   if (phoneDigits.length < 6 || phone.length > 40) return { ok: false, error: 'contact' };
   if (email && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 200)) return { ok: false, error: 'contact' };
 
+  // At most 5 requests per hour from one visitor
+  if (!(await withinRateLimit('booking', 5, 3600))) return { ok: false, error: 'tooMany' };
+
   const { error } = await getSupabase()
     .from('booking_requests')
     .insert({
@@ -120,8 +152,25 @@ export async function submitBookingRequest(input: BookingRequestInput): Promise<
     });
 
   if (error) {
+    if (isFloodGuard(error)) return { ok: false, error: 'tooMany' };
     console.error('Booking request insert failed:', error.message);
     return { ok: false, error: 'server' };
   }
+
+  after(() =>
+    notifyTeam(
+      [
+        `🏡 <b>Novi upit: ${esc(house.name)}</b>`,
+        `📅 ${formatStay(checkIn, checkOut, 'sr')} (${quote.nights} ${quote.nights === 1 ? 'noć' : 'noći'})`,
+        `👥 Broj osoba: ${guests} · ukupno €${Math.round(quote.total)}`,
+        `👤 ${esc(name)}`,
+        `📞 ${esc(phone)}`,
+        ...(email ? [`✉️ ${esc(email)}`] : []),
+        ...(message ? [`💬 ${esc(message.slice(0, 600))}`] : []),
+        '',
+        `<a href="${site.url}/admin/upiti">Otvorite upite u adminu</a>`,
+      ].join('\n')
+    )
+  );
   return { ok: true };
 }
