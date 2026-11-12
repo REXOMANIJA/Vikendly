@@ -107,7 +107,42 @@
     "invalidDates": "Datum odlaska mora biti posle datuma dolaska.",
     "metaDestination": "Vikend kuće – {name} | Vikendly",
     "metaCategory": "{name} – vikend kuće | Vikendly",
-    "metaTitle": "Pretraga vikend kuća | Vikendly"
+    "metaTitle": "Pretraga vikend kuća | Vikendly",
+    "filters": {
+      "filters": "Filteri",
+      "name": "Naziv kuće",
+      "namePlaceholder": "npr. Vila Ribnica",
+      "destination": "Destinacija",
+      "anyDestination": "Sve destinacije",
+      "dates": "Datumi",
+      "guests": "Gosti",
+      "budget": "Budžet (€)",
+      "allTypes": "Sve vrste",
+      "verified": "Provereno uživo",
+      "sort": "Sortiranje",
+      "sortRecommended": "Preporučeno",
+      "sortPriceAsc": "Cena: od najniže",
+      "sortPriceDesc": "Cena: od najviše",
+      "sortCapacity": "Najviše mesta",
+      "clear": "Obrišite filtere",
+      "loading": "Učitavanje",
+      "budgetHint": "Budžet važi za ceo boravak, pa se primenjuje tek kada izaberete datume."
+    },
+    "empty": {
+      "title": "Nema kuća za ovu pretragu",
+      "text": "Probajte da uklonite neki od filtera:",
+      "without": {
+        "checkIn": "Bez datuma",
+        "budget": "Bez budžeta",
+        "guests": "Bez broja gostiju",
+        "destination": "Sve destinacije",
+        "category": "Sve vrste kuća",
+        "q": "Bez naziva",
+        "verified": "I kuće bez provere"
+      },
+      "clearAll": "Obrišite sve filtere",
+      "suggestions": "Možda vam se dopadne"
+    }
   },
   "whyVikendly": {
     "title": "Zašto Vikendly?",
@@ -250,7 +285,40 @@
       "tierRow": "Do {count, plural, one {# osobe} few {# osobe} other {# osoba}}",
       "wholeHouse": "Cela kuća (do {count, plural, one {# osobe} few {# osobe} other {# osoba}})",
       "columnWeekday": "Radnim danima",
-      "columnWeekend": "Petak i subota"
+      "columnWeekend": "Petak i subota",
+      "unitsTitle": "Izaberite smeštaj",
+      "unitsHint": "Možete izabrati jedan ili više delova objekta.",
+      "unitSleeps": "do {count, plural, one {# osobe} few {# osobe} other {# osoba}}",
+      "unitPrices": "{weekday} radnim danima · {weekend} vikendom (po noći)",
+      "unitGuests": "Osoba za noćenje",
+      "party": "Pravimo žurku ili druženje",
+      "partyPeople": "Broj osoba na žurci",
+      "partyHint": "Računajući i one koji noće. Najviše {count}.",
+      "partyLevels": "Cena žurke, jednom po boravku (radnim danima / vikend)",
+      "partyLevel": "do {count, plural, one {# osobe} few {# osobe} other {# osoba}}",
+      "partyOnRequest": "Cena žurke po dogovoru.",
+      "lineStay": "{name}: {nights, plural, one {# noć} few {# noći} other {# noći}}, {guests, plural, one {# osoba} few {# osobe} other {# osoba}}",
+      "lineStayWhole": "Noćenje: {nights, plural, one {# noć} few {# noći} other {# noći}}, {guests, plural, one {# osoba} few {# osobe} other {# osoba}}",
+      "lineParty": "Žurka, {count, plural, one {# osoba} few {# osobe} other {# osoba}}",
+      "linePartyOnRequest": "po dogovoru",
+      "totalPlusParty": "Cena žurke se dogovara posebno.",
+      "problems": {
+        "none": "Izaberite bar jedan deo objekta.",
+        "unknown": "Proverite izbor smeštaja.",
+        "guests": "{unit}: najviše {count, plural, one {# osoba} few {# osobe} other {# osoba}} za noćenje.",
+        "partyNotAllowed": "{unit}: žurke nisu dozvoljene.",
+        "partyTooMany": "{unit}: na žurci može biti najviše {count, plural, one {# osoba} few {# osobe} other {# osoba}}.",
+        "partyTooFew": "{unit}: na žurci su i oni koji noće, upišite bar {count}."
+      },
+      "thisHouse": "Kuća",
+      "partyWeekendHint": "Vikend cena važi za žurku u petak ili subotu.",
+      "fromGroup": "manje grupe od {price}",
+      "partyOnlyCard": "Samo za žurke · do {count, plural, one {# osobe} few {# osobe} other {# osoba}}",
+      "fromPrice": "od {price}",
+      "dayGuests": "tokom dana do {count, plural, one {# osobe} few {# osobe} other {# osoba}}",
+      "dayGuestsNote": "Tokom dana može doći do {day} osoba; noćenje je za najviše {sleeps}.",
+      "partyDate": "Datum žurke",
+      "linePartyOnly": "{name}: žurka, {count, plural, one {# osoba} few {# osobe} other {# osoba}}"
     },
     "sleeps": "Noćenje: {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}",
     "dayCapacity": "Žurka ili druženje: {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}",
@@ -290,7 +358,9 @@
         "contact": "Proverite ime i telefon (i email, ako ste ga upisali).",
         "house": "Ova kuća trenutno nije dostupna.",
         "server": "Upit nije poslat zbog greške kod nas. Pokušajte ponovo za par minuta.",
-        "tooMany": "Poslali ste više upita za kratko vreme. Sačekajte malo pa pokušajte ponovo, ili nas pozovite."
+        "tooMany": "Poslali ste više upita za kratko vreme. Sačekajte malo pa pokušajte ponovo, ili nas pozovite.",
+        "units": "Proverite izbor smeštaja.",
+        "party": "Proverite broj osoba na žurci."
       }
     },
     "map": {
@@ -298,6 +368,25 @@
       "directions": "Kako stići",
       "open": "Google mape",
       "approximate": "Prikazana je približna lokacija na osnovu adrese."
+    },
+    "units": {
+      "title": "Delovi objekta",
+      "intro": "Objekat se izdaje u delovima. Možete rezervisati jedan ili više njih zajedno.",
+      "sleeps": "Noćenje: do {count, plural, one {# osobe} few {# osobe} other {# osoba}}",
+      "party": "Žurka do {count, plural, one {# osobe} few {# osobe} other {# osoba}}",
+      "noParties": "Bez žurki",
+      "pets": "Ljubimci dozvoljeni",
+      "checkInOut": "Dolazak od {in}, odlazak do {out}",
+      "perNight": "{weekday} / {weekend} po noći",
+      "perNightHint": "radnim danima / petak i subota",
+      "groupPrices": "Cene za manje grupe (radnim danima / vikend)",
+      "partyOnly": "Samo za žurke, bez noćenja",
+      "partyUpTo": "Do {count, plural, one {# osobe} few {# osobe} other {# osoba}} na žurci",
+      "dayGuests": "Tokom dana do {count, plural, one {# osobe} few {# osobe} other {# osoba}}",
+      "partiesOk": "Žurke dozvoljene"
+    },
+    "rules": {
+      "partyPrice": "Cena žurke (radnim danima / vikend): {levels}. Plaća se jednom po boravku."
     }
   },
   "datePicker": {
@@ -309,7 +398,9 @@
     "clear": "Obrišite",
     "done": "Gotovo",
     "weekendLegend": "Petak i subota (vikend cena)",
-    "close": "Zatvorite kalendar"
+    "close": "Zatvorite kalendar",
+    "pickDay": "Izaberite datum",
+    "placeholderDay": "Izaberite datum"
   },
   "verified": {
     "badge": "Provereno uživo",
@@ -436,5 +527,19 @@
     "termsTitle": "Uslovi korišćenja",
     "termsMeta": "Uslovi korišćenja | Vikendly",
     "contents": "Sadržaj"
+  },
+  "notFound": {
+    "metaTitle": "Stranica ne postoji | Vikendly",
+    "title": "Ova stranica ne postoji",
+    "text": "Možda je link pogrešno prepisan ili je kuća u međuvremenu sklonjena sa sajta. Evo odakle možete da nastavite:",
+    "home": "Početna strana",
+    "houses": "Pogledajte kuće",
+    "destinations": "Sve destinacije"
+  },
+  "errorPage": {
+    "title": "Nešto nije u redu",
+    "text": "Stranica trenutno ne može da se učita. Pokušajte ponovo za trenutak; ako se problem ponovi, javite nam se.",
+    "retry": "Pokušajte ponovo",
+    "home": "Početna strana"
   }
 }

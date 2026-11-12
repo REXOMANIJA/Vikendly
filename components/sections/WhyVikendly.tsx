@@ -1,9 +1,9 @@
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { Receipt, Users, Volume2, BadgeCheck, MessageCircle } from 'lucide-react';
+import { ReceiptEuro, Users, Volume2, BadgeCheck, MessageCircle } from 'lucide-react';
 
 const features = [
-  { key: 'totalPrice', icon: Receipt },
+  { key: 'totalPrice', icon: ReceiptEuro },
   { key: 'pricePerPerson', icon: Users },
   { key: 'noiseRules', icon: Volume2 },
   { key: 'verified', icon: BadgeCheck },

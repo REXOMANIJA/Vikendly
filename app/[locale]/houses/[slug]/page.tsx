@@ -38,7 +38,8 @@ import {
   getSimilarHouses,
 } from '@/lib/data';
 import { PriceCalculatorFromUrl } from '@/components/house/PriceCalculator';
-import { getLowestNightlyPrice } from '@/lib/pricing';
+import { getLowestNightlyPrice, hasUnits } from '@/lib/pricing';
+import HouseUnits from '@/components/house/HouseUnits';
 import HouseCard from '@/components/cards/HouseCard';
 
 type Params = Promise<{ locale: string; slug: string }>;
@@ -70,7 +71,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale, slug } = await params;
   const house = await getHouseBySlug(slug);
-  if (!house) return {};
+  if (!house) return { title: (await getTranslations({ locale, namespace: 'notFound' }))('metaTitle') };
   const t = await getTranslations({ locale, namespace: 'house' });
   const destination = await getDestinationById(house.destinationId);
   const description = house.description[locale as Locale];
@@ -105,6 +106,8 @@ export default async function HousePage({ params }: { params: Params }) {
   const tVerified = await getTranslations('verified');
   const verifiedOn = parseDateParam(house.verifiedAt);
   const hasDayCapacity = house.dayCapacity != null && house.dayCapacity > house.capacity;
+  // A listing with units shows each unit's rules in its own card instead of one list here
+  const withUnits = hasUnits(house);
 
   const ruleItems = [
     { ok: rules.partiesAllowed, label: rules.partiesAllowed ? t('partiesAllowed') : t('partiesNotAllowed') },
@@ -197,18 +200,22 @@ export default async function HousePage({ params }: { params: Params }) {
               </section>
             )}
 
+            {withUnits && <HouseUnits units={house.units!} />}
+
             <section>
               <h2 className="font-serif text-2xl font-bold text-primary">{t('rulesTitle')}</h2>
               <ul className="mt-4 space-y-3">
-                <li className="flex items-center gap-3">
-                  <Clock className="size-5 text-primary" aria-hidden />
-                  {t('checkInTime', { time: rules.checkInTime })} · {t('checkOutTime', { time: rules.checkOutTime })}
-                </li>
+                {!withUnits && (
+                  <li className="flex items-center gap-3">
+                    <Clock className="size-5 text-primary" aria-hidden />
+                    {t('checkInTime', { time: rules.checkInTime })} · {t('checkOutTime', { time: rules.checkOutTime })}
+                  </li>
+                )}
                 <li className="flex items-center gap-3">
                   <CalendarDays className="size-5 text-primary" aria-hidden />
                   {t('minNights', { count: house.pricing.minNights })}
                 </li>
-                {hasDayCapacity && (
+                {hasDayCapacity && !withUnits && (
                   <li className="flex items-start gap-3">
                     <Users className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
                     {t('capacityNote', {
@@ -217,7 +224,7 @@ export default async function HousePage({ params }: { params: Params }) {
                     })}
                   </li>
                 )}
-                {ruleItems.map(({ ok, label }) => (
+                {!withUnits && ruleItems.map(({ ok, label }) => (
                   <li key={label} className="flex items-center gap-3">
                     {ok ? (
                       <Check className="size-5 text-primary" aria-hidden />

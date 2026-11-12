@@ -1,4 +1,5 @@
 import { submitBookingRequest, type BookingRequestInput } from '@/lib/actions';
+import { WHOLE_HOUSE } from '@/lib/pricing';
 
 // Record what would be written to Supabase instead of calling it
 const inserted: Record<string, unknown>[] = [];
@@ -40,7 +41,7 @@ const valid: BookingRequestInput = {
   slug: 'vila-ribnica',
   checkIn: '2026-11-13', // Friday
   checkOut: '2026-11-15', // Sunday
-  guests: 4,
+  selections: [{ id: WHOLE_HOUSE, guests: 4, partyGuests: 0 }],
   name: 'Marko Marković',
   phone: '+381 64 123 4567',
   email: '',
@@ -76,7 +77,9 @@ describe('submitBookingRequest', () => {
   });
 
   it('rejects more guests than the house sleeps', async () => {
-    expect(await submitBookingRequest({ ...valid, guests: 9 })).toMatchObject({ error: 'guests' });
+    expect(
+      await submitBookingRequest({ ...valid, selections: [{ id: WHOLE_HOUSE, guests: 9, partyGuests: 0 }] })
+    ).toMatchObject({ error: 'guests' });
   });
 
   it('requires a name and a real phone number; email is optional but must look valid', async () => {
@@ -110,5 +113,26 @@ describe('submitBookingRequest', () => {
     expect(alerts[0]).toContain('€240');
     expect(alerts[0]).toContain('+381 64 123 4567');
     expect(alerts[0]).toContain('marko@example.com');
+  });
+
+  it('rejects a party where parties are not allowed, and unknown units', async () => {
+    // Vila Ribnica: no parties
+    expect(
+      await submitBookingRequest({ ...valid, selections: [{ id: WHOLE_HOUSE, guests: 4, partyGuests: 10 }] })
+    ).toMatchObject({ error: 'party' });
+    expect(
+      await submitBookingRequest({ ...valid, selections: [{ id: 'no-such-unit', guests: 2, partyGuests: 0 }] })
+    ).toMatchObject({ error: 'units' });
+    expect(await submitBookingRequest({ ...valid, selections: [] })).toMatchObject({ error: 'units' });
+    expect(inserted).toHaveLength(0);
+  });
+
+  it('saves how many sleep over and the price breakdown', async () => {
+    await submitBookingRequest(valid);
+    expect(inserted[0]).toMatchObject({
+      guests: 4,
+      party_guests: null,
+      details: { units: [{ id: WHOLE_HOUSE, guests: 4, stay: 240, party: 0, total: 240 }] },
+    });
   });
 });

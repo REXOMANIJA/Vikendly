@@ -23,8 +23,10 @@ export default async function DestinationsPage({ params }: { params: Params }) {
 
   const [destinations, counts] = await Promise.all([getDestinations(), getHouseCountsByDestination()]);
 
-  // Within each country: most houses first, then alphabetically
-  const sorted = [...destinations].sort(
+  // Only destinations with at least one published house; within each country: most houses
+  // first, then alphabetically
+  const listed = destinations.filter((d) => (counts[d.id] ?? 0) > 0);
+  const sorted = [...listed].sort(
     (a, b) => (counts[b.id] ?? 0) - (counts[a.id] ?? 0) || a.name.localeCompare(b.name, locale)
   );
 
@@ -45,7 +47,7 @@ export default async function DestinationsPage({ params }: { params: Params }) {
   return (
     <div className="container mx-auto px-4 py-10">
       <h1 className="font-serif text-3xl md:text-4xl font-bold text-primary">{t('allTitle')}</h1>
-      <p className="mt-2 mb-8 text-text/70">{t('allSubtitle', { count: destinations.length })}</p>
+      <p className="mt-2 mb-8 text-text/70">{t('allSubtitle', { count: listed.length })}</p>
       <AllDestinations groups={groups} />
     </div>
   );

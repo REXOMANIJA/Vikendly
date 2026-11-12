@@ -18,6 +18,11 @@ interface DateRangePickerProps {
   label?: string;
   id?: string;
   className?: string;
+  /**
+   * One day instead of a stay (e.g. a party): picking a day sets checkIn to that day and
+   * checkOut to the next day.
+   */
+  single?: boolean;
 }
 
 /** Shows two months on wider screens */
@@ -38,7 +43,7 @@ function useIsWide() {
  * Dates are shown day-month-year ("13.11. – 15.11.2026."); values stay "yyyy-MM-dd" strings.
  * Desktop: dropdown with two months. Phones: panel from the bottom with one month.
  */
-export default function DateRangePicker({ checkIn, checkOut, onChange, label, id, className = '' }: DateRangePickerProps) {
+export default function DateRangePicker({ checkIn, checkOut, onChange, label, id, className = '', single = false }: DateRangePickerProps) {
   const t = useTranslations('datePicker');
   const locale = useLocale();
   const wide = useIsWide();
@@ -83,7 +88,15 @@ export default function DateRangePicker({ checkIn, checkOut, onChange, label, id
     if (nextFrom && nextTo && wide) setTimeout(() => setOpen(false), 250); // desktop: close once both are picked
   };
 
-  const status = !from ? t('pickCheckIn') : !to ? t('pickCheckOut') : t('nights', { count: nights });
+  const pickDay = (day: Date | undefined) => {
+    if (!day) return onChange('', '');
+    const next = new Date(day);
+    next.setDate(day.getDate() + 1);
+    onChange(toDateParam(day), toDateParam(next));
+    setTimeout(() => setOpen(false), 200);
+  };
+
+  const status = single ? (from ? formatDate(from, locale) : t('pickDay')) : !from ? t('pickCheckIn') : !to ? t('pickCheckOut') : t('nights', { count: nights });
 
   return (
     <div ref={wrapper} className={`relative ${className}`}>
@@ -105,7 +118,15 @@ export default function DateRangePicker({ checkIn, checkOut, onChange, label, id
       >
         <CalendarDays className="size-4 shrink-0 text-primary" aria-hidden />
         <span className={`truncate ${from ? 'text-text' : 'text-text/50'}`}>
-          {from && to ? formatStay(from, to, locale) : from ? `${formatDate(from, locale)} – …` : t('placeholder')}
+          {single
+            ? from
+              ? formatDate(from, locale)
+              : t('placeholderDay')
+            : from && to
+              ? formatStay(from, to, locale)
+              : from
+                ? `${formatDate(from, locale)} – …`
+                : t('placeholder')}
         </span>
       </button>
 
@@ -126,21 +147,37 @@ export default function DateRangePicker({ checkIn, checkOut, onChange, label, id
               </button>
             </div>
 
-            <DayPicker
-              mode="range"
-              selected={selected}
-              onSelect={onSelect}
-              resetOnSelect
-              locale={locale === 'sr' ? srLatn : enGB}
-              numberOfMonths={wide ? 2 : 1}
-              pagedNavigation={wide}
-              defaultMonth={from ?? today}
-              startMonth={today}
-              disabled={{ before: today }}
-              excludeDisabled
-              modifiers={{ weekendNight: { dayOfWeek: [5, 6] } }}
-              modifiersClassNames={{ weekendNight: 'vk-weekend' }}
-            />
+            {single ? (
+              <DayPicker
+                mode="single"
+                selected={from}
+                onSelect={pickDay}
+                locale={locale === 'sr' ? srLatn : enGB}
+                numberOfMonths={wide ? 2 : 1}
+                pagedNavigation={wide}
+                defaultMonth={from ?? today}
+                startMonth={today}
+                disabled={{ before: today }}
+                modifiers={{ weekendNight: { dayOfWeek: [5, 6] } }}
+                modifiersClassNames={{ weekendNight: 'vk-weekend' }}
+              />
+            ) : (
+              <DayPicker
+                mode="range"
+                selected={selected}
+                onSelect={onSelect}
+                resetOnSelect
+                locale={locale === 'sr' ? srLatn : enGB}
+                numberOfMonths={wide ? 2 : 1}
+                pagedNavigation={wide}
+                defaultMonth={from ?? today}
+                startMonth={today}
+                disabled={{ before: today }}
+                excludeDisabled
+                modifiers={{ weekendNight: { dayOfWeek: [5, 6] } }}
+                modifiersClassNames={{ weekendNight: 'vk-weekend' }}
+              />
+            )}
 
             <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-primary/10 pt-3">
               <span className="inline-flex items-center gap-2 text-xs text-text/60">

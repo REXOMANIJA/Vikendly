@@ -79,6 +79,7 @@ export const privacy: Record<'sr' | 'en', LegalSection[]> = {
       title: 'Kolačići i mapa',
       text: [
         'Sajt ne koristi kolačiće za praćenje ni reklame. Pamti samo ono što je neophodno za rad (na primer prijavu Vikendly tima u administraciju).',
+        'Broj poseta merimo alatom Vercel Web Analytics, koji ne koristi kolačiće i ne prepoznaje pojedinačne posetioce: vidimo samo zbirne brojke, na primer koliko je ljudi posetilo neku stranicu i iz koje zemlje.',
         'Na stranici kuće prikazujemo Google mapu sa lokacijom. Kada se mapa učita, Google može da postavi svoje kolačiće i vidi vašu internet adresu, prema svojoj politici privatnosti (policies.google.com/privacy).',
       ],
     },
@@ -163,6 +164,7 @@ export const privacy: Record<'sr' | 'en', LegalSection[]> = {
       title: 'Cookies and the map',
       text: [
         'The site uses no tracking or advertising cookies. It only stores what it needs to work (for example, the Vikendly team’s admin login).',
+        'We count visits with Vercel Web Analytics, which uses no cookies and cannot recognise individual visitors: we only see totals, such as how many people visited a page and from which country.',
         'House pages show a Google map of the location. When the map loads, Google may set its own cookies and see your internet address, under its own privacy policy (policies.google.com/privacy).',
       ],
     },

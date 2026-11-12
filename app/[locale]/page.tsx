@@ -34,12 +34,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     getFeaturedHouses(),
     getHouseCountsByDestination(),
   ]);
+  // Guests only see destinations that have at least one published house (the admin sees all)
+  const listed = destinations.filter((d) => (houseCounts[d.id] ?? 0) > 0);
 
   return (
     <>
-      <Hero destinations={destinations} />
+      <Hero destinations={listed} />
       <Categories categories={categories} />
-      <Destinations destinations={destinations} houseCounts={houseCounts} />
+      {listed.length > 0 && <Destinations destinations={listed} houseCounts={houseCounts} />}
       <FreeThisWeekend houses={featured} destinations={destinations} />
       <WhyVikendly />
       <HowItWorks />

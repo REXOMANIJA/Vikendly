@@ -7,9 +7,9 @@ export const site = {
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://vikendly.com',
   /** Who runs the site, as named in the privacy policy and terms */
   operator: 'Vikendly tim',
-  email: '',
+  email: 'info@vikendly.com',
   /** Shown as written; also used for call / WhatsApp / Viber links */
-  phone: '',
+  phone: '+381 64 477 3663',
   instagram: '', // e.g. 'vikendly.rs' (without @)
   /** Date the privacy policy and terms were last changed */
   legalUpdated: '2026-11-12',

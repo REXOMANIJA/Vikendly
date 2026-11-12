@@ -1,13 +1,15 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { localizedAlternates } from '@/lib/seo';
-import { getHouses, getDestinations, getCategoryBySlug } from '@/lib/data';
-import { calculateTotalPrice } from '@/lib/pricing';
+import { getHouses, getDestinations, getCategories, getCategoryBySlug, getHouseCountsByDestination } from '@/lib/data';
+import { getLowestNightlyPrice, quoteStay } from '@/lib/pricing';
 import { parseDateParam } from '@/lib/dates';
 import { slugify } from '@/lib/slug';
 import { Link } from '@/i18n/navigation';
 import HouseCard from '@/components/cards/HouseCard';
-import { BadgeCheck } from 'lucide-react';
+import { SearchX } from 'lucide-react';
+import SearchFilters from '@/components/search/SearchFilters';
+import { SORTS, type SearchValues } from '@/lib/search';
 import { ViewTransition } from 'react';
 import Image from 'next/image';
 import { isVector } from '@/lib/images';
@@ -22,6 +24,8 @@ type SearchParams = {
   checkOut?: string;
   guests?: string;
   budget?: string;
+  /** price-asc | price-desc | capacity; empty = recommended */
+  sort?: string;
 };
 
 export async function generateMetadata({
@@ -45,14 +49,19 @@ export async function generateMetadata({
   const indexable = onlyOneFilter && (!!destination || !!category || Object.keys(sp).length === 0);
   const query = destination ? `?destination=${destination.slug}` : category ? `?category=${category.slug}` : '';
 
+  const title = destination
+    ? t('metaDestination', { name: destination.name })
+    : category
+      ? t('metaCategory', { name: tCat(category.id as 'mountain') })
+      : t('metaTitle');
+  // Shared destination/category links show that place's photo (drawings can't be previews)
+  const photo = destination?.imageUrl ?? (category ? `/images/categories/${category.id}.jpg` : undefined);
+
   return {
-    title: destination
-      ? t('metaDestination', { name: destination.name })
-      : category
-        ? t('metaCategory', { name: tCat(category.id as 'mountain') })
-        : t('metaTitle'),
+    title,
     alternates: localizedAlternates(locale, '/search', query),
     robots: indexable ? undefined : { index: false, follow: true },
+    ...(photo && !isVector(photo) ? { openGraph: { title, images: [photo] } } : {}),
   };
 }
 
@@ -68,10 +77,14 @@ export default async function SearchPage({
   const sp = await searchParams;
   const t = await getTranslations('search');
   const tCat = await getTranslations('categories');
-  const tVerified = await getTranslations('verified');
   const tCountry = await getTranslations('destinations.countries');
 
-  const [houses, destinations] = await Promise.all([getHouses(), getDestinations()]);
+  const [houses, destinations, categories, houseCounts] = await Promise.all([
+    getHouses(),
+    getDestinations(),
+    getCategories(),
+    getHouseCountsByDestination(),
+  ]);
   const destinationOf = (id: string) => destinations.find((d) => d.id === id);
   const destination = sp.destination ? destinations.find((d) => d.slug === sp.destination) : undefined;
   const category = sp.category ? await getCategoryBySlug(sp.category) : undefined;
@@ -101,18 +114,40 @@ export default async function SearchPage({
     })
     .map((house) => ({
       house,
-      quote:
-        canQuote && checkIn && checkOut
-          ? calculateTotalPrice(house, checkIn, checkOut, guests ?? 1)
-          : undefined,
+      quote: canQuote && checkIn && checkOut ? quoteStay(house, checkIn, checkOut, guests ?? 1) : undefined,
     }))
     // Budget is for the whole stay, so it only applies once dates are known
     .filter(({ quote }) => !(budget && quote && quote.total > budget));
 
+  // Sorting: price uses the stay total when dates are known, otherwise the lowest nightly price.
+  // "Recommended" puts houses we visited in person first, then keeps the alphabetical order.
+  const sort = (SORTS as readonly string[]).includes(sp.sort ?? '') ? sp.sort : undefined;
+  const priceOf = (r: (typeof results)[number]) => r.quote?.total ?? getLowestNightlyPrice(r.house);
+  results.sort((a, b) =>
+    sort === 'price-asc'
+      ? priceOf(a) - priceOf(b)
+      : sort === 'price-desc'
+        ? priceOf(b) - priceOf(a)
+        : sort === 'capacity'
+          ? b.house.capacity - a.house.capacity
+          : Number(!!b.house.verifiedAt) - Number(!!a.house.verifiedAt)
+  );
+
+  // Empty results: suggest dropping one filter at a time, and show a few other houses
+  const removable = (['checkIn', 'budget', 'guests', 'destination', 'category', 'q', 'verified'] as const).filter(
+    (key) => sp[key]
+  );
+  const without = (key: (typeof removable)[number]) =>
+    Object.fromEntries(
+      Object.entries(sp).filter(([k, v]) => v && k !== key && !(key === 'checkIn' && k === 'checkOut'))
+    ) as Record<string, string>;
+  const suggestions = results.length === 0 ? houses.slice(0, 3) : [];
+  const listedDestinations = destinations.filter((d) => (houseCounts[d.id] ?? 0) > 0);
+  const filterValues: SearchValues = Object.fromEntries(Object.entries(sp).filter(([, v]) => v)) as SearchValues;
+
   const heading = [query ? `„${query}”` : undefined, destination?.name, category ? tCat(category.id as 'mountain') : undefined]
     .filter(Boolean)
     .join(' · ');
-  const hasAnyFilter = Object.values(sp).some(Boolean);
 
   // Destination or category search gets a photo banner. Its name matches the photo on the card
   // that was clicked, so the photo grows from the card into the banner (see globals.css).
@@ -161,49 +196,59 @@ export default async function SearchPage({
         </div>
       )}
 
-      <div className={`mb-8 flex flex-wrap items-end gap-4 ${banner ? 'justify-end' : 'justify-between'}`}>
-        {!banner && (
-          <div>
-            <h1 className="font-serif text-3xl md:text-4xl font-bold text-primary">
-              {heading || t('title')}
-            </h1>
-            <p className="text-text/70 mt-2">{t('found', { count: results.length })}</p>
-          </div>
-        )}
-        <div className="flex flex-wrap items-center gap-4">
-          {/* Same search, with the "verified in person" filter switched on or off */}
-          <Link
-            href={{
-              pathname: '/search',
-              query: Object.fromEntries(
-                Object.entries({ ...sp, verified: onlyVerified ? undefined : '1' }).filter(([, v]) => v)
-              ) as Record<string, string>,
-            }}
-            aria-pressed={onlyVerified}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-              onlyVerified
-                ? 'border-primary bg-primary text-white hover:bg-primary/90'
-                : 'border-primary/30 bg-white text-primary hover:border-primary'
-            }`}
-          >
-            <BadgeCheck className="size-4" aria-hidden />
-            {tVerified('filter')}
-          </Link>
-          {hasAnyFilter && (
-            <Link href="/search" className="text-accent-dark font-medium hover:underline">
-              {t('clearFilters')}
-            </Link>
-          )}
+      {!banner && (
+        <div className="mb-6">
+          <h1 className="font-serif text-3xl md:text-4xl font-bold text-primary">{heading || t('title')}</h1>
+          <p className="text-text/70 mt-2">{t('found', { count: results.length })}</p>
         </div>
-      </div>
+      )}
+
+      <SearchFilters values={filterValues} destinations={listedDestinations} categories={categories} />
+
+      {budget && !canQuote && <p className="-mt-4 mb-6 text-sm text-text/60">{t('filters.budgetHint')}</p>}
 
       {invalidDates && (
         <p className="mb-6 rounded-lg bg-accent/10 text-accent-dark px-4 py-3">{t('invalidDates')}</p>
       )}
 
       {results.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-xl text-text/70">{t('noResults')}</p>
+        <div className="py-8 md:py-12">
+          <div className="mx-auto max-w-2xl rounded-3xl bg-white p-8 text-center shadow-sm ring-1 ring-primary/10 md:p-10">
+            <span className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-sand text-primary">
+              <SearchX className="size-7" aria-hidden />
+            </span>
+            <h2 className="mt-5 font-serif text-2xl font-bold text-primary md:text-3xl">{t('empty.title')}</h2>
+            {removable.length > 0 && (
+              <>
+                <p className="mt-2 text-text/70">{t('empty.text')}</p>
+                <div className="mt-5 flex flex-wrap justify-center gap-2">
+                  {removable.map((key) => (
+                    <Link
+                      key={key}
+                      href={{ pathname: '/search', query: without(key) }}
+                      className="rounded-full border border-primary/20 bg-white px-4 py-2 text-sm font-medium text-primary transition-colors hover:border-primary hover:bg-primary hover:text-white"
+                    >
+                      {t(`empty.without.${key}`)}
+                    </Link>
+                  ))}
+                </div>
+                <Link href="/search" className="mt-5 inline-block text-sm font-semibold text-accent-dark hover:underline">
+                  {t('empty.clearAll')}
+                </Link>
+              </>
+            )}
+          </div>
+
+          {suggestions.length > 0 && (
+            <section className="mt-12">
+              <h2 className="mb-6 font-serif text-2xl font-bold text-primary">{t('empty.suggestions')}</h2>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {suggestions.map((house) => (
+                  <HouseCard key={house.id} house={house} destinationName={destinationOf(house.destinationId)?.name} />
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { CalendarDays, Users, Phone, Mail, Home, Trash2, ExternalLink } from 'lucide-react';
+import { PartyPopper, CalendarDays, Users, Phone, Mail, Home, Trash2, ExternalLink } from 'lucide-react';
 import { deleteBookingRequest, setBookingStatus, type BookingStatus } from '@/app/admin/actions';
 import type { BookingRequest } from '@/lib/admin-data';
 
@@ -55,6 +55,7 @@ export default function BookingRequestRow({ request }: { request: BookingRequest
   const checkIn = day(request.check_in);
   const checkOut = day(request.check_out);
   const nights = Math.round((checkOut.getTime() - checkIn.getTime()) / 86400000);
+  const lines = request.details?.units ?? [];
 
   return (
     <li className={`space-y-3 p-5 ${status === 'new' ? 'bg-accent/5' : ''}`}>
@@ -99,7 +100,31 @@ export default function BookingRequestRow({ request }: { request: BookingRequest
           <Users className="size-4 text-primary" aria-hidden /> {request.guests} os.
         </span>
         <span className="font-semibold text-primary">€{request.quoted_total}</span>
+        {request.party_guests ? (
+          <span className="inline-flex items-center gap-1.5 font-medium text-accent-dark">
+            <PartyPopper className="size-4" aria-hidden /> žurka, {request.party_guests} os.
+          </span>
+        ) : null}
       </div>
+
+      {/* Units and party: one line per part, shown when there is more than a plain stay */}
+      {lines.length > 0 && (lines.length > 1 || lines.some((l) => l.name || l.party_guests)) && (
+        <ul className="space-y-1 rounded-lg border border-primary/10 p-3 text-sm">
+          {lines.map((l) => (
+            <li key={l.id} className="flex flex-wrap justify-between gap-x-4">
+              <span>
+                <strong className="text-primary">{l.name || 'Cela kuća'}</strong>:{' '}
+                {/* Party-only space: nobody sleeps there, only the party */}
+                {l.guests > 0 ? `${l.guests} os. za noćenje (€${l.stay})` : ''}
+                {l.party_guests
+                  ? `${l.guests > 0 ? ' + ' : ''}žurka ${l.party_guests} os. (${l.party === null ? 'cena po dogovoru' : `€${l.party}`})`
+                  : ''}
+              </span>
+              <span className="font-medium">€{l.total}</span>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {/* Who to call */}
       <div className="grid gap-3 sm:grid-cols-2">

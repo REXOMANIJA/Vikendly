@@ -26,6 +26,45 @@ export interface PriceTier {
   weekendPrice: number; // EUR per night
 }
 
+/**
+ * Party price level: a party with up to `maxGuests` people (once per stay). The weekend price
+ * applies when the stay includes a Friday or Saturday night.
+ */
+export interface PartyPrice {
+  maxGuests: number;
+  weekdayPrice: number; // EUR
+  weekendPrice: number; // EUR
+}
+
+export interface HouseRules {
+  partiesAllowed: boolean;
+  petsAllowed: boolean;
+  smokingAllowed: boolean;
+  checkInTime: string;
+  checkOutTime: string;
+}
+
+/**
+ * A separately rented part of a listing (e.g. "Kuća sa balkonom"). Units share the listing's
+ * photos, description and location, but have their own beds, prices, rules and party prices.
+ */
+export interface HouseUnit {
+  id: string;
+  name: string;
+  /** People who can sleep there */
+  capacity: number;
+  /** People allowed at a party or gathering, if more than sleep */
+  dayCapacity?: number;
+  weekdayPrice: number;
+  weekendPrice: number;
+  /** Cheaper prices for smaller groups in this unit */
+  tiers?: PriceTier[];
+  /** Rented only for parties/gatherings: no beds, priced by the number of people (partyPrices) */
+  partyOnly?: boolean;
+  rules: HouseRules;
+  partyPrices: PartyPrice[];
+}
+
 export interface PricingRule {
   /** Price for the whole house (up to `capacity` guests) */
   weekdayPrice: number; // EUR per night
@@ -58,13 +97,7 @@ export interface House {
   amenities: string[];
   photos: string[];
   description: LocalizedText;
-  rules: {
-    partiesAllowed: boolean;
-    petsAllowed: boolean;
-    smokingAllowed: boolean;
-    checkInTime: string;
-    checkOutTime: string;
-  };
+  rules: HouseRules;
   location: {
     address: string;
     lat?: number;
@@ -72,6 +105,10 @@ export interface House {
   };
   /** Day the Vikendly team visited and checked the house ("yyyy-MM-dd"); missing = not verified */
   verifiedAt?: string;
+  /** Party price levels for a listing without units */
+  partyPrices?: PartyPrice[];
+  /** Separately rented units; empty or missing = the listing is rented as one */
+  units?: HouseUnit[];
   // Owner contact is private (admin only, table house_owner_contacts); guests send booking requests instead.
 }
 
@@ -86,4 +123,6 @@ export interface PriceCalculation {
   weekendRate: number;
   /** Set when a smaller-group price was used ("up to N people") */
   tierMaxGuests?: number;
+  /** Listing with units: the units this price is for */
+  units?: string[];
 }

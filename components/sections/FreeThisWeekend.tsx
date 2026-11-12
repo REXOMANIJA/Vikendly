@@ -1,7 +1,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import HouseCard from '@/components/cards/HouseCard';
 import SectionHeading from '@/components/SectionHeading';
-import { calculateTotalPrice } from '@/lib/pricing';
+import { quoteStay } from '@/lib/pricing';
 import { formatDateRange, getUpcomingWeekend, toDateParam } from '@/lib/dates';
 import type { Destination, House } from '@/types';
 
@@ -41,7 +41,7 @@ export default function FreeThisWeekend({
               key={house.id}
               house={house}
               destinationName={destinationOf(house)?.name}
-              quote={calculateTotalPrice(house, checkIn, checkOut, house.capacity)}
+              quote={quoteStay(house, checkIn, checkOut, house.capacity)}
               quoteLabel={t('quoteLabel', { count: house.capacity })}
               guests={house.capacity}
               linkQuery={{

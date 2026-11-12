@@ -1,12 +1,12 @@
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { Receipt, PartyPopper, BadgeCheck } from 'lucide-react';
+import { ReceiptEuro, PartyPopper, BadgeCheck } from 'lucide-react';
 import SearchBar from '@/components/SearchBar';
 import type { Destination } from '@/types';
 
 // What makes Vikendly different, shown right under the search box
 const promises = [
-  { key: 'totalPrice', icon: Receipt },
+  { key: 'totalPrice', icon: ReceiptEuro },
   { key: 'partyRules', icon: PartyPopper },
   { key: 'verified', icon: BadgeCheck },
 ] as const;

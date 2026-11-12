@@ -43,6 +43,34 @@ export type HouseInput = {
   photos: string[];
   /** Cheaper prices for smaller groups ("up to max_guests people") */
   price_tiers: { max_guests: number; weekday_price: number; weekend_price: number }[];
+  /** Party price levels for a listing without units */
+  party_prices: PartyPriceInput[];
+  /** Separately rented units; empty = the listing is rented as one */
+  units: UnitInput[];
+};
+
+/** Party price level: up to max_guests people at the party, once per stay */
+export type PartyPriceInput = { max_guests: number; weekday_price: number; weekend_price: number };
+/** Cheaper nightly price for a smaller group in a unit */
+export type GroupPriceInput = { max_guests: number; weekday_price: number; weekend_price: number };
+
+export type UnitInput = {
+  /** Existing unit id; missing for a new unit */
+  id?: string;
+  name: string;
+  capacity: number;
+  day_capacity: number | null;
+  weekday_price: number;
+  weekend_price: number;
+  parties_allowed: boolean;
+  pets_allowed: boolean;
+  smoking_allowed: boolean;
+  check_in_time: string;
+  check_out_time: string;
+  party_prices: PartyPriceInput[];
+  price_tiers: GroupPriceInput[];
+  /** Rented only for parties: no beds, priced by number of people */
+  party_only: boolean;
 };
 
 export type ActionResult<T = undefined> =
@@ -62,7 +90,99 @@ async function requireAdmin() {
   if (!user) throw new Error('Niste prijavljeni kao administrator.');
 }
 
+/** Party price levels: whole numbers of people within the party limit, no level twice, prices in euros */
+function partyPricesProblem(prices: PartyPriceInput[], limit: number, where: string): string | null {
+  const seen = new Set<number>();
+  for (const p of prices) {
+    if (!Number.isInteger(p.max_guests) || p.max_guests < 1 || p.max_guests > limit) {
+      return `${where}cena žurke: broj osoba mora biti između 1 i ${limit}.`;
+    }
+    if (seen.has(p.max_guests)) return `${where}cena žurke za do ${p.max_guests} osoba je uneta dva puta.`;
+    seen.add(p.max_guests);
+    if (![p.weekday_price, p.weekend_price].every((x) => Number.isFinite(x) && x >= 0)) {
+      return `${where}cena žurke: unesite iznose u evrima (radnim danima i vikendom).`;
+    }
+  }
+  return null;
+}
+
+function validateUnits(units: UnitInput[]): string | null {
+  const names = new Set<string>();
+  for (const [i, u] of units.entries()) {
+    const where = `Jedinica ${i + 1}${u.name.trim() ? ` („${u.name.trim()}“)` : ''}: `;
+    if (u.name.trim().length < 1 || u.name.trim().length > 80) return `${where}unesite naziv.`;
+    const key = u.name.trim().toLowerCase();
+    if (names.has(key)) return `${where}dve jedinice ne mogu imati isti naziv.`;
+    names.add(key);
+    if (u.party_only) {
+      if (!Number.isInteger(u.day_capacity) || (u.day_capacity as number) < 1) {
+        return `${where}unesite koliko najviše osoba može biti na žurci.`;
+      }
+      const problem = partyPricesProblem(u.party_prices, u.day_capacity as number, where);
+      if (problem) return problem;
+      continue; // no beds, nightly prices or check-in times to check
+    }
+    if (!Number.isInteger(u.capacity) || u.capacity < 1) return `${where}broj osoba za noćenje mora biti ceo broj, najmanje 1.`;
+    if (u.day_capacity !== null && (!Number.isInteger(u.day_capacity) || u.day_capacity < u.capacity)) {
+      return `${where}„tokom dana najviše“ mora biti bar koliko i broj osoba za noćenje, ili ostavite prazno.`;
+    }
+    if (![u.weekday_price, u.weekend_price].every((p) => Number.isFinite(p) && p >= 0)) return `${where}unesite cene u evrima.`;
+    for (const t of [u.check_in_time, u.check_out_time]) if (!/^\d{2}:\d{2}$/.test(t)) return `${where}vreme upišite kao 15:00.`;
+    const groups = new Set<number>();
+    for (const t of u.price_tiers ?? []) {
+      if (!Number.isInteger(t.max_guests) || t.max_guests < 1 || t.max_guests >= u.capacity) {
+        return `${where}cene za manje grupe: broj osoba mora biti između 1 i ${u.capacity - 1}.`;
+      }
+      if (groups.has(t.max_guests)) return `${where}cena za do ${t.max_guests} osoba je uneta dva puta.`;
+      groups.add(t.max_guests);
+      if (![t.weekday_price, t.weekend_price].every((x) => Number.isFinite(x) && x >= 0)) {
+        return `${where}cene za manje grupe: unesite iznose u evrima.`;
+      }
+    }
+  }
+  if (units.length > 0 && units.every((u) => u.party_only)) {
+    return 'Bar jedna jedinica mora imati noćenje (objekat samo za žurke još nije podržan).';
+  }
+  return null;
+}
+
+/**
+ * A listing with units: its own capacity, prices and rules (used on cards and in search)
+ * follow from the units, so admins only enter them once, per unit.
+ */
+function withUnitTotals(h: HouseInput): HouseInput {
+  // Clean each unit for its type: party-only spaces have no beds or nightly prices,
+  // places with beds have no party prices
+  const units = h.units.map((u) =>
+    u.party_only
+      ? { ...u, capacity: 0, weekday_price: 0, weekend_price: 0, price_tiers: [], parties_allowed: true }
+      : { ...u, party_prices: [] }
+  );
+  const beds = units.filter((u) => !u.party_only);
+  if (units.length === 0 || beds.length === 0) return { ...h, units, party_prices: [] };
+  const capacity = beds.reduce((sum, u) => sum + u.capacity, 0);
+  // The most people allowed at once anywhere on the property (shown as "Druženje: do …")
+  const biggest = Math.max(...units.map((u) => u.day_capacity ?? u.capacity));
+  return {
+    ...h,
+    units,
+    capacity,
+    day_capacity: biggest > capacity ? biggest : null,
+    weekday_price: Math.min(...beds.flatMap((u) => [u.weekday_price, ...(u.price_tiers ?? []).map((t) => t.weekday_price)])),
+    weekend_price: Math.min(...beds.map((u) => u.weekend_price)),
+    parties_allowed: units.some((u) => u.parties_allowed),
+    pets_allowed: units.some((u) => u.pets_allowed),
+    smoking_allowed: units.some((u) => u.smoking_allowed),
+    check_in_time: beds[0].check_in_time,
+    check_out_time: beds[0].check_out_time,
+    price_tiers: [],
+    party_prices: [],
+  };
+}
+
 function validateHouse(h: HouseInput): ActionResult<never> | null {
+  const unitsProblem = validateUnits(h.units);
+  if (unitsProblem) return fail(unitsProblem, 'units');
   if (h.name.trim().length < 2) return fail('Unesite naziv kuće.', 'name');
   if (!SLUG_PATTERN.test(h.slug)) return fail('Adresa (slug) sme da sadrži samo mala slova, brojeve i crtice.', 'slug');
   if (!h.destination_id) return fail('Izaberite destinaciju.', 'destination_id');
@@ -125,8 +245,9 @@ function validateHouse(h: HouseInput): ActionResult<never> | null {
   return null;
 }
 
-export async function saveHouse(input: HouseInput): Promise<ActionResult<{ id: string }>> {
+export async function saveHouse(raw: HouseInput): Promise<ActionResult<{ id: string }>> {
   await requireAdmin();
+  const input = withUnitTotals({ ...raw, units: raw.units ?? [], party_prices: raw.party_prices ?? [] });
   const invalid = validateHouse(input);
   if (invalid) return invalid;
 
@@ -141,6 +262,17 @@ export async function saveHouse(input: HouseInput): Promise<ActionResult<{ id: s
       address: input.address.trim(),
       featured_rank: input.featured_rank ?? '',
       verified_at: input.verified_at ?? '',
+      // Houses rented as one have no party price (only the daytime limit)
+      party_prices: [],
+      units: input.units.map((u) => ({
+        ...u,
+        id: u.id ?? '',
+        name: u.name.trim(),
+        day_capacity: u.day_capacity ?? '',
+        party_prices: u.party_only ? u.party_prices : [],
+        price_tiers: u.price_tiers ?? [],
+        party_only: u.party_only === true,
+      })),
     },
   });
 

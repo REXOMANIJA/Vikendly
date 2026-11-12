@@ -11,6 +11,8 @@ import { mapEmbedUrl } from '@/lib/maps';
 import { toDateParam } from '@/lib/dates';
 import { shrinkPhoto } from '@/lib/shrink-photo';
 import type { AdminHouse } from '@/lib/admin-data';
+import UnitsEditor, { type UnitFormRow } from '@/components/admin/UnitsEditor';
+import { type PartyPriceRow } from '@/components/admin/PartyPricesEditor';
 
 type Options = {
   destinations: { id: string; name: string }[];
@@ -22,7 +24,7 @@ type Options = {
 type FormState = Omit<
   HouseInput,
   | 'capacity' | 'day_capacity' | 'bedrooms' | 'bathrooms' | 'weekday_price' | 'weekend_price'
-  | 'min_nights' | 'featured_rank' | 'price_tiers' | 'lat' | 'lng' | 'verified_at'
+  | 'min_nights' | 'featured_rank' | 'price_tiers' | 'lat' | 'lng' | 'verified_at' | 'party_prices' | 'units'
 > & {
   capacity: string;
   day_capacity: string;
@@ -37,6 +39,8 @@ type FormState = Omit<
   lng: string;
   /** "yyyy-MM-dd" or '' = not verified */
   verified_at: string;
+  party_prices: PartyPriceRow[];
+  units: UnitFormRow[];
 };
 
 type TierRow = { key: string; max_guests: string; weekday_price: string; weekend_price: string };
@@ -49,7 +53,7 @@ const empty: FormState = {
   parties_allowed: false, pets_allowed: false, smoking_allowed: false,
   check_in_time: '15:00', check_out_time: '11:00',
   address: '', lat: '', lng: '', owner_phone: '',
-  is_published: false, featured_rank: '', verified_at: '',
+  is_published: false, featured_rank: '', verified_at: '', party_prices: [], units: [],
   category_ids: [], amenity_ids: [], photos: [],
 };
 
@@ -73,8 +77,33 @@ function fromHouse(h: AdminHouse): FormState {
     min_nights: String(h.min_nights),
     featured_rank: h.featured_rank === null ? '' : String(h.featured_rank),
     verified_at: h.verified_at ?? '',
+    party_prices: h.party_prices.map(priceRow),
+    units: h.units.map((u) => ({
+      ...u,
+      key: u.id,
+      capacity: String(u.capacity),
+      day_capacity: u.day_capacity === null ? '' : String(u.day_capacity),
+      weekday_price: String(u.weekday_price),
+      weekend_price: String(u.weekend_price),
+      party_prices: u.party_prices.map(priceRow),
+      price_tiers: u.price_tiers.map(priceRow),
+    })),
   };
 }
+
+/** Party level or group price from the database → editable row */
+const priceRow = (p: { max_guests: number; weekday_price: number; weekend_price: number }): PartyPriceRow => ({
+  key: crypto.randomUUID(),
+  max_guests: String(p.max_guests),
+  weekday_price: String(p.weekday_price),
+  weekend_price: String(p.weekend_price),
+});
+/** Editable row → numbers for saving */
+const priceNumbers = (r: PartyPriceRow) => ({
+  max_guests: num(r.max_guests),
+  weekday_price: num(r.weekday_price),
+  weekend_price: num(r.weekend_price),
+});
 
 const num = (v: string) => (v.trim() === '' ? NaN : Number(v.replace(',', '.')));
 /** Empty optional field → null, otherwise a number (NaN if not a number, caught by validation) */
@@ -189,6 +218,17 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
       min_nights: num(form.min_nights),
       featured_rank: form.featured_rank.trim() === '' ? null : num(form.featured_rank),
       verified_at: form.verified_at || null,
+      party_prices: form.party_prices.map(priceNumbers),
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      units: form.units.map(({ key, ...u }) => ({
+        ...u,
+        capacity: num(u.capacity),
+        day_capacity: optionalNum(u.day_capacity),
+        weekday_price: num(u.weekday_price),
+        weekend_price: num(u.weekend_price),
+        party_prices: u.party_prices.map(priceNumbers),
+        price_tiers: u.price_tiers.map(priceNumbers),
+      })),
     };
     startTransition(async () => {
       const result = await saveHouse(payload);
@@ -217,6 +257,8 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
   const fieldError = (field: string) =>
     error?.field === field ? <p className="mt-1 text-sm text-accent-dark">{error.message}</p> : null;
   const box = 'rounded-2xl bg-white p-5 md:p-6 shadow-sm space-y-4';
+  const hasUnits = form.units.length > 0;
+  const unitBeds = form.units.reduce((sum, u) => sum + (Number(u.capacity) || 0), 0);
   const h2 = 'font-serif text-xl font-bold text-primary';
 
   return (
@@ -257,18 +299,25 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
       {/* ── Kapacitet ── */}
       <section className={box}>
         <h2 className={h2}>Kapacitet</h2>
+        {hasUnits && (
+          <p className="rounded-lg bg-background px-4 py-3 text-sm text-text/80">
+            Objekat ima {form.units.length} {form.units.length === 1 ? 'jedinicu' : 'jedinice'}: ukupno{' '}
+            <strong>{unitBeds} osoba za noćenje</strong>. Broj osoba, cene i pravila se unose za svaku jedinicu
+            posebno, u delu „Delovi objekta“.
+          </p>
+        )}
         <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
           {([
             ['capacity', 'Broj osoba za noćenje', true, 'Koliko ljudi može da prespava.'],
-            ['day_capacity', 'Za žurku / druženje', false, 'Opciono. Koliko ljudi sme da dođe tokom dana.'],
+            ['day_capacity', 'Tokom dana najviše', false, 'Opciono, npr. 15 kada spava 6.'],
             ['bedrooms', 'Spavaće sobe', false, 'Opciono.'],
             ['bathrooms', 'Kupatila', false, 'Opciono.'],
-          ] as const).map(([key, text, required, hint]) => (
+          ] as const).filter(([key]) => !hasUnits || (key !== 'capacity' && key !== 'day_capacity')).map(([key, text, required, hint]) => (
             <div key={key} id={`field-${key}`}>
               <label htmlFor={key} className={label}>{text}</label>
               <input id={key} className={input} inputMode="numeric" value={form[key]}
                 placeholder={required ? '' : '—'}
-                onChange={(e) => set(key, e.target.value.replace(/\D/g, ''))} required={required} />
+                onChange={(e) => set(key, e.target.value.replace(/\D/g, ''))} required={required && !hasUnits} />
               <p className="mt-1 text-xs text-text/60">{hint}</p>
               {fieldError(key)}
             </div>
@@ -280,14 +329,16 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
       <section className={box}>
         <h2 className={h2}>Cene</h2>
         <p className="text-sm text-text/70">
-          Cena cele kuće važi za grupu do {form.capacity || '…'} osoba.
+          {hasUnits
+            ? 'Cene se unose za svaku jedinicu posebno, u delu „Delovi objekta“. Ovde je samo najmanji broj noći, za ceo objekat.'
+            : `Cena cele kuće važi za grupu do ${form.capacity || '…'} osoba.`}
         </p>
         <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
           {([
             ['weekday_price', 'Radnim danima (€/noć)'],
             ['weekend_price', 'Petak i subota (€/noć)'],
             ['min_nights', 'Najmanje noći'],
-          ] as const).map(([key, text]) => (
+          ] as const).filter(([key]) => !hasUnits || key === 'min_nights').map(([key, text]) => (
             <div key={key} id={`field-${key}`}>
               <label htmlFor={key} className={label}>{text}</label>
               <input id={key} className={input} inputMode="decimal" value={form[key]}
@@ -298,7 +349,7 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
         </div>
 
         {/* Optional cheaper prices for smaller groups */}
-        <div id="field-price_tiers" className="space-y-3 rounded-xl bg-background p-4">
+        <div id="field-price_tiers" className={`space-y-3 rounded-xl bg-background p-4 ${hasUnits ? 'hidden' : ''}`}>
           <div>
             <h3 className="font-semibold text-primary">Cene za manje grupe <span className="font-normal text-text/60">(opciono)</span></h3>
             <p className="text-sm text-text/70">
@@ -351,7 +402,22 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
           </button>
           {fieldError('price_tiers')}
         </div>
-        <p className="text-sm text-text/60">Boravišna taksa se računa automatski po destinaciji i broju osoba.</p>
+      </section>
+
+      {/* ── Delovi objekta ── */}
+      <section className={box} id="field-units">
+        <div>
+          <h2 className={h2}>
+            Delovi objekta <span className="font-sans text-base font-normal text-text/60">(opciono)</span>
+          </h2>
+          <p className="mt-1 text-sm text-text/70">
+            Ako se objekat izdaje u delovima (npr. „Kuća“, „Kuća sa balkonom“, „Apartman“), dodajte svaki deo kao
+            jedinicu. Fotografije, opis i lokacija su zajednički; broj osoba, cene i pravila ima svaka jedinica.
+            Gosti na stranici biraju jednu ili više jedinica u istom upitu.
+          </p>
+        </div>
+        <UnitsEditor units={form.units} onChange={(units) => set('units', units)} />
+        {fieldError('units')}
       </section>
 
       {/* ── Opis ── */}
@@ -444,6 +510,12 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
       {/* ── Pravila ── */}
       <section className={box}>
         <h2 className={h2}>Pravila kuće</h2>
+        {hasUnits && (
+          <p className="rounded-lg bg-background px-4 py-3 text-sm text-text/80">
+            Svaka jedinica ima svoja pravila, vreme dolaska i odlaska i cenu žurke (u delu „Delovi objekta“).
+          </p>
+        )}
+        <div className={hasUnits ? 'hidden' : 'space-y-4'}>
         <div className="grid gap-3 sm:grid-cols-3">
           {([
             ['parties_allowed', 'Žurke su dozvoljene'],
@@ -470,6 +542,7 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
               onChange={(e) => set('check_out_time', e.target.value)} required />
             {fieldError('check_out_time')}
           </div>
+        </div>
         </div>
       </section>
 

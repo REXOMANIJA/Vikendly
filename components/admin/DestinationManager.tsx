@@ -131,6 +131,12 @@ export default function DestinationManager({
               {!editing.id && editing.name && (
                 <p className="mt-1 text-xs text-text/60">Adresa pretrage: …/search?destination=<strong>{slugify(editing.name)}</strong></p>
               )}
+              {/* The id doubles as the address and is fixed once created (links stay valid) */}
+              {editing.id && (
+                <p className="mt-1 text-xs text-text/60">
+                  Adresa pretrage: …/search?destination=<strong>{editing.id}</strong> (ne menja se kada promenite naziv)
+                </p>
+              )}
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>

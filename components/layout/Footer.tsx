@@ -2,6 +2,8 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import LanguageSwitcher from './LanguageSwitcher';
 import Logo from './Logo';
+import { Mail, Phone } from 'lucide-react';
+import { phoneDigits, site } from '@/lib/site';
 
 const links = [
   { key: 'owners', href: '/owners' },
@@ -23,6 +25,22 @@ export default function Footer() {
               <Logo tone="light" />
             </Link>
             <p className="mt-4 max-w-md text-white/80">{t('tagline')}</p>
+            <ul className="mt-5 space-y-2 text-white/80">
+              {site.phone && (
+                <li>
+                  <a href={`tel:${phoneDigits(site.phone)}`} className="inline-flex items-center gap-2 hover:text-white">
+                    <Phone className="size-4" aria-hidden /> {site.phone}
+                  </a>
+                </li>
+              )}
+              {site.email && (
+                <li>
+                  <a href={`mailto:${site.email}`} className="inline-flex items-center gap-2 hover:text-white">
+                    <Mail className="size-4" aria-hidden /> {site.email}
+                  </a>
+                </li>
+              )}
+            </ul>
           </div>
 
           <nav aria-label={t('linksTitle')}>

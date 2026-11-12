@@ -54,7 +54,41 @@ export type AdminHouse = {
   amenity_ids: string[];
   photos: string[];
   price_tiers: { max_guests: number; weekday_price: number; weekend_price: number }[];
+  party_prices: PriceLevel[];
+  units: AdminUnit[];
 };
+
+/** Party level or group price: up to max_guests people */
+export type PriceLevel = { max_guests: number; weekday_price: number; weekend_price: number };
+
+export type AdminUnit = {
+  id: string;
+  name: string;
+  capacity: number;
+  day_capacity: number | null;
+  weekday_price: number;
+  weekend_price: number;
+  parties_allowed: boolean;
+  pets_allowed: boolean;
+  smoking_allowed: boolean;
+  check_in_time: string;
+  check_out_time: string;
+  party_prices: PriceLevel[];
+  price_tiers: PriceLevel[];
+  /** Rented only for parties (no beds) */
+  party_only: boolean;
+};
+
+/** Party levels / group prices from the database, sorted, with numbers as numbers */
+const partyRows = (value: unknown): PriceLevel[] =>
+  (Array.isArray(value) ? value : [])
+    .map((p) => ({
+      max_guests: Number(p?.max_guests),
+      weekday_price: Number(p?.weekday_price ?? p?.price),
+      weekend_price: Number(p?.weekend_price ?? p?.price),
+    }))
+    .filter((p) => [p.max_guests, p.weekday_price, p.weekend_price].every(Number.isFinite))
+    .sort((a, b) => a.max_guests - b.max_guests);
 
 export type OwnerApplication = {
   id: string;
@@ -84,6 +118,21 @@ export type BookingRequest = {
   locale: string;
   status: 'new' | 'contacted' | 'confirmed' | 'declined';
   created_at: string;
+  /** People at a party in total (migration 0010); null = no party */
+  party_guests?: number | null;
+  /** Which units and the price of each part (migration 0010) */
+  details?: {
+    units?: {
+      id: string;
+      name: string;
+      guests: number;
+      party_guests: number | null;
+      stay: number;
+      /** null = party price agreed in person */
+      party: number | null;
+      total: number;
+    }[];
+  } | null;
 };
 
 /** All booking requests, newest first, with the house's owner phone for calling */
@@ -134,14 +183,17 @@ export async function listHousesForAdmin(): Promise<AdminHouseListItem[]> {
 
 export async function getHouseForAdmin(id: string): Promise<AdminHouse | null> {
   const supabase = await createAdminClient();
-  const { data, error } = await supabase
-    .from('houses')
-    .select('*, house_photos(url, sort_order), house_categories(category_id), house_amenities(amenity_id), house_price_tiers(max_guests, weekday_price, weekend_price), house_owner_contacts(phone)')
-    .eq('id', id)
-    .maybeSingle();
+  const related =
+    'house_photos(url, sort_order), house_categories(category_id), house_amenities(amenity_id), house_price_tiers(max_guests, weekday_price, weekend_price), house_owner_contacts(phone)';
+  const query = (withUnits: boolean) =>
+    supabase.from('houses').select(`*, ${related}${withUnits ? ', house_units(*)' : ''}`).eq('id', id).maybeSingle();
+  let { data, error } = await query(true);
+  // Before migration 0010 the units table doesn't exist yet
+  if (error && /house_units/.test(error.message)) ({ data, error } = await query(false));
   if (error) throw new Error(error.message);
   if (!data) return null;
-  const { house_photos, house_categories, house_amenities, house_price_tiers, house_owner_contacts, ...h } = data;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { house_photos, house_categories, house_amenities, house_price_tiers, house_owner_contacts, house_units, party_prices, ...h } = data as any;
   // One-to-one relation: PostgREST returns an object (or an array in older versions)
   const ownerContact = Array.isArray(house_owner_contacts) ? house_owner_contacts[0] : house_owner_contacts;
   return {
@@ -151,6 +203,25 @@ export async function getHouseForAdmin(id: string): Promise<AdminHouse | null> {
       .sort((a, b) => a.max_guests - b.max_guests),
     weekday_price: Number(h.weekday_price),
     weekend_price: Number(h.weekend_price),
+    party_prices: partyRows(party_prices),
+    units: [...(house_units ?? [])]
+      .sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order)
+      .map((u: AdminUnit & { party_prices: unknown; price_tiers: unknown; weekday_price: unknown; weekend_price: unknown }) => ({
+        id: u.id,
+        name: u.name,
+        capacity: u.capacity,
+        day_capacity: u.day_capacity,
+        weekday_price: Number(u.weekday_price),
+        weekend_price: Number(u.weekend_price),
+        parties_allowed: u.parties_allowed,
+        pets_allowed: u.pets_allowed,
+        smoking_allowed: u.smoking_allowed,
+        check_in_time: u.check_in_time,
+        check_out_time: u.check_out_time,
+        party_prices: partyRows(u.party_prices),
+        price_tiers: partyRows(u.price_tiers),
+        party_only: u.party_only === true,
+      })),
     owner_phone: ownerContact?.phone ?? '',
     category_ids: house_categories.map((c: { category_id: string }) => c.category_id),
     amenity_ids: house_amenities.map((a: { amenity_id: string }) => a.amenity_id),

@@ -7,6 +7,7 @@ import { routing } from '@/i18n/routing';
 import { site } from '@/lib/site';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { Analytics } from '@vercel/analytics/next';
 import '../globals.css';
 
 const playfair = Playfair_Display({
@@ -43,7 +44,11 @@ export async function generateMetadata({
       type: 'website',
       locale,
       alternateLocale: routing.locales.filter((l) => l !== locale),
+      // Preview picture for shared links (hero photo + logo + slogan, 1200×630, ~100 KB).
+      // House and owner pages replace it with their own photo.
+      images: [{ url: `/images/og-${locale === 'en' ? 'en' : 'sr'}.jpg`, width: 1200, height: 630, alt: 'Vikendly' }],
     },
+    twitter: { card: 'summary_large_image' },
     // Each page sets its own canonical / language links (lib/seo.ts)
   };
 }
@@ -69,6 +74,9 @@ export default async function LocaleLayout({
           <main>{children}</main>
           <Footer />
         </NextIntlClientProvider>
+        {/* Anonymous visit counts (Vercel Web Analytics: no cookies, nothing personal). Only
+            collects on the live site once Analytics is switched on in the Vercel project. */}
+        <Analytics />
       </body>
     </html>
   );

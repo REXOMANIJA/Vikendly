@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { getSupabase } from '@/lib/supabase/public';
-import type { Category, Destination, House } from '@/types';
+import type { Category, Destination, House, HouseUnit, PartyPrice, PriceTier } from '@/types';
 
 /**
  * All data access goes through this file. Components never talk to Supabase directly.
@@ -45,7 +45,75 @@ type HouseRow = {
   house_categories: { category_id: string }[];
   house_amenities: { amenity_id: string }[];
   house_price_tiers: { max_guests: number; weekday_price: number; weekend_price: number }[];
+  /** Missing until migration 0010 is run */
+  party_prices?: unknown;
+  house_units?: UnitRow[];
 };
+
+type UnitRow = {
+  id: string;
+  sort_order: number;
+  name: string;
+  capacity: number;
+  day_capacity: number | null;
+  weekday_price: number;
+  weekend_price: number;
+  parties_allowed: boolean;
+  pets_allowed: boolean;
+  smoking_allowed: boolean;
+  check_in_time: string;
+  check_out_time: string;
+  party_prices: unknown;
+  price_tiers?: unknown;
+  party_only?: boolean;
+};
+
+/**
+ * [{max_guests, weekday_price, weekend_price}] from the database → sorted PartyPrice[].
+ * An older single "price" counts for both days; anything malformed is skipped.
+ */
+export function toPartyPrices(value: unknown): PartyPrice[] {
+  if (!Array.isArray(value)) return [];
+  const ok = (n: number) => Number.isFinite(n) && n >= 0;
+  return value
+    .map((p) => ({
+      maxGuests: Number(p?.max_guests),
+      weekdayPrice: Number(p?.weekday_price ?? p?.price),
+      weekendPrice: Number(p?.weekend_price ?? p?.price),
+    }))
+    .filter((p) => Number.isFinite(p.maxGuests) && p.maxGuests > 0 && ok(p.weekdayPrice) && ok(p.weekendPrice))
+    .sort((a, b) => a.maxGuests - b.maxGuests);
+}
+
+/** Group prices stored as JSON on a unit → sorted PriceTier[] */
+function toTiers(value: unknown): PriceTier[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((t) => ({ maxGuests: Number(t?.max_guests), weekdayPrice: Number(t?.weekday_price), weekendPrice: Number(t?.weekend_price) }))
+    .filter((t) => [t.maxGuests, t.weekdayPrice, t.weekendPrice].every(Number.isFinite) && t.maxGuests > 0)
+    .sort((a, b) => a.maxGuests - b.maxGuests);
+}
+
+function toUnit(row: UnitRow): HouseUnit {
+  return {
+    id: row.id,
+    name: row.name,
+    capacity: row.capacity,
+    dayCapacity: row.day_capacity ?? undefined,
+    weekdayPrice: Number(row.weekday_price),
+    weekendPrice: Number(row.weekend_price),
+    tiers: toTiers(row.price_tiers),
+    partyOnly: row.party_only === true,
+    rules: {
+      partiesAllowed: row.parties_allowed,
+      petsAllowed: row.pets_allowed,
+      smokingAllowed: row.smoking_allowed,
+      checkInTime: row.check_in_time,
+      checkOutTime: row.check_out_time,
+    },
+    partyPrices: toPartyPrices(row.party_prices),
+  };
+}
 
 type DestinationRow = {
   id: string;
@@ -95,6 +163,8 @@ function toHouse(row: HouseRow): House & { featuredRank: number | null } {
       lng: row.lng ?? undefined,
     },
     verifiedAt: row.verified_at ?? undefined,
+    partyPrices: toPartyPrices(row.party_prices),
+    units: [...(row.house_units ?? [])].sort((a, b) => a.sort_order - b.sort_order).map(toUnit),
     featuredRank: row.featured_rank,
   };
 }
@@ -116,15 +186,19 @@ const loadHouses = cache(async (): Promise<(House & { featuredRank: number | nul
     const { houses } = await import('@/data/houses');
     return houses.map((h, i) => ({ ...h, featuredRank: i < 6 ? i + 1 : null }));
   }
-  const { data, error } = await getSupabase()
-    .from('houses')
-    .select(
-      '*, house_photos(url, sort_order), house_categories(category_id), house_amenities(amenity_id), house_price_tiers(max_guests, weekday_price, weekend_price)'
-    )
-    .eq('is_published', true)
-    .order('name');
+  const related =
+    'house_photos(url, sort_order), house_categories(category_id), house_amenities(amenity_id), house_price_tiers(max_guests, weekday_price, weekend_price)';
+  const query = (withUnits: boolean) =>
+    getSupabase()
+      .from('houses')
+      .select(`*, ${related}${withUnits ? ', house_units(*)' : ''}`)
+      .eq('is_published', true)
+      .order('name');
+  let { data, error } = await query(true);
+  // Before migration 0010 the units table doesn't exist yet: load the houses without units
+  if (error && /house_units/.test(error.message)) ({ data, error } = await query(false));
   if (error) throw new Error(`Could not load houses: ${error.message}`);
-  return (data as HouseRow[]).map(toHouse);
+  return (data as unknown as HouseRow[]).map(toHouse);
 });
 
 const loadDestinations = cache(async (): Promise<Destination[]> => {
