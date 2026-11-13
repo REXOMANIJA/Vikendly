@@ -118,6 +118,8 @@ export type BookingRequest = {
   locale: string;
   status: 'new' | 'contacted' | 'confirmed' | 'declined';
   created_at: string;
+  /** Review link for this booking, if one was made (migration 0013) */
+  review?: BookingReview | null;
   /** People at a party in total (migration 0010); null = no party */
   party_guests?: number | null;
   /** Which units and the price of each part (migration 0010) */
@@ -138,23 +140,71 @@ export type BookingRequest = {
 /** All booking requests, newest first, with the house's owner phone for calling */
 export async function listBookingRequests(): Promise<BookingRequest[]> {
   const supabase = await createAdminClient();
-  const { data, error } = await supabase
-    .from('booking_requests')
-    .select('*, houses(slug, house_owner_contacts(phone))')
-    .order('created_at', { ascending: false });
+  const query = (withReviews: boolean) =>
+    supabase
+      .from('booking_requests')
+      .select(`*, houses(slug, house_owner_contacts(phone))${withReviews ? ', reviews(token, status, rating)' : ''}`)
+      .order('created_at', { ascending: false });
+  let { data, error } = await query(true);
+  // Before migration 0013 there is no reviews table
+  if (error && /reviews/.test(error.message)) ({ data, error } = await query(false));
   if (error) throw new Error(error.message);
-  type Row = Omit<BookingRequest, 'house_slug' | 'owner_phone'> & {
+  type Row = Omit<BookingRequest, 'house_slug' | 'owner_phone' | 'review'> & {
     houses: { slug: string; house_owner_contacts: { phone: string } | { phone: string }[] | null } | null;
+    reviews?: BookingReview | BookingReview[] | null;
   };
-  return (data as Row[]).map(({ houses, ...r }) => {
+  return (data as unknown as Row[]).map(({ houses, reviews, ...r }) => {
     const contact = houses?.house_owner_contacts;
     return {
       ...r,
       quoted_total: Number(r.quoted_total),
       house_slug: houses?.slug ?? null,
       owner_phone: (Array.isArray(contact) ? contact[0]?.phone : contact?.phone) ?? null,
+      review: (Array.isArray(reviews) ? reviews[0] : reviews) ?? null,
     };
   });
+}
+
+/** Review link made for a booking (migration 0013) */
+export type BookingReview = { token: string; status: 'invited' | 'submitted' | 'approved' | 'hidden'; rating: number | null };
+
+export type AdminReview = {
+  id: string;
+  status: 'submitted' | 'approved' | 'hidden';
+  guest_name: string | null;
+  rating: number;
+  comment: string | null;
+  locale: string;
+  submitted_at: string;
+  house_name: string;
+  house_slug: string;
+};
+
+/** Reviews guests have sent (not the unused links), newest first */
+export async function listReviews(): Promise<AdminReview[] | null> {
+  const supabase = await createAdminClient();
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('id, status, guest_name, rating, comment, locale, submitted_at, houses(name, slug)')
+    .neq('status', 'invited')
+    .order('submitted_at', { ascending: false });
+  if (error) return null; // table missing (migration 0013 not run)
+  type Row = Omit<AdminReview, 'house_name' | 'house_slug'> & { houses: { name: string; slug: string } | null };
+  return (data as unknown as Row[]).map(({ houses, ...r }) => ({
+    ...r,
+    house_name: houses?.name ?? '(obrisana kuća)',
+    house_slug: houses?.slug ?? '',
+  }));
+}
+
+/** Reviews waiting for approval (shown in the admin menu) */
+export async function countNewReviews(): Promise<number> {
+  const supabase = await createAdminClient();
+  const { count, error } = await supabase
+    .from('reviews')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'submitted');
+  return error ? 0 : count ?? 0;
 }
 
 /** Number of requests nobody has handled yet (shown in the admin menu) */
@@ -165,6 +215,24 @@ export async function countNewBookingRequests(): Promise<number> {
     .select('id', { count: 'exact', head: true })
     .eq('status', 'new');
   return count ?? 0;
+}
+
+/** Number of owner applications nobody has handled yet (shown in the admin menu) */
+export async function countNewOwnerApplications(): Promise<number> {
+  const supabase = await createAdminClient();
+  const { count } = await supabase
+    .from('owner_applications')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'new');
+  return count ?? 0;
+}
+
+/** One owner application (for "create a house from this application") */
+export async function getOwnerApplication(id: string): Promise<OwnerApplication | null> {
+  const supabase = await createAdminClient();
+  const { data, error } = await supabase.from('owner_applications').select('*').eq('id', id).maybeSingle();
+  if (error) return null;
+  return (data as OwnerApplication | null) ?? null;
 }
 
 export async function listHousesForAdmin(): Promise<AdminHouseListItem[]> {

@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Check, CircleCheck, Loader2, PawPrint, Send, Users } from 'lucide-react';
 import type { House } from '@/types';
-import { getBookables, getNightlyRates, hasUnits, partyLimit, quoteStay, type Bookable } from '@/lib/pricing';
+import { getBookables, getNightlyRates, hasUnits, isVenue, partyLimit, quoteStay, type Bookable } from '@/lib/pricing';
 import { checkSelection, quoteSelection, suggestSelection, type Selection, type SelectionProblem } from '@/lib/booking';
 import { formatDateRange, parseDateParam } from '@/lib/dates';
 import { submitBookingRequest, type BookingRequestResult } from '@/lib/actions';
@@ -59,13 +59,23 @@ export default function PriceCalculator({
     const outDate = parseDateParam(initialCheckOut);
     const unitNames =
       multi && initialGuests && inDate && outDate && outDate > inDate
-        ? quoteStay(house, inDate, outDate, initialGuests).units
+        ? quoteStay(house, inDate, outDate, initialGuests)?.units
         : undefined;
-    const preset = multi && !unitNames ? [] : suggestSelection(house, initialGuests ?? 1, unitNames);
+    // A venue with a single party space: that space is always the one being booked
+    const venueSingle = isVenue(house) && bookables.length === 1;
+    const preset =
+      (multi && !unitNames && !venueSingle) ? [] : suggestSelection(house, initialGuests ?? 1, unitNames);
     return Object.fromEntries(
       bookables.map((b) => {
         const p = preset.find((x) => x.id === b.id);
-        return [b.id, { selected: !multi || !!p, guests: p && initialGuests ? String(p.guests) : '', partyGuests: '' }];
+        return [
+          b.id,
+          {
+            selected: !multi || !!p,
+            guests: p && initialGuests && p.guests ? String(p.guests) : '',
+            partyGuests: p && initialGuests && p.partyGuests ? String(p.partyGuests) : '',
+          },
+        ];
       })
     );
   });

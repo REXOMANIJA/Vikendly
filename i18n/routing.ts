@@ -24,6 +24,19 @@ export const routing = defineRouting({
       sr: '/kontakt',
       en: '/contact',
     },
+    '/faq': {
+      sr: '/cesta-pitanja',
+      en: '/faq',
+    },
+    '/saved': {
+      sr: '/sacuvane',
+      en: '/saved',
+    },
+    // Private review link a guest gets after a confirmed stay (not in the sitemap)
+    '/review/[token]': {
+      sr: '/ocena/[token]',
+      en: '/review/[token]',
+    },
     '/terms': {
       sr: '/uslovi-koriscenja',
       en: '/terms',

@@ -134,6 +134,17 @@ a {
 ::view-transition-new(site-header) {
   animation: none;
 }
+/* Same for the loading bar at the top (components/layout/NavigationProgress.tsx) */
+::view-transition-group(nav-progress) {
+  animation: none;
+  z-index: 101;
+}
+::view-transition-old(nav-progress) {
+  display: none;
+}
+::view-transition-new(nav-progress) {
+  animation: none;
+}
 
 /* Forward (opening a category, destination or house): old page drifts left, new one comes from the right */
 ::view-transition-old(.nav-forward) {
@@ -249,5 +260,19 @@ a {
   .vk-menu-in,
   .vk-menu-item {
     animation: none;
+  }
+}
+
+/* ───── Loading bar at the top (components/layout/NavigationProgress.tsx) ───── */
+/* Fills quickly at first, then slows down and waits at 90% until the page is there */
+.vk-progress {
+  animation: vk-progress 10s cubic-bezier(0.08, 0.8, 0.2, 1) forwards;
+}
+@keyframes vk-progress {
+  from {
+    transform: scaleX(0.05);
+  }
+  to {
+    transform: scaleX(0.9);
   }
 }

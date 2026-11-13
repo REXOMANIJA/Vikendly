@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { Home, Inbox, ExternalLink, LogOut, CalendarCheck, MapPin } from 'lucide-react';
+import { Home, Inbox, ExternalLink, LogOut, CalendarCheck, MapPin, Star } from 'lucide-react';
 import { createAdminClient, getAdminUser } from '@/lib/supabase/server';
-import { countNewBookingRequests } from '@/lib/admin-data';
+import { countNewBookingRequests, countNewOwnerApplications, countNewReviews } from '@/lib/admin-data';
 import { signOut } from '../actions';
 
 // Admin pages always show live data and are never cached
@@ -31,7 +31,11 @@ export default async function AdminPanelLayout({ children }: { children: React.R
   }
 
   const nav = 'inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-primary/10';
-  const newRequests = await countNewBookingRequests();
+  const [newRequests, newApplications, newReviews] = await Promise.all([
+    countNewBookingRequests(),
+    countNewOwnerApplications(),
+    countNewReviews(),
+  ]);
 
   return (
     <div className="min-h-screen">
@@ -51,7 +55,22 @@ export default async function AdminPanelLayout({ children }: { children: React.R
             </Link>
             <Link href="/admin/kuce" className={nav}><Home className="size-4" aria-hidden /> Kuće</Link>
             <Link href="/admin/destinacije" className={nav}><MapPin className="size-4" aria-hidden /> Destinacije</Link>
-            <Link href="/admin/prijave" className={nav}><Inbox className="size-4" aria-hidden /> Prijave vlasnika</Link>
+            <Link href="/admin/prijave" className={nav}>
+              <Inbox className="size-4" aria-hidden /> Prijave vlasnika
+              {newApplications > 0 && (
+                <span className="rounded-full bg-accent-dark px-1.5 py-0.5 text-xs font-semibold text-white" title="Nove prijave">
+                  {newApplications}
+                </span>
+              )}
+            </Link>
+            <Link href="/admin/ocene" className={nav}>
+              <Star className="size-4" aria-hidden /> Ocene
+              {newReviews > 0 && (
+                <span className="rounded-full bg-accent-dark px-1.5 py-0.5 text-xs font-semibold text-white" title="Ocene koje čekaju odobrenje">
+                  {newReviews}
+                </span>
+              )}
+            </Link>
             <a href="/sr" target="_blank" className={nav}><ExternalLink className="size-4" aria-hidden /> Sajt</a>
           </nav>
           <span className="hidden text-sm text-text/60 sm:inline">{admin.email}</span>

@@ -109,7 +109,30 @@ export interface House {
   partyPrices?: PartyPrice[];
   /** Separately rented units; empty or missing = the listing is rented as one */
   units?: HouseUnit[];
+  /** Average of approved guest reviews; missing = no reviews yet */
+  rating?: RatingSummary;
   // Owner contact is private (admin only, table house_owner_contacts); guests send booking requests instead.
+}
+
+/** A guest review, shown once the team approved it (table reviews, migration 0013) */
+export interface Review {
+  id: string;
+  houseId: string;
+  /** First name the guest gave */
+  guestName: string;
+  /** 1–5 stars */
+  rating: number;
+  comment?: string;
+  /** Language the guest wrote in */
+  locale: 'sr' | 'en';
+  /** "yyyy-MM-dd" */
+  date: string;
+}
+
+export interface RatingSummary {
+  /** Average stars, one decimal */
+  average: number;
+  count: number;
 }
 
 export interface PriceCalculation {
@@ -125,4 +148,6 @@ export interface PriceCalculation {
   tierMaxGuests?: number;
   /** Listing with units: the units this price is for */
   units?: string[];
+  /** Event venue: the price of one party day (no nights) */
+  partyDay?: boolean;
 }

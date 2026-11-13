@@ -16,7 +16,8 @@
     "menu": "Open menu",
     "closeMenu": "Close menu",
     "menuTagline": "Weekend houses in Serbia and the region, with the full price up front.",
-    "language": "Language"
+    "language": "Language",
+    "saved": "Saved houses ({count})"
   },
   "languageSwitcher": {
     "label": "Language",
@@ -41,7 +42,9 @@
       "close": "Close search",
       "name": "House name",
       "namePlaceholder": "e.g. Vila Ribnica",
-      "dates": "Dates"
+      "dates": "Dates",
+      "guestsPlaceholder": "How many",
+      "budgetPlaceholder": "No limit"
     },
     "promises": {
       "totalPrice": "Full price upfront, no hidden fees",
@@ -97,7 +100,11 @@
     },
     "perPerson": "{price} per person",
     "sleeps": "Sleeps {count, plural, one {up to # guest} other {up to # guests}}",
-    "dayCapacity": "Gatherings: {count, plural, one {up to # guest} other {up to # guests}}"
+    "dayCapacity": "Gatherings: {count, plural, one {up to # guest} other {up to # guests}}",
+    "partyCapacity": "Parties: {count, plural, one {up to # guest} other {up to # guests}}",
+    "perParty": " per party",
+    "partyDay": "party, one day",
+    "reviews": "({count, plural, one {# review} other {# reviews}})"
   },
   "search": {
     "title": "Search results",
@@ -167,7 +174,8 @@
       "text": "Send a request, we check the dates with the owner and get back to you."
     },
     "eyebrow": "Why us",
-    "intro": "We are not another huge listings site. We pick fewer houses, check them in person and show everything you need to know before you go."
+    "intro": "We are not another huge listings site. We pick fewer houses, check them in person and show everything you need to know before you go.",
+    "imageAlt": "Wooden party room at the Kutak u Vraniću house"
   },
   "howItWorks": {
     "title": "How it works",
@@ -228,7 +236,8 @@
       "terms": "Terms of use",
       "privacy": "Privacy policy",
       "owners": "For owners",
-      "destinations": "Destinations"
+      "destinations": "Destinations",
+      "faq": "FAQ"
     },
     "copyright": "© {year} Vikendly. All rights reserved."
   },
@@ -387,6 +396,14 @@
     },
     "rules": {
       "partyPrice": "Party price (weekdays / weekend): {levels}. Paid once per stay."
+    },
+    "mobilePriceParty": "from {price} per party",
+    "shareText": "{name}, {destination} – a weekend house on Vikendly:",
+    "reviews": {
+      "title": "What guests say",
+      "starsLabel": "{average} out of 5 stars",
+      "count": "{count, plural, one {# review} other {# reviews}}",
+      "verifiedOnly": "only guests who stayed here"
     }
   },
   "datePicker": {
@@ -541,5 +558,104 @@
     "text": "This page can’t be loaded right now. Please try again in a moment; if it keeps happening, let us know.",
     "retry": "Try again",
     "home": "Home page"
+  },
+  "faq": {
+    "metaTitle": "Questions from guests | Vikendly",
+    "metaDescription": "How requests, payment and deposits, cancellation, check-in and check-out, pets and parties work for weekend houses on Vikendly.",
+    "eyebrow": "For guests",
+    "title": "Frequently asked questions",
+    "intro": "What guests ask most often before sending a request. If your question is not here, get in touch.",
+    "items": {
+      "howToBook": {
+        "q": "How do I book a house?",
+        "a": "On the house page, pick your dates and the number of guests and send a request with your name and phone. We check the dates with the owner and call you back. A request does not commit you to anything: the house is yours only once you confirm it on that call."
+      },
+      "payment": {
+        "q": "Do I pay on the website?",
+        "a": "No. Nothing is paid on the site and you never enter card details. Payment is arranged directly with the owner, and we tell you how and when to pay before you confirm."
+      },
+      "deposit": {
+        "q": "Is there a deposit?",
+        "a": "It depends on the house: some owners ask for a deposit to hold the dates, some don’t. You hear the amount and how to pay it from us before you confirm the stay, never after."
+      },
+      "cancellation": {
+        "q": "What if I need to cancel?",
+        "a": "Until you confirm the stay, just let us know and you pay nothing. After confirming, the house’s cancellation terms apply (for example, whether the deposit is refunded); we tell you these before you confirm."
+      },
+      "price": {
+        "q": "Is the price on the site final?",
+        "a": "Yes. The price you see is for the whole stay and your group size, with nothing added. If you also choose a party space, its price is shown separately and included in the total."
+      },
+      "checkIn": {
+        "q": "When are check-in and check-out?",
+        "a": "Check-in and check-out times are on each house page (for places with several parts, next to each part). If you’d like to arrive earlier or leave later, write it in the message with your request and we will ask the owner."
+      },
+      "pets": {
+        "q": "Can I bring a pet?",
+        "a": "Each house page clearly says whether pets are allowed. If they are, mention your pet in the request so the owner knows."
+      },
+      "parties": {
+        "q": "Are parties allowed?",
+        "a": "Every house says whether parties are allowed or it is a quiet house. Some have a separate space for celebrations, priced by the number of people, and houses with beds show how many people can be there during the day. If you are not sure, write what you are planning in the message."
+      },
+      "verified": {
+        "q": "What does “Verified in person” mean?",
+        "a": "That we have been to the house ourselves, met the host and checked that everything looks like in the photos. The house page also shows when we visited."
+      }
+    },
+    "moreTitle": "Didn’t find an answer?",
+    "moreText": "Call or write to us, we are happy to help.",
+    "moreLink": "Contact"
+  },
+  "favorites": {
+    "add": "Save {name}",
+    "remove": "Remove {name} from saved",
+    "save": "Save",
+    "saved": "Saved",
+    "metaTitle": "Saved houses | Vikendly",
+    "title": "Saved houses",
+    "intro": "Houses you marked with a heart. Kept only in this browser, no account needed.",
+    "emptyTitle": "No saved houses yet",
+    "emptyText": "Tap the heart on a house you like and you will find it here later.",
+    "browse": "Browse houses",
+    "count": "{count, plural, one {# saved house} other {# saved houses}}"
+  },
+  "share": {
+    "button": "Share",
+    "copy": "Copy link",
+    "copied": "Link copied",
+    "copyPrompt": "Copy the link:"
+  },
+  "review": {
+    "metaTitle": "Review your stay | Vikendly",
+    "eyebrow": "Your review",
+    "title": "How was your stay at {house}?",
+    "ratingLabel": "Your rating",
+    "stars": "{count, plural, one {# star} other {# stars}}",
+    "ratingWords": {
+      "1": "Poor",
+      "2": "Below expectations",
+      "3": "Okay",
+      "4": "Very good",
+      "5": "Excellent"
+    },
+    "commentLabel": "What would you tell other guests?",
+    "optional": "optional",
+    "commentPlaceholder": "E.g. how it was, what you liked most, who the house is perfect for…",
+    "nameLabel": "Name shown with your review",
+    "nameHint": "We only show the name you type here, never your phone number.",
+    "submit": "Send review",
+    "moderationNote": "We read reviews before publishing them. Only guests who stayed at the house can leave one.",
+    "thanksTitle": "Thank you for your review!",
+    "thanksText": "You are helping other guests choose. It will appear on the house page once we have read it.",
+    "alreadyTitle": "This link has already been used",
+    "alreadyText": "A review for this stay has already been sent. Thank you!",
+    "houseLink": "See {house}",
+    "errors": {
+      "invalid": "Choose 1 to 5 stars.",
+      "used": "This link has already been used.",
+      "tooMany": "Too many attempts. Please try again in an hour.",
+      "server": "Your review was not sent because of an error on our side. Please try again in a few minutes."
+    }
   }
 }

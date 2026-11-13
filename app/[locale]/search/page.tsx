@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { localizedAlternates } from '@/lib/seo';
 import { getHouses, getDestinations, getCategories, getCategoryBySlug, getHouseCountsByDestination } from '@/lib/data';
-import { getLowestNightlyPrice, quoteStay } from '@/lib/pricing';
+import { getLowestNightlyPrice, maxGuestsOf, quoteStay } from '@/lib/pricing';
 import { parseDateParam } from '@/lib/dates';
 import { slugify } from '@/lib/slug';
 import { Link } from '@/i18n/navigation';
@@ -107,7 +107,8 @@ export default async function SearchPage({
     .filter((house) => {
       if (destination && house.destinationId !== destination.id) return false;
       if (category && !house.categoryIds.includes(category.id)) return false;
-      if (guests && house.capacity < guests) return false;
+      // Venues (no beds) count the people their party space takes
+      if (guests && maxGuestsOf(house) < guests) return false;
       if (onlyVerified && !house.verifiedAt) return false;
       if (queryWords.length && !matchesQuery(house.name, destinationOf(house.destinationId)?.name)) return false;
       return true;
@@ -129,7 +130,7 @@ export default async function SearchPage({
       : sort === 'price-desc'
         ? priceOf(b) - priceOf(a)
         : sort === 'capacity'
-          ? b.house.capacity - a.house.capacity
+          ? maxGuestsOf(b.house) - maxGuestsOf(a.house)
           : Number(!!b.house.verifiedAt) - Number(!!a.house.verifiedAt)
   );
 

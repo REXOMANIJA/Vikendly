@@ -1,9 +1,10 @@
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { PartyPopper, Moon, PawPrint, WavesLadder, Users, BedDouble, Images } from 'lucide-react';
+import { PartyPopper, Moon, PawPrint, WavesLadder, Users, BedDouble, Images, Star } from 'lucide-react';
+import FavoriteButton from '@/components/FavoriteButton';
 import type { LucideIcon } from 'lucide-react';
 import { House, PriceCalculation } from '@/types';
-import { getLowestNightlyPrice } from '@/lib/pricing';
+import { getLowestNightlyPrice, isVenue, maxGuestsOf } from '@/lib/pricing';
 import { Link } from '@/i18n/navigation';
 import { isVector } from '@/lib/images';
 import VerifiedBadge from '@/components/VerifiedBadge';
@@ -36,6 +37,8 @@ export default function HouseCard({
 }: HouseCardProps) {
   const t = useTranslations('houseCard');
   const { capacity, name, rules } = house;
+  // Event venue: no beds, priced per party
+  const venue = isVenue(house);
 
   // House rules are a core promise of Vikendly, so they're visible on every card
   const badges: Badge[] = [
@@ -62,6 +65,8 @@ export default function HouseCard({
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
         {house.verifiedAt && <VerifiedBadge variant="photo" className="absolute left-2 top-2" />}
+        {/* Above the card-wide link, so tapping the heart saves instead of opening the house */}
+        <FavoriteButton slug={house.slug} name={name} className="absolute right-2 top-2" />
         {house.photos.length > 1 && (
           <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-xs font-medium text-white">
             <Images className="size-3.5" aria-hidden />
@@ -75,6 +80,13 @@ export default function HouseCard({
             {destinationName}
           </p>
         )}
+        {house.rating && (
+          <p className="mb-1 inline-flex items-center gap-1 text-sm font-semibold text-primary">
+            <Star className="size-4 fill-amber-400 text-amber-400" aria-hidden />
+            {house.rating.average.toFixed(1)}
+            <span className="font-normal text-text/60">{t('reviews', { count: house.rating.count })}</span>
+          </p>
+        )}
         <h3 className="font-serif text-xl font-bold text-primary mb-2">
           {/* The link covers the whole card (after:inset-0), so anywhere on the card opens the house */}
           <Link
@@ -86,11 +98,18 @@ export default function HouseCard({
           </Link>
         </h3>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-text/70 mb-3">
-          <span className="inline-flex items-center gap-1.5">
-            <BedDouble className="size-4" aria-hidden />
-            {t('sleeps', { count: capacity })}
-          </span>
-          {house.dayCapacity && house.dayCapacity > capacity && (
+          {venue ? (
+            <span className="inline-flex items-center gap-1.5">
+              <Users className="size-4" aria-hidden />
+              {t('partyCapacity', { count: maxGuestsOf(house) })}
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5">
+              <BedDouble className="size-4" aria-hidden />
+              {t('sleeps', { count: capacity })}
+            </span>
+          )}
+          {!venue && house.dayCapacity && house.dayCapacity > capacity && (
             <span className="inline-flex items-center gap-1.5">
               <Users className="size-4" aria-hidden />
               {t('dayCapacity', { count: house.dayCapacity })}
@@ -127,7 +146,7 @@ export default function HouseCard({
                 )}
               </p>
               <p className="text-xs text-text/60 mt-1">
-                {quoteLabel ?? t('nights', { count: quote.nights })}
+                {quote.partyDay ? t('partyDay') : (quoteLabel ?? t('nights', { count: quote.nights }))}
               </p>
             </>
           ) : (
@@ -135,7 +154,7 @@ export default function HouseCard({
               <span className="text-lg font-bold text-primary">
                 {t('from', { price: eur(getLowestNightlyPrice(house)) })}
               </span>
-              <span className="text-sm text-text/70">{t('perNight')}</span>
+              <span className="text-sm text-text/70">{venue ? t('perParty') : t('perNight')}</span>
             </p>
           )}
         </div>

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { RotateCw, TriangleAlert } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
+import { reportClientError } from '@/lib/actions';
 
 /**
  * Shown instead of a page that crashed (for example if the database can't be reached).
@@ -14,6 +15,10 @@ export default function ErrorPage({ error, retry }: { error: Error & { digest?: 
 
   useEffect(() => {
     console.error(error);
+    // Errors with a digest came from the server and were already reported (instrumentation.ts)
+    if (!error.digest) {
+      reportClientError({ message: error.message || String(error), path: window.location.pathname }).catch(() => {});
+    }
   }, [error]);
 
   return (

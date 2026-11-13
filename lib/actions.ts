@@ -223,3 +223,63 @@ export async function submitBookingRequest(input: BookingRequestInput): Promise<
   );
   return { ok: true };
 }
+
+export type ReviewResult = { ok: true } | { ok: false; error: 'invalid' | 'used' | 'tooMany' | 'server' };
+
+/**
+ * Saves a guest's review from their private link (/ocena/[token]). The review is only shown
+ * on the site after the team approves it in admin → Ocene.
+ */
+export async function submitReview(input: {
+  token: string;
+  rating: number;
+  comment: string;
+  name: string;
+  locale: 'sr' | 'en';
+}): Promise<ReviewResult> {
+  const rating = Math.round(Number(input.rating));
+  const comment = String(input.comment ?? '').trim();
+  const name = String(input.name ?? '').trim();
+  if (!/^[0-9a-f-]{36}$/i.test(String(input.token)) || !(rating >= 1 && rating <= 5)) return { ok: false, error: 'invalid' };
+  if (comment.length > 1500 || name.length > 60) return { ok: false, error: 'invalid' };
+  if (!(await withinRateLimit('review', 5, 3600))) return { ok: false, error: 'tooMany' };
+
+  const { data, error } = await getSupabase().rpc('submit_review', {
+    p_token: input.token,
+    p_rating: rating,
+    p_comment: comment,
+    p_name: name,
+    p_locale: input.locale === 'en' ? 'en' : 'sr',
+  });
+  if (error) {
+    console.error('Review submit failed:', error.message);
+    return { ok: false, error: 'server' };
+  }
+  if (data !== true) return { ok: false, error: 'used' };
+
+  after(() =>
+    notifyTeam(
+      [
+        `⭐ <b>Nova ocena gosta: ${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}</b>`,
+        ...(name ? [`👤 ${esc(name)}`] : []),
+        ...(comment ? [`💬 ${esc(comment.slice(0, 600))}`] : []),
+        '',
+        `<a href="${site.url}/admin/ocene">Odobrite je u adminu</a>`,
+      ].join('\n')
+    )
+  );
+  return { ok: true };
+}
+
+/**
+ * A page crashed in a visitor's browser (error page shown). Server errors are reported by
+ * instrumentation.ts; this covers errors that only happen in the browser. Limited per visitor.
+ */
+export async function reportClientError(input: { message: string; path: string }): Promise<void> {
+  const message = String(input?.message ?? '').slice(0, 500);
+  const path = String(input?.path ?? '').slice(0, 200);
+  if (!message) return;
+  if (!(await withinRateLimit('client-error', 5, 3600))) return;
+  const { alertError } = await import('@/lib/error-alert');
+  after(() => alertError({ kind: 'browser', message, where: path }));
+}

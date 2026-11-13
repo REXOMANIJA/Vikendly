@@ -12,7 +12,7 @@ export const site = {
   phone: '+381 64 477 3663',
   instagram: '', // e.g. 'vikendly.rs' (without @)
   /** Date the privacy policy and terms were last changed */
-  legalUpdated: '2026-11-12',
+  legalUpdated: '2026-11-13',
 };
 
 /** "+381 64 123 4567" → "+381641234567" for tel:, WhatsApp and Viber links */

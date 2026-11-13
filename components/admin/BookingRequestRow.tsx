@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { PartyPopper, CalendarDays, Users, Phone, Mail, Home, Trash2, ExternalLink } from 'lucide-react';
+import { PartyPopper, CalendarDays, Users, Mail, Home, Trash2, ExternalLink } from 'lucide-react';
+import PhoneLinks from '@/components/admin/PhoneLinks';
+import ReviewInvite from '@/components/admin/ReviewInvite';
 import { deleteBookingRequest, setBookingStatus, type BookingStatus } from '@/app/admin/actions';
 import type { BookingRequest } from '@/lib/admin-data';
 
@@ -19,7 +21,6 @@ const day = (s: string) => {
   return new Date(y, m - 1, d);
 };
 const nightsWord = (n: number) => (n % 10 === 1 && n % 100 !== 11 ? 'noć' : 'noći');
-const tel = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
 
 export default function BookingRequestRow({ request }: { request: BookingRequest }) {
   const [status, setStatus] = useState(request.status);
@@ -131,11 +132,9 @@ export default function BookingRequestRow({ request }: { request: BookingRequest
         <div className="rounded-lg bg-background p-3 text-sm">
           <p className="text-xs font-medium uppercase tracking-wide text-text/60">Gost</p>
           <p className="font-medium">{request.name}</p>
-          <a href={tel(request.phone)} className="inline-flex items-center gap-1.5 font-medium text-primary hover:underline">
-            <Phone className="size-3.5" aria-hidden /> {request.phone}
-          </a>
+          <PhoneLinks phone={request.phone} />
           {request.email && (
-            <a href={`mailto:${request.email}`} className="block text-text/80 hover:underline">
+            <a href={`mailto:${request.email}`} className="mt-1.5 block text-text/80 hover:underline">
               <Mail className="mr-1.5 inline size-3.5" aria-hidden />{request.email}
             </a>
           )}
@@ -143,9 +142,7 @@ export default function BookingRequestRow({ request }: { request: BookingRequest
         <div className="rounded-lg bg-background p-3 text-sm">
           <p className="text-xs font-medium uppercase tracking-wide text-text/60">Vlasnik</p>
           {request.owner_phone ? (
-            <a href={tel(request.owner_phone)} className="inline-flex items-center gap-1.5 font-medium text-primary hover:underline">
-              <Phone className="size-3.5" aria-hidden /> {request.owner_phone}
-            </a>
+            <PhoneLinks phone={request.owner_phone} />
           ) : (
             <p className="text-text/60">{request.house_id ? 'Telefon vlasnika nije unet.' : 'Kuća je obrisana.'}</p>
           )}
@@ -154,6 +151,17 @@ export default function BookingRequestRow({ request }: { request: BookingRequest
 
       {request.message && (
         <p className="whitespace-pre-line rounded-lg border border-primary/10 p-3 text-sm text-text/85">{request.message}</p>
+      )}
+      {/* After a confirmed stay: private link for the guest's review */}
+      {status === 'confirmed' && request.house_id && (
+        <ReviewInvite
+          bookingId={request.id}
+          guestName={request.name}
+          guestPhone={request.phone}
+          houseName={request.house_name}
+          locale={request.locale}
+          initial={request.review ?? null}
+        />
       )}
       {error && <p className="text-sm text-accent-dark">{error}</p>}
     </li>

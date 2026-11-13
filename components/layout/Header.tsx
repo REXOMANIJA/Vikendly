@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { ChevronRight, House, KeyRound, Lightbulb, MapPin, Menu, X } from 'lucide-react';
+import { ChevronRight, Heart, House, KeyRound, Lightbulb, MapPin, Menu, X } from 'lucide-react';
+import { useFavorites } from '@/lib/favorites';
 import { Link, usePathname } from '@/i18n/navigation';
 import LanguageSwitcher from './LanguageSwitcher';
 import Logo from './Logo';
 
 const navItems = [
-  { key: 'houses', href: { pathname: '/', hash: 'houses' }, icon: House },
+  // All houses (search page without filters), not just the few featured on the homepage
+  { key: 'houses', href: { pathname: '/search' }, icon: House },
   // Own page: lists every destination, however many there are
   { key: 'destinations', href: { pathname: '/destinations' }, icon: MapPin },
   { key: 'howItWorks', href: { pathname: '/', hash: 'how-it-works' }, icon: Lightbulb },
@@ -22,6 +24,7 @@ export default function Header() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const favorites = useFavorites();
 
   // A bit more solid, with a shadow, once the page is scrolled
   useEffect(() => {
@@ -49,7 +52,8 @@ export default function Header() {
   }, [open]);
 
   const isActive = (key: (typeof navItems)[number]['key']) =>
-    key === 'destinations' && pathname.startsWith('/destinations');
+    (key === 'destinations' && pathname.startsWith('/destinations')) ||
+    (key === 'houses' && pathname.startsWith('/search'));
 
   return (
     <header
@@ -87,6 +91,20 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Saved houses: only once the visitor saved one */}
+            {favorites.list.length > 0 && (
+              <Link
+                href="/saved"
+                aria-label={t('saved', { count: favorites.list.length })}
+                title={t('saved', { count: favorites.list.length })}
+                className="relative flex size-11 items-center justify-center rounded-full bg-white text-accent-dark ring-1 ring-primary/15 transition-colors hover:bg-primary hover:text-white"
+              >
+                <Heart className="size-5 fill-current" aria-hidden />
+                <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-accent-dark text-[11px] font-bold text-white">
+                  {favorites.list.length}
+                </span>
+              </Link>
+            )}
             <div className="hidden md:block">
               <LanguageSwitcher />
             </div>

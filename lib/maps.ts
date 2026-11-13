@@ -50,7 +50,9 @@ const target = (place: { lat?: number; lng?: number; address: string }) =>
 
 /** URL for the embedded map (iframe) with a pin */
 export function mapEmbedUrl(place: { lat?: number; lng?: number; address: string }, locale: string, zoom = 13) {
-  // For Google, "sr" means Serbian in Cyrillic; the site is in Latin script
+  // For Google, "sr" means Serbian in Cyrillic; the site is in Latin script.
+  // With sr-Latn place names are Latin first (Google always adds the Cyrillic name under them in
+  // Serbia, no setting removes that); tested 13 Nov 2026 against bs, hr, sh: those show Cyrillic only.
   const hl = locale === 'sr' ? 'sr-Latn' : locale;
   return `https://maps.google.com/maps?q=${encodeURIComponent(target(place))}&z=${zoom}&hl=${hl}&output=embed`;
 }

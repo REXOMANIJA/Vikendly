@@ -1,7 +1,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import HouseCard from '@/components/cards/HouseCard';
 import SectionHeading from '@/components/SectionHeading';
-import { quoteStay } from '@/lib/pricing';
+import { isVenue, quoteStay } from '@/lib/pricing';
 import { formatDateRange, getUpcomingWeekend, toDateParam } from '@/lib/dates';
 import type { Destination, House } from '@/types';
 
@@ -35,13 +35,16 @@ export default function FreeThisWeekend({
             label: t('seeAll'),
           }}
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Phones: one row you swipe sideways (the next card peeks in), so the homepage stays
+            short; tablet/desktop: a normal grid */}
+        <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3">
           {houses.map((house) => (
+            <div key={house.id} className={`${houses.length > 1 ? 'w-[85%]' : 'w-full'} shrink-0 snap-start sm:w-auto`}>
             <HouseCard
-              key={house.id}
               house={house}
               destinationName={destinationOf(house)?.name}
-              quote={quoteStay(house, checkIn, checkOut, house.capacity)}
+              // Venues show their "from" party price instead of a weekend stay
+              quote={isVenue(house) ? undefined : quoteStay(house, checkIn, checkOut, house.capacity)}
               quoteLabel={t('quoteLabel', { count: house.capacity })}
               guests={house.capacity}
               linkQuery={{
@@ -50,6 +53,7 @@ export default function FreeThisWeekend({
                 guests: house.capacity,
               }}
             />
+            </div>
           ))}
         </div>
       </div>

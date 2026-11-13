@@ -25,9 +25,17 @@ const nextConfig = {
   allowedDevOrigins: ['127.0.0.1'],
   poweredByHeader: false,
   async headers() {
-    return [{ source: '/:path*', headers: securityHeaders }];
+    return [
+      { source: '/:path*', headers: securityHeaders },
+      // Pictures in public/images (hero, categories, share images): browsers keep them a week
+      { source: '/images/:path*', headers: [{ key: 'Cache-Control', value: 'public, max-age=604800, stale-while-revalidate=86400' }] },
+    ];
   },
   images: {
+    // Resized photos are kept 31 days (default is 4 hours). Uploaded photos get a new file name
+    // every time, so a long cache never shows an old picture, and Vercel resizes far less often.
+    // The originals in Supabase Storage are already cached for a year (set on upload).
+    minimumCacheTTL: 2678400,
     // Allowed compression levels for next/image (70 for large photos, 75 is the default)
     qualities: [70, 75],
     // House photos uploaded in the admin panel live in Supabase Storage

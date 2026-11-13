@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { getSupabase } from '@/lib/supabase/public';
-import type { Category, Destination, House, HouseUnit, PartyPrice, PriceTier } from '@/types';
+import type { Category, Destination, House, HouseUnit, PartyPrice, PriceTier, RatingSummary, Review } from '@/types';
 
 /**
  * All data access goes through this file. Components never talk to Supabase directly.
@@ -194,12 +194,45 @@ const loadHouses = cache(async (): Promise<(House & { featuredRank: number | nul
       .select(`*, ${related}${withUnits ? ', house_units(*)' : ''}`)
       .eq('is_published', true)
       .order('name');
-  let { data, error } = await query(true);
+  const [first, reviews] = await Promise.all([query(true), loadReviews()]);
+  let { data, error } = first;
   // Before migration 0010 the units table doesn't exist yet: load the houses without units
   if (error && /house_units/.test(error.message)) ({ data, error } = await query(false));
   if (error) throw new Error(`Could not load houses: ${error.message}`);
-  return (data as unknown as HouseRow[]).map(toHouse);
+  return (data as unknown as HouseRow[]).map((row) => {
+    const house = toHouse(row);
+    const rating = summarize(reviews.filter((r) => r.houseId === house.id));
+    return rating ? { ...house, rating } : house;
+  });
 });
+
+/** Approved guest reviews, newest first. Empty before migration 0013 (no table yet). */
+const loadReviews = cache(async (): Promise<Review[]> => {
+  if (useSampleData) return [];
+  const { data, error } = await getSupabase()
+    .from('reviews')
+    .select('id, house_id, guest_name, rating, comment, locale, submitted_at')
+    .eq('status', 'approved')
+    .order('submitted_at', { ascending: false });
+  if (error) return [];
+  type Row = { id: string; house_id: string; guest_name: string | null; rating: number; comment: string | null; locale: string; submitted_at: string | null };
+  return (data as Row[]).map((r) => ({
+    id: r.id,
+    houseId: r.house_id,
+    guestName: r.guest_name?.trim() || 'Gost',
+    rating: r.rating,
+    comment: r.comment ?? undefined,
+    locale: r.locale === 'en' ? 'en' : 'sr',
+    date: (r.submitted_at ?? '').slice(0, 10),
+  }));
+});
+
+/** Average stars (one decimal) and count; undefined when there are no reviews */
+export function summarize(reviews: Pick<Review, 'rating'>[]): RatingSummary | undefined {
+  if (reviews.length === 0) return undefined;
+  const average = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+  return { average: Math.round(average * 10) / 10, count: reviews.length };
+}
 
 const loadDestinations = cache(async (): Promise<Destination[]> => {
   if (useSampleData) return (await import('@/data/destinations')).destinations;
@@ -250,6 +283,11 @@ export async function getSimilarHouses(house: House, limit = 3): Promise<House[]
   return [...sameDestination, ...sameCategory].slice(0, limit);
 }
 
+/** Approved reviews of one house, newest first */
+export async function getHouseReviews(houseId: string): Promise<Review[]> {
+  return (await loadReviews()).filter((r) => r.houseId === houseId);
+}
+
 export async function getHouseCountsByDestination(): Promise<Record<string, number>> {
   const counts: Record<string, number> = {};
   for (const house of await loadHouses()) {
@@ -276,4 +314,30 @@ export async function getCategories(): Promise<Category[]> {
 
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
   return (await loadCategories()).find((c) => c.slug === slug);
+}
+
+/** What a guest's review link is for (page /ocena/[token]); undefined = unknown link */
+export type ReviewInvite = {
+  houseName: string;
+  houseSlug: string;
+  guestName: string;
+  checkIn?: string;
+  checkOut?: string;
+  /** 'invited' = can still be used; anything else = already reviewed */
+  status: string;
+};
+
+export async function getReviewInvite(token: string): Promise<ReviewInvite | undefined> {
+  if (useSampleData || !/^[0-9a-f-]{36}$/i.test(token)) return undefined;
+  const { data, error } = await getSupabase().rpc('get_review_invite', { p_token: token });
+  if (error || !Array.isArray(data) || data.length === 0) return undefined;
+  const r = data[0] as { house_name: string; house_slug: string; guest_name: string | null; check_in: string | null; check_out: string | null; status: string };
+  return {
+    houseName: r.house_name,
+    houseSlug: r.house_slug,
+    guestName: r.guest_name ?? '',
+    checkIn: r.check_in ?? undefined,
+    checkOut: r.check_out ?? undefined,
+    status: r.status,
+  };
 }

@@ -42,7 +42,7 @@ describe('listings with units', () => {
     // 5 people: Kuća sa balkonom alone (€200) beats Kuća + Apartman (€220)
     expect(quoteStay(withUnits, d(13), d(15), 5)).toMatchObject({ total: 200, units: ['Kuća sa balkonom'] });
     // 11 people: all three units
-    expect(quoteStay(withUnits, d(13), d(15), 11).units).toEqual(['Kuća', 'Kuća sa balkonom', 'Apartman']);
+    expect(quoteStay(withUnits, d(13), d(15), 11)!.units).toEqual(['Kuća', 'Kuća sa balkonom', 'Apartman']);
   });
 
   it('shows the cheapest unit as the "from" price', () => {
@@ -62,8 +62,8 @@ describe('smaller-group prices in a unit', () => {
   };
 
   it('uses the group price when the unit is not full', () => {
-    expect(quoteStay(tiered, d(13), d(15), 2).total).toBe(120); // 2 weekend nights × €60
-    expect(quoteStay(tiered, d(13), d(15), 5).total).toBe(200); // full price
+    expect(quoteStay(tiered, d(13), d(15), 2)!.total).toBe(120); // 2 weekend nights × €60
+    expect(quoteStay(tiered, d(13), d(15), 5)!.total).toBe(200); // full price
   });
 
   it('counts group prices in the "from" price', () => {
@@ -151,7 +151,55 @@ describe('party-only spaces (e.g. Letnjikovac)', () => {
   });
 
   it('leaves the party space out of overnight prices in search', () => {
-    expect(quoteStay(venue, d(13), d(15), 3).units).toEqual(['Kuća']);
+    expect(quoteStay(venue, d(13), d(15), 3)!.units).toEqual(['Kuća']);
     expect(getLowestNightlyPrice(venue)).toBe(50);
+  });
+});
+
+describe('event venue (only party-only spaces, no beds)', () => {
+  const hall: House = {
+    ...base,
+    capacity: 0,
+    units: [
+      {
+        id: 'hall',
+        name: 'Sala',
+        capacity: 0,
+        dayCapacity: 70,
+        weekdayPrice: 0,
+        weekendPrice: 0,
+        partyOnly: true,
+        rules: { ...rules, partiesAllowed: true },
+        partyPrices: [
+          { maxGuests: 30, weekdayPrice: 190, weekendPrice: 315 },
+          { maxGuests: 70, weekdayPrice: 315, weekendPrice: 440 },
+        ],
+      },
+    ],
+  };
+  const { suggestSelection } = jest.requireActual('@/lib/booking') as typeof import('@/lib/booking');
+  const { isVenue, maxGuestsOf } = jest.requireActual('@/lib/pricing') as typeof import('@/lib/pricing');
+
+  it('is recognised as a venue and counts party guests, not beds', () => {
+    expect(isVenue(hall)).toBe(true);
+    expect(isVenue(withUnits)).toBe(false);
+    expect(maxGuestsOf(hall)).toBe(70);
+    expect(maxGuestsOf(withUnits)).toBe(10);
+  });
+
+  it('shows the lowest party price as its "from" price', () => {
+    expect(getLowestNightlyPrice(hall)).toBe(190);
+  });
+
+  it('quotes one party day for the group (weekend price on Friday)', () => {
+    expect(quoteStay(hall, d(13), d(14), 25)).toMatchObject({ total: 315, partyDay: true, units: ['Sala'] });
+    expect(quoteStay(hall, d(18), d(19), 50)).toMatchObject({ total: 315, partyDay: true });
+    // Too many people for any space: no price
+    expect(quoteStay(hall, d(18), d(19), 90)).toBeUndefined();
+  });
+
+  it('preselects the party space with the group as party guests', () => {
+    expect(suggestSelection(hall, 40)).toEqual([{ id: 'hall', guests: 0, partyGuests: 40 }]);
+    expect(suggestSelection(hall, 200)).toEqual([{ id: 'hall', guests: 0, partyGuests: 70 }]);
   });
 });

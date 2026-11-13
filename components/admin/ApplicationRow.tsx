@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Phone, MapPin, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { MapPin, Plus, Trash2 } from 'lucide-react';
+import PhoneLinks from '@/components/admin/PhoneLinks';
 import { deleteApplication, setApplicationStatus } from '@/app/admin/actions';
 import type { OwnerApplication } from '@/lib/admin-data';
 
@@ -47,7 +49,6 @@ export default function ApplicationRow({ application }: { application: OwnerAppl
   const date = new Intl.DateTimeFormat('sr-Latn', { dateStyle: 'medium', timeStyle: 'short' }).format(
     new Date(application.created_at)
   );
-  const tel = application.phone.replace(/[^\d+]/g, '');
 
   return (
     <li className="space-y-3 p-5">
@@ -73,15 +74,21 @@ export default function ApplicationRow({ application }: { application: OwnerAppl
           </button>
         </div>
       </div>
-      <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
-        <a href={`tel:${tel}`} className="inline-flex items-center gap-1.5 font-medium text-primary hover:underline">
-          <Phone className="size-4" aria-hidden /> {application.phone}
-        </a>
+      <div className="flex flex-wrap items-start gap-x-6 gap-y-2 text-sm">
+        <PhoneLinks phone={application.phone} />
         <span className="inline-flex items-center gap-1.5 text-text/80">
           <MapPin className="size-4" aria-hidden /> {application.location}
         </span>
       </div>
       <p className="whitespace-pre-line rounded-lg bg-background p-3 text-sm text-text/85">{application.description}</p>
+      {status !== 'rejected' && status !== 'published' && (
+        <Link
+          href={`/admin/kuce/nova?prijava=${application.id}`}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-primary/20 px-3 py-2 text-sm font-medium text-primary hover:bg-primary/5"
+        >
+          <Plus className="size-4" aria-hidden /> Napravite kuću iz prijave
+        </Link>
+      )}
       {error && <p className="text-sm text-accent-dark">{error}</p>}
     </li>
   );

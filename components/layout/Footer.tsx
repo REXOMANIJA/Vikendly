@@ -8,6 +8,7 @@ import { phoneDigits, site } from '@/lib/site';
 const links = [
   { key: 'owners', href: '/owners' },
   { key: 'destinations', href: '/destinations' },
+  { key: 'faq', href: '/faq' },
   { key: 'contact', href: '/contact' },
   { key: 'terms', href: '/terms' },
   { key: 'privacy', href: '/privacy' },

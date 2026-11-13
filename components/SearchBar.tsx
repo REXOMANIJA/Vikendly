@@ -6,6 +6,7 @@ import { Search, X } from 'lucide-react';
 import { useRouter } from '@/i18n/navigation';
 import { groupByCountry } from '@/lib/destinations';
 import DateRangePicker from '@/components/DateRangePicker';
+import { startNavigationProgress } from '@/components/layout/NavigationProgress';
 import type { Destination } from '@/types';
 
 const budgetOptions = [200, 300, 500, 800];
@@ -45,6 +46,7 @@ export default function SearchBar({ destinations }: { destinations: Destination[
     if (checkOut) query.checkOut = checkOut;
     if (guests) query.guests = guests;
     if (budget) query.budget = budget;
+    startNavigationProgress();
     router.push({ pathname: '/search', query });
   };
 
@@ -154,7 +156,7 @@ export default function SearchBar({ destinations }: { destinations: Destination[
               inputMode="numeric"
               value={guests}
               onChange={(e) => setGuests(e.target.value)}
-              placeholder="2"
+              placeholder={t('guestsPlaceholder')}
               className={fieldClass}
             />
           </div>
@@ -171,7 +173,7 @@ export default function SearchBar({ destinations }: { destinations: Destination[
               inputMode="numeric"
               value={budget}
               onChange={(e) => setBudget(e.target.value)}
-              placeholder="500"
+              placeholder={t('budgetPlaceholder')}
               className={fieldClass}
             />
           </div>

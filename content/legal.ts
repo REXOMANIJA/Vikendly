@@ -37,6 +37,7 @@ export const privacy: Record<'sr' | 'en', LegalSection[]> = {
       list: [
         'Upit za rezervaciju: ime i prezime, broj telefona, email (ako ga upišete), poruka, datumi boravka, broj osoba i izabrana kuća.',
         'Prijava vlasnika: ime i prezime, broj telefona, lokacija kuće i kratak opis.',
+        'Ocena boravka (samo ako vam pošaljemo link posle boravka): ime koje upišete, ocena i komentar. Posle našeg pregleda ime, ocena i komentar se javno prikazuju na stranici kuće.',
         'Zaštita od zloupotrebe: kada pošaljete formular, čuvamo jednosmerno šifrovan zapis vaše internet adrese (IP). Iz njega se ne može pročitati vaša adresa i brišemo ga posle 24 sata.',
       ],
       after: ['Za pregledanje sajta ne morate da ostavljate nikakve podatke i ne pravite nalog.'],
@@ -79,6 +80,7 @@ export const privacy: Record<'sr' | 'en', LegalSection[]> = {
       title: 'Kolačići i mapa',
       text: [
         'Sajt ne koristi kolačiće za praćenje ni reklame. Pamti samo ono što je neophodno za rad (na primer prijavu Vikendly tima u administraciju).',
+        'Kuće koje sačuvate srcem pamte se samo u vašem pregledaču, na vašem uređaju. Mi ih ne vidimo i ne šaljemo nigde.',
         'Broj poseta merimo alatom Vercel Web Analytics, koji ne koristi kolačiće i ne prepoznaje pojedinačne posetioce: vidimo samo zbirne brojke, na primer koliko je ljudi posetilo neku stranicu i iz koje zemlje.',
         'Na stranici kuće prikazujemo Google mapu sa lokacijom. Kada se mapa učita, Google može da postavi svoje kolačiće i vidi vašu internet adresu, prema svojoj politici privatnosti (policies.google.com/privacy).',
       ],
@@ -122,6 +124,7 @@ export const privacy: Record<'sr' | 'en', LegalSection[]> = {
       list: [
         'Booking request: name, phone number, email (if you add it), message, dates, number of guests and the house.',
         'Owner application: name, phone number, location of the house and a short description.',
+        'Review of your stay (only if we send you a link after your stay): the name you type, your rating and comment. After we read it, the name, rating and comment are shown publicly on the house page.',
         'Abuse protection: when you send a form, we keep a one-way scrambled record of your internet (IP) address. Your address cannot be read from it, and we delete it after 24 hours.',
       ],
       after: ['You don’t need to give any details or create an account to browse the site.'],
@@ -164,6 +167,7 @@ export const privacy: Record<'sr' | 'en', LegalSection[]> = {
       title: 'Cookies and the map',
       text: [
         'The site uses no tracking or advertising cookies. It only stores what it needs to work (for example, the Vikendly team’s admin login).',
+        'Houses you save with the heart are kept only in your browser, on your device. We never see them or send them anywhere.',
         'We count visits with Vercel Web Analytics, which uses no cookies and cannot recognise individual visitors: we only see totals, such as how many people visited a page and from which country.',
         'House pages show a Google map of the location. When the map loads, Google may set its own cookies and see your internet address, under its own privacy policy (policies.google.com/privacy).',
       ],

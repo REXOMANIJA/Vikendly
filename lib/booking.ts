@@ -95,6 +95,11 @@ export function quoteSelection(house: House, checkIn: Date, checkOut: Date, sele
 export function suggestSelection(house: House, guests: number, unitNames?: string[]): Selection[] {
   const bookables = getBookables(house);
   const withBeds = bookables.filter((b) => !b.partyOnly);
+  // Event venue (no beds at all): the party space, with the group as party guests
+  if (withBeds.length === 0) {
+    const party = unitNames?.length ? bookables.filter((b) => unitNames.includes(b.name)) : bookables.slice(0, 1);
+    return party.map((b) => ({ id: b.id, guests: 0, partyGuests: Math.min(Math.max(guests, 1), partyLimit(b)) }));
+  }
   const picked = unitNames?.length ? withBeds.filter((b) => unitNames.includes(b.name)) : withBeds.slice(0, 1);
   let left = Math.max(guests, 1);
   return picked.map((b) => {

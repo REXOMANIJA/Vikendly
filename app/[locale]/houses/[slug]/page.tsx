@@ -30,17 +30,25 @@ import { formatVisitMonth, parseDateParam } from '@/lib/dates';
 import type { LucideIcon } from 'lucide-react';
 import { Link, getPathname } from '@/i18n/navigation';
 import { routing, type Locale } from '@/i18n/routing';
+import { site } from '@/lib/site';
 import {
   getDestinationById,
   getDestinations,
   getHouseBySlug,
   getHouses,
+  getHouseReviews,
   getSimilarHouses,
 } from '@/lib/data';
+import Stars from '@/components/Stars';
+import FavoriteButton from '@/components/FavoriteButton';
+import ShareButton from '@/components/ShareButton';
+import HouseReviews from '@/components/house/HouseReviews';
+import { houseStructuredData } from '@/lib/structured-data';
 import { PriceCalculatorFromUrl } from '@/components/house/PriceCalculator';
-import { getLowestNightlyPrice, hasUnits } from '@/lib/pricing';
+import { getLowestNightlyPrice, hasUnits, isVenue } from '@/lib/pricing';
 import HouseUnits from '@/components/house/HouseUnits';
 import HouseCard from '@/components/cards/HouseCard';
+import MobileBookingBar from '@/components/house/MobileBookingBar';
 
 type Params = Promise<{ locale: string; slug: string }>;
 
@@ -99,7 +107,11 @@ export default async function HousePage({ params }: { params: Params }) {
   const t = await getTranslations('house');
   const tAmenity = await getTranslations('amenities');
   const tCountry = await getTranslations('destinations.countries');
-  const [destinations, similar] = await Promise.all([getDestinations(), getSimilarHouses(house)]);
+  const [destinations, similar, reviews] = await Promise.all([
+    getDestinations(),
+    getSimilarHouses(house),
+    getHouseReviews(house.id),
+  ]);
   const destinationOf = (id: string) => destinations.find((d) => d.id === id);
   const destination = destinationOf(house.destinationId);
   const { rules } = house;
@@ -108,6 +120,8 @@ export default async function HousePage({ params }: { params: Params }) {
   const hasDayCapacity = house.dayCapacity != null && house.dayCapacity > house.capacity;
   // A listing with units shows each unit's rules in its own card instead of one list here
   const withUnits = hasUnits(house);
+  // Event venue: nobody sleeps there, booked per party day
+  const venue = isVenue(house);
 
   const ruleItems = [
     { ok: rules.partiesAllowed, label: rules.partiesAllowed ? t('partiesAllowed') : t('partiesNotAllowed') },
@@ -115,8 +129,22 @@ export default async function HousePage({ params }: { params: Params }) {
     { ok: rules.smokingAllowed, label: rules.smokingAllowed ? t('smokingAllowed') : t('smokingNotAllowed') },
   ];
 
+  // Lets Google show the house with photo, place, price and stars in search results (G8)
+  const structuredData = houseStructuredData({
+    house,
+    reviews,
+    destinationName: destination?.name,
+    country: destination?.country,
+    url: site.url + getPathname({ locale: locale as Locale, href: { pathname: '/houses/[slug]', params: { slug } } }),
+    description: house.description[locale as Locale],
+  });
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
+      />
       <div className="container mx-auto px-4 pt-6 pb-16">
         <Link
           href="/search"
@@ -137,11 +165,29 @@ export default async function HousePage({ params }: { params: Params }) {
           <h1 className="mt-1 font-serif text-3xl md:text-5xl font-bold text-primary text-balance">
             {house.name}
           </h1>
-          {verifiedOn && <VerifiedBadge className="mt-3" />}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {verifiedOn && <VerifiedBadge />}
+            {house.rating && (
+              <a href="#ocene" className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-primary ring-1 ring-primary/15 hover:bg-primary/5">
+                <Stars value={house.rating.average} label={t('reviews.starsLabel', { average: house.rating.average })} />
+                {house.rating.average.toLocaleString(locale === 'en' ? 'en' : 'sr-Latn', { minimumFractionDigits: 1 })}
+                <span className="font-normal text-text/60">({house.rating.count})</span>
+              </a>
+            )}
+            <span className="ml-auto flex gap-2">
+              <FavoriteButton slug={house.slug} name={house.name} variant="pill" />
+              <ShareButton
+                title={house.name}
+                text={t('shareText', { name: house.name, destination: destination?.name ?? '' })}
+              />
+            </span>
+          </div>
           <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-text/80">
-            <li className="inline-flex items-center gap-1.5">
-              <BedDouble className="size-4" aria-hidden /> {t('sleeps', { count: house.capacity })}
-            </li>
+            {!venue && (
+              <li className="inline-flex items-center gap-1.5">
+                <BedDouble className="size-4" aria-hidden /> {t('sleeps', { count: house.capacity })}
+              </li>
+            )}
             {hasDayCapacity && (
               <li className="inline-flex items-center gap-1.5">
                 <Users className="size-4" aria-hidden /> {t('dayCapacity', { count: house.dayCapacity! })}
@@ -202,7 +248,8 @@ export default async function HousePage({ params }: { params: Params }) {
 
             {withUnits && <HouseUnits units={house.units!} />}
 
-            <section>
+            {/* A venue's rules are all in its party space cards above, so this list would be empty */}
+            <section hidden={venue}>
               <h2 className="font-serif text-2xl font-bold text-primary">{t('rulesTitle')}</h2>
               <ul className="mt-4 space-y-3">
                 {!withUnits && (
@@ -211,10 +258,13 @@ export default async function HousePage({ params }: { params: Params }) {
                     {t('checkInTime', { time: rules.checkInTime })} · {t('checkOutTime', { time: rules.checkOutTime })}
                   </li>
                 )}
-                <li className="flex items-center gap-3">
-                  <CalendarDays className="size-5 text-primary" aria-hidden />
-                  {t('minNights', { count: house.pricing.minNights })}
-                </li>
+                {/* A venue is booked for one day, so there is no minimum stay */}
+                {!venue && (
+                  <li className="flex items-center gap-3">
+                    <CalendarDays className="size-5 text-primary" aria-hidden />
+                    {t('minNights', { count: house.pricing.minNights })}
+                  </li>
+                )}
                 {hasDayCapacity && !withUnits && (
                   <li className="flex items-start gap-3">
                     <Users className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
@@ -237,6 +287,8 @@ export default async function HousePage({ params }: { params: Params }) {
               </ul>
             </section>
 
+            {house.rating && <HouseReviews reviews={reviews} summary={house.rating} locale={locale} />}
+
             <section>
               <h2 className="mb-4 font-serif text-2xl font-bold text-primary">{t('locationTitle')}</h2>
               <HouseMap
@@ -250,7 +302,7 @@ export default async function HousePage({ params }: { params: Params }) {
           </div>
 
           {/* Price + contact, sticks while scrolling on desktop */}
-          <aside className="lg:col-span-5">
+          <aside id="booking-box" className="lg:col-span-5">
             <div className="lg:sticky lg:top-24">
               <PriceCalculatorFromUrl house={house} />
             </div>
@@ -269,17 +321,12 @@ export default async function HousePage({ params }: { params: Params }) {
         )}
       </div>
 
-      {/* Phones: price and a shortcut to the calculator always at hand */}
-      <div className="sticky bottom-0 z-40 border-t border-primary/10 bg-white/95 backdrop-blur px-4 py-3 lg:hidden">
-        <div className="flex items-center justify-between gap-4">
-          <span className="font-semibold text-primary">
-            {t('mobilePrice', { price: eur(getLowestNightlyPrice(house)) })}
-          </span>
-          <a href="#cena" className="rounded-lg bg-accent-dark px-4 py-2.5 font-medium text-white">
-            {t('mobileCta')}
-          </a>
-        </div>
-      </div>
+      {/* Phones: price and a shortcut to the calculator, hidden while the calculator is on screen */}
+      <MobileBookingBar
+        targetId="booking-box"
+        price={t(venue ? 'mobilePriceParty' : 'mobilePrice', { price: eur(getLowestNightlyPrice(house)) })}
+        cta={t('mobileCta')}
+      />
     </>
   );
 }

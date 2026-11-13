@@ -75,8 +75,25 @@ export function getNightlyRates(
   return ratesFor(house.pricing, house.capacity, guests);
 }
 
-/** Lowest weekday price of any group size or unit ("od €80 / noć") */
+/**
+ * An event venue: a listing made only of party-only spaces (nobody sleeps there). It is booked
+ * for one day and priced by the number of people, so cards show "od €X po žurci".
+ */
+export const isVenue = (house: House) => hasUnits(house) && house.units!.every((u) => u.partyOnly);
+
+/** Most people a listing can take: overnight guests, or for a venue its biggest party space */
+export const maxGuestsOf = (house: House) =>
+  isVenue(house) ? Math.max(0, ...getBookables(house).map(partyLimit)) : house.capacity;
+
+/**
+ * Lowest weekday price of any group size or unit ("od €80 / noć").
+ * For a venue: the lowest party price ("od €190 po žurci").
+ */
 export function getLowestNightlyPrice(house: House): number {
+  if (isVenue(house)) {
+    const prices = house.units!.flatMap((u) => u.partyPrices.map((p) => p.weekdayPrice));
+    return prices.length ? Math.min(...prices) : 0;
+  }
   const withBeds = (house.units ?? []).filter((u) => !u.partyOnly);
   if (withBeds.length > 0) {
     return Math.min(...withBeds.flatMap((u) => [u.weekdayPrice, ...(u.tiers ?? []).map((t) => t.weekdayPrice)]));
@@ -150,9 +167,12 @@ export function getPartyPrice(b: Bookable, people: number, weekend: boolean): nu
 /**
  * Price shown on cards and in search for a stay. A listing with units shows the cheapest
  * combination of units with room for everyone (all units if even that is too small).
+ * A venue shows the cheapest party for the group on the arrival day (`partyDay`), or nothing
+ * (undefined) when no space takes that many people or its price is agreed in person.
  */
-export function quoteStay(house: House, checkIn: Date, checkOut: Date, guests: number): PriceCalculation {
+export function quoteStay(house: House, checkIn: Date, checkOut: Date, guests: number): PriceCalculation | undefined {
   if (!hasUnits(house)) return calculateTotalPrice(house, checkIn, checkOut, guests);
+  if (isVenue(house)) return quoteParty(house, checkIn, guests);
 
   // Only places with beds count for an overnight stay
   const units = getBookables(house).filter((u) => !u.partyOnly);
@@ -194,5 +214,28 @@ export function quoteStay(house: House, checkIn: Date, checkOut: Date, guests: n
     weekendRate: best.reduce((sum, p) => sum + p.price.weekendRate, 0),
     // In the order the units are listed
     units: best.map((p) => p.i).sort((a, b) => a - b).map((i) => units[i].name),
+  };
+}
+
+/** Venue: the cheapest party space that takes `guests` people, priced for the party day */
+function quoteParty(house: House, day: Date, guests: number): PriceCalculation | undefined {
+  const people = Math.max(guests, 1);
+  const weekend = isWeekendDay(day);
+  const options = getBookables(house)
+    .filter((b) => people <= partyLimit(b))
+    .map((b) => ({ b, price: getPartyPrice(b, people, weekend) }))
+    .filter((o): o is { b: Bookable; price: number } => o.price !== null)
+    .sort((a, c) => a.price - c.price);
+  if (!options.length) return undefined;
+  const { b, price } = options[0];
+  return {
+    total: price,
+    nights: 0,
+    weekdayNights: 0,
+    weekendNights: 0,
+    weekdayRate: 0,
+    weekendRate: 0,
+    units: [b.name],
+    partyDay: true,
   };
 }

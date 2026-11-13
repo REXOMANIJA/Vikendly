@@ -27,14 +27,17 @@ export default function HouseMap({
 
   return (
     <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-primary/10">
-      <div className="relative aspect-[4/3] bg-background sm:aspect-[16/9]">
+      <div className="relative aspect-[4/3] overflow-hidden bg-background sm:aspect-[16/9]">
         <iframe
           src={mapEmbedUrl(place, locale, exact ? 14 : 12)}
           title={t('iframeTitle', { name })}
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
           allowFullScreen
-          className="absolute inset-0 size-full border-0"
+          // Searching by address, Google adds a box at the top with "Отвори у Мапама" in Cyrillic
+          // (Google has no Latin Serbian for it). It's pushed out of view: our own "Google mape"
+          // button below does the same. Exact coordinates show no such box.
+          className={`absolute inset-x-0 w-full border-0 ${exact ? 'inset-y-0 h-full' : '-top-18 h-[calc(100%+4.5rem)]'}`}
         />
       </div>
       <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">

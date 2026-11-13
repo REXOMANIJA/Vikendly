@@ -140,9 +140,7 @@ function validateUnits(units: UnitInput[]): string | null {
       }
     }
   }
-  if (units.length > 0 && units.every((u) => u.party_only)) {
-    return 'Bar jedna jedinica mora imati noćenje (objekat samo za žurke još nije podržan).';
-  }
+  // Only party-only spaces = an event venue (no beds); allowed since migration 0013
   return null;
 }
 
@@ -159,7 +157,26 @@ function withUnitTotals(h: HouseInput): HouseInput {
       : { ...u, party_prices: [] }
   );
   const beds = units.filter((u) => !u.party_only);
-  if (units.length === 0 || beds.length === 0) return { ...h, units, party_prices: [] };
+  if (units.length === 0) return { ...h, units, party_prices: [] };
+  if (beds.length === 0) {
+    // Event venue: nobody sleeps there. "Prices" are the lowest party prices (for sorting),
+    // the daytime limit is the biggest party space.
+    const levels = units.flatMap((u) => u.party_prices);
+    return {
+      ...h,
+      units,
+      capacity: 0,
+      day_capacity: Math.max(...units.map((u) => u.day_capacity ?? 0)),
+      weekday_price: levels.length ? Math.min(...levels.map((p) => p.weekday_price)) : 0,
+      weekend_price: levels.length ? Math.min(...levels.map((p) => p.weekend_price)) : 0,
+      parties_allowed: true,
+      pets_allowed: units.some((u) => u.pets_allowed),
+      smoking_allowed: units.some((u) => u.smoking_allowed),
+      min_nights: 1,
+      price_tiers: [],
+      party_prices: [],
+    };
+  }
   const capacity = beds.reduce((sum, u) => sum + u.capacity, 0);
   // The most people allowed at once anywhere on the property (shown as "Druženje: do …")
   const biggest = Math.max(...units.map((u) => u.day_capacity ?? u.capacity));
@@ -186,8 +203,10 @@ function validateHouse(h: HouseInput): ActionResult<never> | null {
   if (h.name.trim().length < 2) return fail('Unesite naziv kuće.', 'name');
   if (!SLUG_PATTERN.test(h.slug)) return fail('Adresa (slug) sme da sadrži samo mala slova, brojeve i crtice.', 'slug');
   if (!h.destination_id) return fail('Izaberite destinaciju.', 'destination_id');
+  // An event venue (only party-only units) has nobody sleeping over
+  const venue = h.units.length > 0 && h.units.every((u) => u.party_only);
   const ints: [keyof HouseInput, number, string, boolean][] = [
-    ['capacity', 1, 'Broj osoba za noćenje', true],
+    ['capacity', venue ? 0 : 1, 'Broj osoba za noćenje', true],
     ['day_capacity', 1, 'Broj osoba za žurku/druženje', false],
     ['bedrooms', 0, 'Broj spavaćih soba', false],
     ['bathrooms', 0, 'Broj kupatila', false],
@@ -487,4 +506,68 @@ export async function signOut() {
   const supabase = await createAdminClient();
   await supabase.auth.signOut();
   redirect('/admin/login');
+}
+
+// ───────────── Guest reviews (migration 0013) ─────────────
+
+export type ReviewStatus = 'invited' | 'submitted' | 'approved' | 'hidden';
+
+/**
+ * Private review link for a confirmed booking. Returns the existing link if one was made
+ * before, so the guest never gets two.
+ */
+export async function createReviewInvite(bookingId: string): Promise<ActionResult<{ token: string; status: ReviewStatus }>> {
+  await requireAdmin();
+  const supabase = await createAdminClient();
+  const existing = await supabase.from('reviews').select('token, status').eq('booking_request_id', bookingId).maybeSingle();
+  if (existing.error) {
+    if (/reviews/.test(existing.error.message)) return fail('Ocene još nisu uključene: pokrenite migraciju 0013 u Supabase-u.');
+    return fail(existing.error.message);
+  }
+  if (existing.data) return { ok: true, data: existing.data as { token: string; status: ReviewStatus } };
+
+  const { data: booking, error } = await supabase
+    .from('booking_requests')
+    .select('id, house_id, name, locale, status')
+    .eq('id', bookingId)
+    .maybeSingle();
+  if (error || !booking) return fail('Upit nije pronađen.');
+  if (booking.status !== 'confirmed') return fail('Link za ocenu može samo za potvrđen boravak.');
+  if (!booking.house_id) return fail('Kuća iz ovog upita je obrisana.');
+
+  const { data, error: insertError } = await supabase
+    .from('reviews')
+    .insert({
+      booking_request_id: booking.id,
+      house_id: booking.house_id,
+      // Only the first name is shown with the review; the guest can change it
+      guest_name: String(booking.name).trim().split(/\s+/)[0].slice(0, 60) || null,
+      locale: booking.locale === 'en' ? 'en' : 'sr',
+    })
+    .select('token, status')
+    .single();
+  if (insertError) return fail(insertError.message);
+  revalidatePath('/admin', 'layout');
+  return { ok: true, data: data as { token: string; status: ReviewStatus } };
+}
+
+/** Approve (show on the site) or hide a review */
+export async function setReviewStatus(id: string, status: 'approved' | 'hidden'): Promise<ActionResult> {
+  await requireAdmin();
+  const supabase = await createAdminClient();
+  const { error } = await supabase.from('reviews').update({ status }).eq('id', id).neq('status', 'invited');
+  if (error) return fail(error.message);
+  refreshPublicSite();
+  revalidatePath('/admin', 'layout');
+  return { ok: true };
+}
+
+export async function deleteReview(id: string): Promise<ActionResult> {
+  await requireAdmin();
+  const supabase = await createAdminClient();
+  const { error } = await supabase.from('reviews').delete().eq('id', id);
+  if (error) return fail(error.message);
+  refreshPublicSite();
+  revalidatePath('/admin', 'layout');
+  return { ok: true };
 }

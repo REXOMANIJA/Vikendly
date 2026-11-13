@@ -16,7 +16,8 @@
     "menu": "Otvorite meni",
     "closeMenu": "Zatvorite meni",
     "menuTagline": "Vikend kuće u Srbiji i regionu, sa ukupnom cenom unapred.",
-    "language": "Jezik"
+    "language": "Jezik",
+    "saved": "Sačuvane kuće ({count})"
   },
   "languageSwitcher": {
     "label": "Jezik",
@@ -41,7 +42,9 @@
       "close": "Zatvorite pretragu",
       "name": "Naziv kuće",
       "namePlaceholder": "npr. Vila Ribnica",
-      "dates": "Datumi"
+      "dates": "Datumi",
+      "guestsPlaceholder": "Broj osoba",
+      "budgetPlaceholder": "Bez limita"
     },
     "promises": {
       "totalPrice": "Ukupna cena unapred, bez skrivenih troškova",
@@ -97,7 +100,11 @@
     },
     "perPerson": "{price} po osobi",
     "sleeps": "Noćenje: {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}",
-    "dayCapacity": "Druženje: {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}"
+    "dayCapacity": "Druženje: {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}",
+    "partyCapacity": "Žurka: {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}",
+    "perParty": " po žurci",
+    "partyDay": "žurka, jedan dan",
+    "reviews": "({count, plural, one {# ocena} few {# ocene} other {# ocena}})"
   },
   "search": {
     "title": "Rezultati pretrage",
@@ -167,7 +174,8 @@
       "text": "Pošaljete upit, mi proverimo termin sa vlasnikom i javimo vam se."
     },
     "eyebrow": "Zašto mi",
-    "intro": "Nismo još jedan veliki oglasnik. Biramo manji broj kuća, lično ih proveravamo i pokazujemo sve što treba da znate pre nego što krenete."
+    "intro": "Nismo još jedan veliki oglasnik. Biramo manji broj kuća, lično ih proveravamo i pokazujemo sve što treba da znate pre nego što krenete.",
+    "imageAlt": "Drvena sala za druženje u kući Kutak u Vraniću"
   },
   "howItWorks": {
     "title": "Kako radi",
@@ -228,7 +236,8 @@
       "terms": "Uslovi korišćenja",
       "privacy": "Politika privatnosti",
       "owners": "Za vlasnike",
-      "destinations": "Destinacije"
+      "destinations": "Destinacije",
+      "faq": "Česta pitanja"
     },
     "copyright": "© {year} Vikendly. Sva prava zadržana."
   },
@@ -387,6 +396,14 @@
     },
     "rules": {
       "partyPrice": "Cena žurke (radnim danima / vikend): {levels}. Plaća se jednom po boravku."
+    },
+    "mobilePriceParty": "od {price} po žurci",
+    "shareText": "{name}, {destination} – vikend kuća na Vikendly-ju:",
+    "reviews": {
+      "title": "Utisci gostiju",
+      "starsLabel": "{average} od 5 zvezdica",
+      "count": "{count, plural, one {# ocena} few {# ocene} other {# ocena}}",
+      "verifiedOnly": "samo gosti koji su boravili ovde"
     }
   },
   "datePicker": {
@@ -541,5 +558,104 @@
     "text": "Stranica trenutno ne može da se učita. Pokušajte ponovo za trenutak; ako se problem ponovi, javite nam se.",
     "retry": "Pokušajte ponovo",
     "home": "Početna strana"
+  },
+  "faq": {
+    "metaTitle": "Česta pitanja za goste | Vikendly",
+    "metaDescription": "Kako ide upit, plaćanje i kapara, otkazivanje, ulazak i izlazak, ljubimci i žurke u vikend kućama na Vikendly-ju.",
+    "eyebrow": "Za goste",
+    "title": "Česta pitanja",
+    "intro": "Sve što gosti najčešće pitaju pre nego što pošalju upit. Ako ovde nema odgovora, javite nam se.",
+    "items": {
+      "howToBook": {
+        "q": "Kako rezervišem kuću?",
+        "a": "Na stranici kuće izaberete datume i broj osoba i pošaljete upit sa imenom i telefonom. Mi proverimo termin sa vlasnikom i javimo vam se telefonom. Upit vas ni na šta ne obavezuje: kuća je vaša tek kada je potvrdite u tom razgovoru."
+      },
+      "payment": {
+        "q": "Da li plaćam preko sajta?",
+        "a": "Ne. Na sajtu se ništa ne plaća i ne unosite podatke o kartici. Plaćanje se dogovara direktno sa vlasnikom, a mi vam pre potvrde kažemo kako i kada se plaća."
+      },
+      "deposit": {
+        "q": "Da li se plaća kapara (depozit)?",
+        "a": "Zavisi od kuće: neki vlasnici traže kaparu da bi sačuvali termin, neki ne. Iznos i način plaćanja čujete od nas pre nego što potvrdite boravak, nikad posle."
+      },
+      "cancellation": {
+        "q": "Šta ako moram da otkažem?",
+        "a": "Dok ne potvrdite boravak, samo nam javite i ništa ne plaćate. Posle potvrde važe uslovi otkazivanja te kuće (npr. da li se kapara vraća), koje vam saopštavamo pre potvrde."
+      },
+      "price": {
+        "q": "Da li je cena na sajtu konačna?",
+        "a": "Da. Cena koju vidite je za ceo boravak i vaš broj osoba, bez dodatnih stavki. Ako izaberete i prostor za žurku, njegova cena je prikazana posebno i uračunata u ukupnu."
+      },
+      "checkIn": {
+        "q": "Kada je ulazak, a kada izlazak?",
+        "a": "Vreme ulaska i izlaska piše na stranici svake kuće (kod kuća sa više delova, uz svaki deo). Ako želite da stignete ranije ili odete kasnije, napišite to u poruci uz upit, pa ćemo pitati vlasnika."
+      },
+      "pets": {
+        "q": "Mogu li da povedem ljubimca?",
+        "a": "Na stranici kuće jasno piše da li su ljubimci dozvoljeni. Ako jesu, u upitu napišite koji ljubimac dolazi, da vlasnik zna."
+      },
+      "parties": {
+        "q": "Da li su dozvoljene žurke?",
+        "a": "Za svaku kuću piše da li su žurke dozvoljene ili je to mirna kuća. Neke kuće imaju poseban prostor za proslave, sa cenom po broju ljudi, a uz kuće sa krevetima piše i koliko ljudi najviše može da bude tokom dana. Ako niste sigurni, napišite u poruci šta planirate."
+      },
+      "verified": {
+        "q": "Šta znači „Provereno uživo“?",
+        "a": "Da smo lično bili u toj kući, upoznali domaćina i proverili da sve izgleda kao na slikama. Na stranici kuće piše i kada smo je obišli."
+      }
+    },
+    "moreTitle": "Niste našli odgovor?",
+    "moreText": "Pozovite nas ili pišite, rado ćemo pomoći.",
+    "moreLink": "Kontakt"
+  },
+  "favorites": {
+    "add": "Sačuvajte kuću {name}",
+    "remove": "Uklonite kuću {name} iz sačuvanih",
+    "save": "Sačuvajte",
+    "saved": "Sačuvano",
+    "metaTitle": "Sačuvane kuće | Vikendly",
+    "title": "Sačuvane kuće",
+    "intro": "Kuće koje ste označili srcem. Čuvaju se samo u ovom pregledaču, bez naloga.",
+    "emptyTitle": "Još niste sačuvali nijednu kuću",
+    "emptyText": "Dodirnite srce na kući koja vam se dopada i ovde ćete je lako naći kasnije.",
+    "browse": "Pogledajte kuće",
+    "count": "{count, plural, one {# sačuvana kuća} few {# sačuvane kuće} other {# sačuvanih kuća}}"
+  },
+  "share": {
+    "button": "Podelite",
+    "copy": "Kopirajte link",
+    "copied": "Link je kopiran",
+    "copyPrompt": "Kopirajte link:"
+  },
+  "review": {
+    "metaTitle": "Ocenite boravak | Vikendly",
+    "eyebrow": "Vaš utisak",
+    "title": "Kako vam je bilo u kući {house}?",
+    "ratingLabel": "Vaša ocena",
+    "stars": "{count, plural, one {# zvezdica} few {# zvezdice} other {# zvezdica}}",
+    "ratingWords": {
+      "1": "Loše",
+      "2": "Ispod očekivanja",
+      "3": "Solidno",
+      "4": "Vrlo dobro",
+      "5": "Odlično"
+    },
+    "commentLabel": "Šta biste rekli drugim gostima?",
+    "optional": "opciono",
+    "commentPlaceholder": "Npr. kako je bilo, šta vam se najviše dopalo, za koga je kuća idealna…",
+    "nameLabel": "Ime uz ocenu",
+    "nameHint": "Prikazujemo samo ime koje ovde upišete, nikad vaš telefon.",
+    "submit": "Pošaljite ocenu",
+    "moderationNote": "Ocene pregledamo pre objavljivanja. Ocenu mogu da ostave samo gosti koji su boravili u kući.",
+    "thanksTitle": "Hvala na oceni!",
+    "thanksText": "Pomažete drugim gostima da izaberu. Ocena će se pojaviti na stranici kuće kada je pregledamo.",
+    "alreadyTitle": "Ovaj link je već iskorišćen",
+    "alreadyText": "Za ovaj boravak ocena je već poslata. Hvala!",
+    "houseLink": "Pogledajte kuću {house}",
+    "errors": {
+      "invalid": "Izaberite od 1 do 5 zvezdica.",
+      "used": "Ovaj link je već iskorišćen.",
+      "tooMany": "Previše pokušaja. Pokušajte ponovo za sat vremena.",
+      "server": "Ocena nije poslata zbog greške kod nas. Pokušajte ponovo za par minuta."
+    }
   }
 }

@@ -7,6 +7,8 @@ import { routing } from '@/i18n/routing';
 import { site } from '@/lib/site';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import NavigationProgress from '@/components/layout/NavigationProgress';
+import { Suspense } from 'react';
 import { Analytics } from '@vercel/analytics/next';
 import '../globals.css';
 
@@ -69,6 +71,10 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={`${playfair.variable} ${inter.variable}`}>
       <body className="font-sans antialiased bg-background text-text">
+        {/* Suspense: the bar reads the address (search params), which must not block the page */}
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         <NextIntlClientProvider>
           <Header />
           <main>{children}</main>

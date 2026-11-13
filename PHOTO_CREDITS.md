@@ -18,6 +18,12 @@ These show a *type* of house, not a listed house or a specific place.
 | Category: Porodična kuća | `categories/family.jpg` | https://unsplash.com/photos/178j8tJrNlc |
 | Category: Apartman | `categories/apartment.jpg` | https://unsplash.com/photos/iYQT6PNToYo |
 
+## Real house photos used outside the house page
+
+| Where on the site | File | Source |
+|---|---|---|
+| Homepage "Zašto Vikendly?" (desktop): wooden party room | `why-vikendly.jpg` | Copy of a listing photo of **Kutak u Vraniću** (supplied by the owner for the listing). If that house leaves Vikendly, replace this file. |
+
 ## Destinations (stored in Supabase Storage, bucket `house-photos`, folder `destinacije/`)
 
 Each location was checked on the photo's Unsplash page. Replace any of them in the admin under **Destinacije**.

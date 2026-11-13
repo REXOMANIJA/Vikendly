@@ -113,10 +113,21 @@ const input =
   'w-full h-11 px-3 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary';
 const label = 'mb-1.5 block text-sm font-medium';
 
-export default function HouseForm({ house, options }: { house?: AdminHouse; options: Options }) {
+/** Fields filled in from an owner application ("Napravite kuću iz prijave") */
+export type HousePrefill = Partial<Pick<FormState, 'owner_phone' | 'address' | 'destination_id'>>;
+
+export default function HouseForm({
+  house,
+  options,
+  prefill,
+}: {
+  house?: AdminHouse;
+  options: Options;
+  prefill?: HousePrefill;
+}) {
   const router = useRouter();
   const isNew = !house;
-  const [form, setForm] = useState<FormState>(house ? fromHouse(house) : empty);
+  const [form, setForm] = useState<FormState>(house ? fromHouse(house) : { ...empty, ...prefill });
   const [slugTouched, setSlugTouched] = useState(!isNew);
   const [error, setError] = useState<{ message: string; field?: string } | null>(null);
   const [saved, setSaved] = useState(false);
@@ -301,9 +312,13 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
         <h2 className={h2}>Kapacitet</h2>
         {hasUnits && (
           <p className="rounded-lg bg-background px-4 py-3 text-sm text-text/80">
-            Objekat ima {form.units.length} {form.units.length === 1 ? 'jedinicu' : 'jedinice'}: ukupno{' '}
-            <strong>{unitBeds} osoba za noćenje</strong>. Broj osoba, cene i pravila se unose za svaku jedinicu
-            posebno, u delu „Delovi objekta“.
+            Objekat ima {form.units.length} {form.units.length === 1 ? 'jedinicu' : 'jedinice'}:{' '}
+            {form.units.every((u) => u.party_only) ? (
+              <strong>samo prostor za žurke, bez noćenja</strong>
+            ) : (
+              <>ukupno <strong>{unitBeds} osoba za noćenje</strong></>
+            )}
+            . Broj osoba, cene i pravila se unose za svaku jedinicu posebno, u delu „Delovi objekta“.
           </p>
         )}
         <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
@@ -348,8 +363,12 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
           ))}
         </div>
 
-        {/* Optional cheaper prices for smaller groups */}
-        <div id="field-price_tiers" className={`space-y-3 rounded-xl bg-background p-4 ${hasUnits ? 'hidden' : ''}`}>
+        {/* Optional cheaper prices for smaller groups. With units it is left out completely (not just
+            hidden): hidden required fields would block saving with a browser error nobody can see.
+            The rows stay in memory and come back if the units are removed; the server ignores them
+            while there are units. */}
+        {!hasUnits && (
+        <div id="field-price_tiers" className="space-y-3 rounded-xl bg-background p-4">
           <div>
             <h3 className="font-semibold text-primary">Cene za manje grupe <span className="font-normal text-text/60">(opciono)</span></h3>
             <p className="text-sm text-text/70">
@@ -402,6 +421,7 @@ export default function HouseForm({ house, options }: { house?: AdminHouse; opti
           </button>
           {fieldError('price_tiers')}
         </div>
+        )}
       </section>
 
       {/* ── Delovi objekta ── */}

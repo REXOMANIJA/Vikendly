@@ -43,13 +43,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     })),
-    // Owners, contact and legal pages
-    ...(['/owners', '/contact', '/terms', '/privacy'] as const).flatMap((href) =>
+    // Owners, FAQ, contact and legal pages
+    ...(['/owners', '/faq', '/contact', '/terms', '/privacy'] as const).flatMap((href) =>
       locales.map((locale) => ({
         url: baseUrl + getPathname({ locale, href }),
         lastModified: now,
         changeFrequency: 'monthly' as const,
-        priority: href === '/owners' ? 0.8 : 0.3,
+        priority: href === '/owners' ? 0.8 : href === '/faq' ? 0.5 : 0.3,
       }))
     ),
     ...housePages,

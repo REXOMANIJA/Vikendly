@@ -22,7 +22,15 @@ export default function WhyVikendly() {
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary text-balance">{t('title')}</h2>
           <p className="mt-4 text-text/70 leading-relaxed">{t('intro')}</p>
           <div className="relative mt-8 hidden aspect-[4/3] overflow-hidden rounded-2xl lg:block">
-            <Image src="/images/house-04.svg" alt="" fill unoptimized className="object-cover" />
+            {/* Real photo of a listed house (Kutak u Vraniću, owner's photo), see PHOTO_CREDITS.md */}
+            <Image
+              src="/images/why-vikendly.jpg"
+              alt={t('imageAlt')}
+              fill
+              sizes="(min-width: 1280px) 500px, 40vw"
+              quality={75}
+              className="object-cover"
+            />
           </div>
         </div>
 
