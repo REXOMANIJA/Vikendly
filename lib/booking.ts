@@ -69,7 +69,7 @@ export function quoteSelection(house: House, checkIn: Date, checkOut: Date, sele
       // Party day = the first day; Friday and Saturday parties pay the weekend price
       const nights = countNights(checkIn, checkOut);
       const stay = { total: 0, nights, weekdayNights: 0, weekendNights: 0, weekdayRate: 0, weekendRate: 0 };
-      const party = getPartyPrice(bookable, s.partyGuests, isWeekendDay(checkIn));
+      const party = getPartyPrice(bookable, s.partyGuests, isWeekendDay(checkIn), checkIn);
       return { bookable, guests: 0, partyGuests: s.partyGuests, stay, party, total: party ?? 0 };
     }
     const stay = calculateBookablePrice(bookable, checkIn, checkOut, s.guests);

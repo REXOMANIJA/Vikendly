@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { createAdminClient, getAdminUser } from '@/lib/supabase/server';
 import { SLUG_PATTERN, slugify } from '@/lib/slug';
 import { parseCoordinates, type LatLng } from '@/lib/maps';
+import type { SpecialPriceInput } from '@/lib/admin-data';
 
 export type HouseInput = {
   id?: string;
@@ -53,6 +54,8 @@ export type HouseInput = {
   party_prices: PartyPriceInput[];
   /** Separately rented units; empty = the listing is rented as one */
   units: UnitInput[];
+  /** Holiday prices for chosen nights (migration 0016) */
+  special_prices?: SpecialPriceInput[];
 };
 
 /** Party price level: up to max_guests people at the party, once per stay */
@@ -277,7 +280,7 @@ function validateHouse(h: HouseInput): ActionResult<never> | null {
 export async function saveHouse(raw: HouseInput): Promise<ActionResult<{ id: string }>> {
   await requireAdmin();
   const input = withUnitTotals({ ...raw, units: raw.units ?? [], party_prices: raw.party_prices ?? [] });
-  const invalid = validateHouse(input);
+  const invalid = validateHouse(input) ?? validateSpecialPrices(input);
   if (invalid) return invalid;
 
   const supabase = await createAdminClient();
@@ -315,8 +318,88 @@ export async function saveHouse(raw: HouseInput): Promise<ActionResult<{ id: str
     return fail(`Čuvanje nije uspelo: ${error.message}`);
   }
 
+  const savedSpecials = await saveSpecialPrices(supabase, data as string, input.special_prices ?? []);
   refreshPublicSite();
+  if (!savedSpecials.ok) return savedSpecials;
   return { ok: true, data: { id: data as string } };
+}
+
+const DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Checks the holiday prices before anything is saved */
+function validateSpecialPrices(h: HouseInput): ActionResult | null {
+  const rows = h.special_prices ?? [];
+  if (rows.length > 60) return fail('Previše posebnih cena (najviše 60).', 'special_prices');
+  for (const s of rows) {
+    const name = s.label.trim() || `${s.first_night} – ${s.last_night}`;
+    if (!DATE.test(s.first_night) || !DATE.test(s.last_night)) return fail('Posebne cene: izaberite prvu i poslednju noć.', 'special_prices');
+    if (s.last_night < s.first_night) return fail(`Posebne cene („${name}“): poslednja noć je pre prve.`, 'special_prices');
+    if (s.label.trim().length > 60) return fail('Posebne cene: naziv je predugačak (najviše 60 znakova).', 'special_prices');
+    if (!Number.isFinite(s.price) || s.price < 0) return fail(`Posebne cene („${name}“): unesite cenu u evrima.`, 'special_prices');
+    if (s.min_nights !== null && (!Number.isInteger(s.min_nights) || s.min_nights < 1 || s.min_nights > 30)) {
+      return fail(`Posebne cene („${name}“): najkraći boravak je od 1 do 30 noći.`, 'special_prices');
+    }
+    const units = h.units ?? [];
+    const unit = s.unit_index === null ? undefined : units[s.unit_index];
+    // Places with beds: a nightly price; party-only spaces: a party price for one of their sizes
+    const fits = units.length === 0
+      ? s.unit_index === null && s.max_guests === null
+      : !!unit && (unit.party_only
+        ? s.max_guests !== null && unit.party_prices.some((p) => p.max_guests === s.max_guests)
+        : s.max_guests === null);
+    if (!fits) {
+      return fail(`Posebne cene („${name}“): proverite delove objekta.`, 'special_prices');
+    }
+  }
+  return null;
+}
+
+/**
+ * Replaces the house's holiday prices. Units are matched by their position, because new units
+ * only get an id when the house is saved.
+ */
+async function saveSpecialPrices(
+  supabase: Awaited<ReturnType<typeof createAdminClient>>,
+  houseId: string,
+  rows: SpecialPriceInput[]
+): Promise<ActionResult> {
+  const missingTable = (message: string) => /house_special_prices/.test(message);
+  let unitIds: string[] = [];
+  if (rows.some((r) => r.unit_index !== null)) {
+    const { data } = await supabase.from('house_units').select('id').eq('house_id', houseId).order('sort_order');
+    unitIds = (data ?? []).map((u: { id: string }) => u.id);
+  }
+  const removed = await supabase.from('house_special_prices').delete().eq('house_id', houseId);
+  if (removed.error) {
+    // Before migration 0016 there is nothing to save, unless prices were entered
+    if (missingTable(removed.error.message) && rows.length === 0) return { ok: true };
+    return fail(
+      missingTable(removed.error.message)
+        ? 'Kuća je sačuvana, ali posebne cene nisu: prvo pokrenite migraciju 0016 u Supabase-u.'
+        : `Kuća je sačuvana, ali posebne cene nisu: ${removed.error.message}`,
+      'special_prices'
+    );
+  }
+  if (rows.length === 0) return { ok: true };
+  const { error } = await supabase.from('house_special_prices').insert(
+    rows.map((r) => ({
+      house_id: houseId,
+      unit_id: r.unit_index === null ? null : unitIds[r.unit_index],
+      label: r.label.trim(),
+      first_night: r.first_night,
+      last_night: r.last_night,
+      price: r.price,
+      min_nights: r.min_nights,
+      // Only sent when set, so prices for places with beds save before migration 0017 too
+      ...(r.max_guests !== null ? { max_guests: r.max_guests } : {}),
+    }))
+  );
+  if (error) {
+    // Party prices need the max_guests column from migration 0017
+    const message = /max_guests/.test(error.message) ? 'za cene žurki prvo pokrenite migraciju 0017 u Supabase-u.' : error.message;
+    return fail(`Kuća je sačuvana, ali posebne cene nisu: ${message}`, 'special_prices');
+  }
+  return { ok: true };
 }
 
 export async function setHousePublished(id: string, published: boolean): Promise<ActionResult> {
@@ -594,4 +677,85 @@ export async function deleteReview(id: string): Promise<ActionResult> {
 export async function triggerTestError(): Promise<never> {
   await requireAdmin();
   throw new Error(`Probna greška iz admina (test obaveštenja) – ${new Date().toISOString()}`);
+}
+
+// ───────────── Holidays (migration 0016) ─────────────
+
+export type HolidayInput = {
+  /** Empty for a new holiday */
+  id?: string;
+  name_sr: string;
+  name_en: string;
+  text_sr: string;
+  text_en: string;
+  /** "yyyy-MM-dd": suggested arrival and departure */
+  check_in: string;
+  check_out: string;
+  image_url: string;
+  is_active: boolean;
+  /** Houses confirmed free for these days */
+  house_ids: string[];
+};
+
+export async function saveHoliday(input: HolidayInput): Promise<ActionResult<{ id: string }>> {
+  await requireAdmin();
+  const err = (error: string): ActionResult<never> => ({ ok: false, error });
+  const name_sr = input.name_sr.trim();
+  if (name_sr.length < 2 || name_sr.length > 80) return err('Unesite naziv na srpskom (npr. „Nova godina 2027“).');
+  if (input.name_en.trim().length > 80) return err('Naziv na engleskom je predugačak.');
+  if (input.text_sr.trim().length > 600 || input.text_en.trim().length > 600) return err('Tekst je predugačak (najviše 600 znakova).');
+  if (!DATE.test(input.check_in) || !DATE.test(input.check_out)) return err('Izaberite datum dolaska i odlaska.');
+  if (input.check_out <= input.check_in) return err('Datum odlaska mora biti posle datuma dolaska.');
+
+  const supabase = await createAdminClient();
+  const fields = {
+    name_sr,
+    name_en: input.name_en.trim(),
+    text_sr: input.text_sr.trim(),
+    text_en: input.text_en.trim(),
+    check_in: input.check_in,
+    check_out: input.check_out,
+    image_url: input.image_url.trim() || null,
+    is_active: input.is_active,
+  };
+  const missing = (message: string) =>
+    /holidays|holiday_houses/.test(message) ? 'Prvo pokrenite migraciju 0016 u Supabase-u.' : message;
+
+  let id = input.id;
+  if (id) {
+    const { error } = await supabase.from('holidays').update(fields).eq('id', id);
+    if (error) return err(`Čuvanje nije uspelo: ${missing(error.message)}`);
+  } else {
+    // The address (/sr/praznici/nova-godina-2027) comes from the name and stays fixed afterwards
+    const slug = slugify(name_sr);
+    if (!slug) return err('Naziv mora sadržati bar jedno slovo.');
+    const { data, error } = await supabase.from('holidays').insert({ ...fields, slug }).select('id').single();
+    if (error) {
+      if (error.code === '23505') return err(`Praznik sa adresom „${slug}“ već postoji. Promenite naziv (npr. dodajte godinu).`);
+      return err(`Čuvanje nije uspelo: ${missing(error.message)}`);
+    }
+    id = (data as { id: string }).id;
+  }
+
+  // Ticked houses: replace the list
+  const removed = await supabase.from('holiday_houses').delete().eq('holiday_id', id);
+  if (removed.error) return err(`Kuće nisu sačuvane: ${removed.error.message}`);
+  const houseIds = [...new Set(input.house_ids)];
+  if (houseIds.length) {
+    const { error } = await supabase.from('holiday_houses').insert(houseIds.map((house_id) => ({ holiday_id: id, house_id })));
+    if (error) return err(`Kuće nisu sačuvane: ${error.message}`);
+  }
+  refreshPublicSite();
+  revalidatePath('/admin/praznici');
+  return { ok: true, data: { id: id! } };
+}
+
+export async function deleteHoliday(id: string): Promise<ActionResult> {
+  await requireAdmin();
+  const supabase = await createAdminClient();
+  const { error } = await supabase.from('holidays').delete().eq('id', id);
+  if (error) return { ok: false, error: error.message };
+  refreshPublicSite();
+  revalidatePath('/admin/praznici');
+  return { ok: true };
 }

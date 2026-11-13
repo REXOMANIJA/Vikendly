@@ -3,6 +3,9 @@ import { defineRouting } from 'next-intl/routing';
 export const routing = defineRouting({
   locales: ['sr', 'en'],
   defaultLocale: 'sr',
+  // Everyone starts on the Serbian site (vikendly.com → /sr), whatever their browser language;
+  // the SR / EN switch in the header moves to English
+  localeDetection: false,
   // Internal route (folder name) → URL shown to visitors in each language.
   // Always link with the internal name, e.g. { pathname: '/houses/[slug]', params: { slug } }.
   pathnames: {
@@ -19,6 +22,11 @@ export const routing = defineRouting({
     '/houses/[slug]': {
       sr: '/kuce/[slug]',
       en: '/houses/[slug]',
+    },
+    // Holiday offer (admin → Praznici)
+    '/holidays/[slug]': {
+      sr: '/praznici/[slug]',
+      en: '/holidays/[slug]',
     },
     '/owners': {
       sr: '/za-vlasnike',

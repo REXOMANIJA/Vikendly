@@ -59,10 +59,47 @@ export interface HouseUnit {
   weekendPrice: number;
   /** Cheaper prices for smaller groups in this unit */
   tiers?: PriceTier[];
+  /** Special prices for chosen nights in this unit (holidays) */
+  specials?: SpecialPrice[];
   /** Rented only for parties/gatherings: no beds, priced by the number of people (partyPrices) */
   partyOnly?: boolean;
   rules: HouseRules;
   partyPrices: PartyPrice[];
+}
+
+/**
+ * A special price per night for chosen nights (holidays), entered in admin (migration 0016).
+ * Replaces the weekday/weekend and smaller-group price for those nights.
+ */
+export interface SpecialPrice {
+  /** e.g. "Nova godina" */
+  label?: string;
+  /** First and last night it applies to, "yyyy-MM-dd" (31.12–1.1 = the nights of 31 Dec and 1 Jan) */
+  firstNight: string;
+  lastNight: string;
+  /** EUR per night */
+  price: number;
+  /** A stay that includes any of these nights must be at least this long */
+  minNights?: number;
+  /**
+   * Party-only space: the party size this price is for ("do 30 osoba"); `price` is then the
+   * price of a party on these days, not a nightly price (migration 0017)
+   */
+  maxGuests?: number;
+}
+
+/** A holiday offer: shown on the homepage and on its own page while switched on (migration 0016) */
+export interface Holiday {
+  id: string;
+  slug: string;
+  name: LocalizedText;
+  text: LocalizedText;
+  /** Suggested stay, "yyyy-MM-dd" */
+  checkIn: string;
+  checkOut: string;
+  imageUrl?: string;
+  /** Houses the team confirmed are free for these days */
+  houseIds: string[];
 }
 
 export interface PricingRule {
@@ -72,6 +109,8 @@ export interface PricingRule {
   minNights: number;
   /** Optional prices for smaller groups, sorted by maxGuests ascending */
   tiers?: PriceTier[];
+  /** Special prices for chosen nights (holidays) */
+  specials?: SpecialPrice[];
 }
 
 /** Text stored in both site languages (maps to sr/en columns in the database later) */
@@ -150,6 +189,9 @@ export interface PriceCalculation {
   weekendRate: number;
   /** Set when a smaller-group price was used ("up to N people") */
   tierMaxGuests?: number;
+  /** Nights at a special (holiday) price, and what they cost; not in weekday/weekendNights */
+  specialNights?: number;
+  specialTotal?: number;
   /** Listing with units: the units this price is for */
   units?: string[];
   /** Event venue: the price of one party day (no nights) */

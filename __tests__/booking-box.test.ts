@@ -1,5 +1,5 @@
 import type { House } from '@/types';
-import { quoteStay } from '@/lib/pricing';
+import { quoteStay, stayMinNights } from '@/lib/pricing';
 import { checkSelection, quoteSelection, suggestForStay, suggestSelection } from '@/lib/booking';
 import { summarizeRules } from '@/lib/rules';
 
@@ -95,5 +95,75 @@ describe('house rules for the whole listing (U8)', () => {
   it('shows one time line when all units share it', () => {
     const same = { ...kutak, units: kutak.units!.map((u) => ({ ...u, rules: { ...u.rules, checkInTime: '15:00' } })) };
     expect(summarizeRules(same).times).toEqual([{ checkIn: '15:00', checkOut: '11:00' }]);
+  });
+});
+
+describe('holiday (special) prices', () => {
+  // 30 Dec 2026 – 2 Jan 2027: nights of 30.12 (Wed), 31.12 (Thu), 1.1 (Fri)
+  const nye = new Date(2026, 11, 30);
+  const out = new Date(2027, 0, 2);
+  const special = { label: 'Nova godina', firstNight: '2026-12-31', lastNight: '2027-01-01', price: 150, minNights: 3 };
+  const house: House = { ...base, pricing: { ...base.pricing, specials: [special] } };
+
+  it('uses the holiday price for those nights and the normal price for the rest', () => {
+    const quote = quoteStay(house, nye, out, 4)!;
+    // 30.12 weekday €50 + 31.12 and 1.1 at €150
+    expect(quote.total).toBe(50 + 150 + 150);
+    expect(quote).toMatchObject({ weekdayNights: 1, weekendNights: 0, specialNights: 2, specialTotal: 300 });
+  });
+
+  it('replaces smaller-group prices too', () => {
+    const tiered: House = {
+      ...house,
+      pricing: { ...house.pricing, tiers: [{ maxGuests: 2, weekdayPrice: 30, weekendPrice: 40 }] },
+    };
+    expect(quoteStay(tiered, nye, out, 2)!.total).toBe(30 + 150 + 150);
+  });
+
+  it('asks for the longer stay only when a holiday night is included', () => {
+    expect(stayMinNights(house, nye, out)).toBe(3);
+    expect(stayMinNights(house, new Date(2026, 11, 20), new Date(2026, 11, 22))).toBe(1);
+  });
+
+  it('prices each unit with its own holiday price', () => {
+    const units: House = {
+      ...kutak,
+      units: kutak.units!.map((u) => (u.id === 'brv' ? { ...u, specials: [{ ...special, price: 120 }] } : u)),
+    };
+    const quote = quoteSelection(units, nye, out, [{ id: 'brv', guests: 2, partyGuests: 0 }]);
+    // 30.12 at €63, then two holiday nights at €120
+    expect(quote.total).toBe(63 + 120 + 120);
+    expect(stayMinNights(units, nye, out)).toBe(3);
+  });
+});
+
+describe('holiday prices for a party space', () => {
+  const withParty: House = {
+    ...kutak,
+    units: kutak.units!.map((u) =>
+      u.id === 'let'
+        ? { ...u, specials: [{ label: 'Nova godina', firstNight: '2026-12-31', lastNight: '2026-12-31', price: 500, maxGuests: 30, minNights: 3 }] }
+        : u
+    ),
+  };
+  const party = (day: Date, people: number) =>
+    quoteSelection(withParty, day, new Date(day.getFullYear(), day.getMonth(), day.getDate() + 1), [
+      { id: 'let', guests: 0, partyGuests: people },
+    ]);
+
+  it('uses the holiday party price on that day for that party size', () => {
+    expect(party(new Date(2026, 11, 31), 25).total).toBe(500);
+  });
+
+  it('keeps the normal party price on other days', () => {
+    // 1 Jan 2027 is a Friday: normal weekend price
+    expect(party(new Date(2027, 0, 1), 25).total).toBe(315);
+  });
+
+  it('does not change nightly prices or the minimum stay', () => {
+    const nye = new Date(2026, 11, 31);
+    const out = new Date(2027, 0, 1);
+    expect(quoteSelection(withParty, nye, out, [{ id: 'brv', guests: 2, partyGuests: 0 }]).total).toBe(63);
+    expect(stayMinNights(withParty, nye, out)).toBe(1);
   });
 });

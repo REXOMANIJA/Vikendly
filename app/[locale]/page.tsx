@@ -8,7 +8,10 @@ import FreeThisWeekend from '@/components/sections/FreeThisWeekend';
 import WhyVikendly from '@/components/sections/WhyVikendly';
 import HowItWorks from '@/components/sections/HowItWorks';
 import OwnerCTA from '@/components/sections/OwnerCTA';
+import HolidayOffer from '@/components/sections/HolidayOffer';
 import {
+  getActiveHolidays,
+  getHolidayHouses,
   getCategories,
   getDestinations,
   getFeaturedHouses,
@@ -28,19 +31,25 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [destinations, categories, featured, houseCounts] = await Promise.all([
+  const [destinations, categories, featured, houseCounts, holidays] = await Promise.all([
     getDestinations(),
     getCategories(),
     getFeaturedHouses(),
     getHouseCountsByDestination(),
+    getActiveHolidays(),
   ]);
   // Guests only see destinations that have at least one published house (the admin sees all)
   const listed = destinations.filter((d) => (houseCounts[d.id] ?? 0) > 0);
+  // Holiday offer switched on in admin (the soonest one), shown only once it has free houses
+  const holiday = holidays[0];
+  const holidayHouses = holiday ? await getHolidayHouses(holiday) : [];
 
   return (
     <>
       <Hero destinations={listed} />
       <Categories categories={categories} />
+      {/* Holiday offer, right under "Kakav vikend želite?" */}
+      {holiday && holidayHouses.length > 0 && <HolidayOffer holiday={holiday} houses={holidayHouses} />}
       {listed.length > 0 && <Destinations destinations={listed} houseCounts={houseCounts} />}
       <FreeThisWeekend houses={featured} destinations={destinations} />
       <WhyVikendly />

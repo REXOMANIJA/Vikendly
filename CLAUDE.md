@@ -20,7 +20,7 @@ Supabase. Alerts: Telegram bot @VikendlyBot.
   words, no jargon. Show results (what changed on the site), not code.
 - **"Save and upload" = commit and push to `main`.** Never commit or push without being asked.
   Before pushing, scan the staged diff for secrets (Telegram token, keys) and leftover `TEMP-PREVIEW`.
-- **Database changes:** write a new numbered file in `supabase/migrations/` (next is `0016_…`), make
+- **Database changes:** write a new numbered file in `supabase/migrations/` (next is `0018_…`), make
   it safe to run twice (`if not exists`, `create or replace`, guarded `update`s), and ask the owner
   to run it in Supabase → SQL Editor. Never assume it ran: check with a read-only REST query using
   the publishable key from `.env.local` (e.g. `curl "$URL/rest/v1/table?select=col&limit=1" -H "apikey: $KEY"`).
@@ -77,10 +77,19 @@ react-day-picker 10 · lucide-react (no brand icons) · Jest · Vercel Analytics
   (`quoteStay`). Booking requests save `details` (per-unit breakdown) and `party_guests`.
 - Example in production: **Kutak u Vraniću** = Brvnara (4) + Kuća sa balkonom (6) + Letnjikovac
   (party-only, up to 30/50/70 people).
+- **Holiday prices** (`house_special_prices`, admin → house → "Posebne cene za praznike"): a price per
+  night for chosen nights (first–last night inclusive), per bed unit or for the whole house. It replaces
+  weekday/weekend and group prices for those nights; optional `min_nights` raises the minimum stay
+  when a stay includes one of those nights (`stayMinNights`). Party-only spaces keep normal prices.
+- **Holidays** (admin → Praznici, `holidays` + `holiday_houses`): one reusable offer per holiday
+  (name, dates, text, picture, on/off, ticked free houses). While on and not past its departure day it
+  shows on the homepage (`HolidayOffer`) and at `/sr/praznici/[slug]`. The site has no availability
+  calendar: the team ticks houses they confirmed are free.
+- Everyone starts on Serbian (`localeDetection: false` in `i18n/routing.ts`); EN only via the switch.
 
 ## Database status
 
-Migrations **0001–0012 have all been run** in Supabase (checked 12 Nov 2026). **0013 (venues, reviews) run 13 Nov. 0014 (free-text rules) run (checked 13 Nov). 0015_house_nearby.sql (`nearby_sr`/`nearby_en`, "Udaljenosti i okolina" under the map) written 13 Nov – confirm it ran** (code works without it; the text just isn't saved). Tables of note:
+Migrations **0001–0012 have all been run** in Supabase (checked 12 Nov 2026). **0013 (venues, reviews) run 13 Nov. 0014 (free-text rules) run (checked 13 Nov). 0015 (nearby text), 0016 (holidays, special prices) and 0017 (holiday read fix, party holiday prices) run 13 Nov.** Tables of note:
 `houses`, `house_units`, `house_price_tiers`, `house_photos`, `booking_requests` (with `details`,
 `party_guests`), `reviews` (0013: token link per confirmed booking, approved before public), `owner_applications`, `rate_limits`, `destinations` (id = URL slug, fixed after
 creation). Save function: `admin_save_house(jsonb)` – redefine it fully in any migration that adds
@@ -95,7 +104,7 @@ The same must exist in Vercel. Template: `.env.example`.
 ## How to check work (do all before saying "done")
 
 1. `npx tsc --noEmit`
-2. `npx jest` (86 tests at last count; add tests for new price/booking rules in `__tests__/`)
+2. `npx jest` (90 tests at last count; add tests for new price/booking rules in `__tests__/`)
 3. `npx next build --experimental-build-mode compile`
 4. Browser: preview server `vikendly` from `.claude/launch.json` (port 3000). Check desktop (1280×800)
    **and phone (375×812)**, Serbian and English, no sideways scroll

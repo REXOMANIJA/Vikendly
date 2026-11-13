@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { site } from '@/lib/site';
 import { locales } from '@/i18n/routing';
 import { getPathname } from '@/i18n/navigation';
-import { getHouses } from '@/lib/data';
+import { getActiveHolidays, getHouses } from '@/lib/data';
 
 const baseUrl = site.url;
 
@@ -31,11 +31,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     })),
     ...locales.map((locale) => ({
-      url: `${baseUrl}/${locale}/search`,
+      // /sr/pretraga, /en/search
+      url: baseUrl + getPathname({ locale, href: '/search' }),
       lastModified: now,
       changeFrequency: 'daily' as const,
       priority: 0.8,
     })),
+    // Holiday offers while they are on (/sr/praznici/nova-godina-2027)
+    ...(await getActiveHolidays()).flatMap((holiday) =>
+      locales.map((locale) => ({
+        url: baseUrl + getPathname({ locale, href: { pathname: '/holidays/[slug]', params: { slug: holiday.slug } } }),
+        lastModified: now,
+        changeFrequency: 'daily' as const,
+        priority: 0.9,
+      }))
+    ),
     ...locales.map((locale) => ({
       // /sr/destinacije, /en/destinations
       url: baseUrl + getPathname({ locale, href: '/destinations' }),

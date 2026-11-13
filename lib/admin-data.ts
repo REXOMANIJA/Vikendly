@@ -62,6 +62,23 @@ export type AdminHouse = {
   price_tiers: { max_guests: number; weekday_price: number; weekend_price: number }[];
   party_prices: PriceLevel[];
   units: AdminUnit[];
+  /** Holiday prices; empty before migration 0016 */
+  special_prices: SpecialPriceInput[];
+};
+
+/**
+ * Holiday price for chosen nights (table house_special_prices, migration 0016).
+ * unit_index = position of the unit in the house's unit list; null for a house rented as one.
+ */
+export type SpecialPriceInput = {
+  unit_index: number | null;
+  label: string;
+  first_night: string;
+  last_night: string;
+  price: number;
+  min_nights: number | null;
+  /** Party-only space: the party size this price is for (migration 0017); null = nightly price */
+  max_guests: number | null;
 };
 
 /** Party level or group price: up to max_guests people */
@@ -270,8 +287,30 @@ export async function getHouseForAdmin(id: string): Promise<AdminHouse | null> {
   const { house_photos, house_categories, house_amenities, house_price_tiers, house_owner_contacts, house_units, party_prices, ...h } = data as any;
   // One-to-one relation: PostgREST returns an object (or an array in older versions)
   const ownerContact = Array.isArray(house_owner_contacts) ? house_owner_contacts[0] : house_owner_contacts;
+  const unitIds: string[] = [...(house_units ?? [])]
+    .sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order)
+    .map((u: { id: string }) => u.id);
+  // Holiday prices (no table before migration 0016: none)
+  const specials = await supabase
+    .from('house_special_prices')
+    .select('*') // all columns: works before and after migration 0017
+    .eq('house_id', id)
+    .order('first_night');
+  type SpecialRow = { unit_id: string | null; label: string; first_night: string; last_night: string; price: number | string; min_nights: number | null; max_guests?: number | null };
+  const special_prices: SpecialPriceInput[] = (specials.error ? [] : (specials.data as SpecialRow[]))
+    .map((s) => ({
+      unit_index: s.unit_id ? unitIds.indexOf(s.unit_id) : null,
+      label: s.label ?? '',
+      first_night: s.first_night,
+      last_night: s.last_night,
+      price: Number(s.price),
+      min_nights: s.min_nights,
+      max_guests: s.max_guests ?? null,
+    }))
+    .filter((s) => s.unit_index !== -1);
   return {
     ...h,
+    special_prices,
     price_tiers: (house_price_tiers as AdminHouse['price_tiers'])
       .map((t) => ({ ...t, weekday_price: Number(t.weekday_price), weekend_price: Number(t.weekend_price) }))
       .sort((a, b) => a.max_guests - b.max_guests),
@@ -351,4 +390,40 @@ export async function listOwnerApplications(): Promise<OwnerApplication[]> {
     .order('created_at', { ascending: false });
   if (error) throw new Error(error.message);
   return data as OwnerApplication[];
+}
+
+// ───────────── Holidays (migration 0016) ─────────────
+
+export type AdminHoliday = {
+  id: string;
+  slug: string;
+  name_sr: string;
+  name_en: string;
+  text_sr: string;
+  text_en: string;
+  check_in: string;
+  check_out: string;
+  image_url: string | null;
+  is_active: boolean;
+  house_ids: string[];
+};
+
+/** All holidays, newest dates first; null before migration 0016 (no table yet) */
+export async function listHolidaysForAdmin(): Promise<AdminHoliday[] | null> {
+  const supabase = await createAdminClient();
+  const { data, error } = await supabase
+    .from('holidays')
+    .select('id, slug, name_sr, name_en, text_sr, text_en, check_in, check_out, image_url, is_active, holiday_houses(house_id)')
+    .order('check_in', { ascending: false });
+  if (error) return null;
+  return (data as (Omit<AdminHoliday, 'house_ids'> & { holiday_houses: { house_id: string }[] })[]).map(
+    ({ holiday_houses, ...h }) => ({ ...h, house_ids: holiday_houses.map((x) => x.house_id) })
+  );
+}
+
+/** Nights with a holiday price per house ("yyyy-MM-dd" ranges), to show which houses have one */
+export async function listSpecialPriceRanges(): Promise<{ house_id: string; first_night: string; last_night: string }[]> {
+  const supabase = await createAdminClient();
+  const { data, error } = await supabase.from('house_special_prices').select('house_id, first_night, last_night');
+  return error ? [] : (data as { house_id: string; first_night: string; last_night: string }[]);
 }

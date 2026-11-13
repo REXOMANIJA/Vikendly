@@ -23,8 +23,7 @@ P2 = can come after launch
 
 ### Code work, no input needed
 
-Nothing open. Waiting on the owner: **run migration `0014_house_rules_text.sql`** (house rules as
-free text in admin; without it the text is not saved).
+Nothing open. Migrations 0015–0017 have run (13 Nov). Holiday "Nova godina 2027" is on with 7 houses.
 
 ### Running the business (owner, outside the code)
 
@@ -37,6 +36,12 @@ free text in admin; without it the text is not saved).
 | G7 | P2 | Google Search Console: verified, `sitemap.xml` submitted. Check "Pages" report after a few days. |
 
 ---
+
+## Done (13 Nov 2026, fourth round)
+
+- **UI/UX tasks** U1–U3, U6, U8–U13, U15–U17, U21 (see `UI_UX_TASKS.md`): booking box dates-first with suggested units, combined house rules, compact amenities, section links, "Udaljenosti i okolina" (0015), sticky search filters, `/sr/pretraga` + redirects, results map, owner banner on the homepage.
+- **Serbian is the default** for every visitor (no browser-language redirect); English via the SR/EN switch.
+- **Holidays:** admin → Praznici (reusable offer: name, dates, text, picture, on/off, ticked free houses) → homepage block + `/sr/praznici/[slug]`; **holiday prices** per house/unit with optional minimum stay (0016).
 
 ## Done (13 Nov 2026, third round)
 

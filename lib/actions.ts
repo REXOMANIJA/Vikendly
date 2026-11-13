@@ -3,6 +3,7 @@
 import { getSupabase } from '@/lib/supabase/public';
 import { getHouseBySlug } from '@/lib/data';
 import { checkSelection, quoteSelection, type Selection } from '@/lib/booking';
+import { stayMinNights } from '@/lib/pricing';
 import { after } from 'next/server';
 import { formatDate, formatStay, parseDateParam } from '@/lib/dates';
 import { esc, notifyTeam, withinRateLimit } from '@/lib/notify';
@@ -137,8 +138,10 @@ export async function submitBookingRequest(input: BookingRequestInput): Promise<
 
   const quote = quoteSelection(house, checkIn, checkOut, selections);
   // A party-only booking is one day, so the minimum stay doesn't apply
-  if (!quote.partyOnly && quote.nights < house.pricing.minNights) {
-    return { ok: false, error: 'minNights', minNights: house.pricing.minNights };
+  // Holiday nights can ask for a longer stay than usual
+  const minNights = stayMinNights(house, checkIn, checkOut);
+  if (!quote.partyOnly && quote.nights < minNights) {
+    return { ok: false, error: 'minNights', minNights };
   }
   if (quote.nights > MAX_NIGHTS) return { ok: false, error: 'dates' };
   // People sleeping over; for a party-only booking, the number of people at the party

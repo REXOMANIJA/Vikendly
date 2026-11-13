@@ -344,7 +344,10 @@
       "linePartyOnly": "{name}: žurka, {count, plural, one {# osoba} few {# osobe} other {# osoba}}",
       "unitPrice": "{price} po noći",
       "suggested": "Predložili smo najpovoljniji smeštaj za {count, plural, one {# osobu} few {# osobe} other {# osoba}}. Možete ga promeniti.",
-      "venueGuests": "Broj osoba na žurci"
+      "venueGuests": "Broj osoba na žurci",
+      "specialLine": "{count, plural, one {# noć} few {# noći} other {# noći}} po prazničnoj ceni",
+      "specialIncluded": "Uključena praznična cena za {count, plural, one {# noć} few {# noći} other {# noći}}.",
+      "tooFewNightsHoliday": "Za praznične dane najkraći boravak je {count, plural, one {# noć} few {# noći} other {# noći}}."
     },
     "sleeps": "Noćenje: {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}",
     "dayCapacity": "Žurka ili druženje: {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}",
@@ -440,7 +443,13 @@
       "rules": "Pravila",
       "reviews": "Utisci",
       "location": "Lokacija"
-    }
+    },
+    "specialTitle": "Praznične cene",
+    "specialLine": "{label}: {dates}, {price} po noći",
+    "specialLineUnit": "{label} ({unit}): {dates}, {price} po noći",
+    "specialMin": "najmanje {count, plural, one {# noć} few {# noći} other {# noći}}",
+    "specialDefault": "Praznik",
+    "specialLineParty": "{label} ({unit}, žurka do {count, plural, one {# osobe} few {# osobe} other {# osoba}}): {dates}, {price}"
   },
   "datePicker": {
     "label": "Datumi",
@@ -693,5 +702,21 @@
       "tooMany": "Previše pokušaja. Pokušajte ponovo za sat vremena.",
       "server": "Ocena nije poslata zbog greške kod nas. Pokušajte ponovo za par minuta."
     }
+  },
+  "holiday": {
+    "eyebrow": "Praznična ponuda",
+    "nights": "{count, plural, one {# noć} few {# noći} other {# noći}}, {dates}",
+    "seeAll": "Sve slobodne kuće",
+    "freeCount": "{count, plural, one {# slobodna kuća} few {# slobodne kuće} other {# slobodnih kuća}}",
+    "metaTitle": "{name}: slobodne vikend kuće | Vikendly",
+    "howItWorks": "Cene su za ceo boravak u ovim danima. Na stranici kuće možete promeniti datume i broj gostiju i poslati besplatan upit, a mi proveravamo sa vlasnikom.",
+    "empty": "Sve kuće za ove praznike su trenutno popunjene. Javite nam se i pokušaćemo da nađemo nešto za vas.",
+    "contact": "Kontaktirajte nas",
+    "back": "Sve kuće",
+    "cardLabel": "za {nights}",
+    "fromTotal": "od {price} za ceo boravak",
+    "countdown": "{count, plural, one {Još # dan} few {Još # dana} other {Još # dana}}",
+    "started": "Praznici su počeli",
+    "cta": "Pogledajte slobodne kuće"
   }
 }

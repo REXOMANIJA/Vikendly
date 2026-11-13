@@ -26,11 +26,12 @@ import {
   BadgeCheck,
   CircleDot,
   Route,
+  Sparkles,
 } from 'lucide-react';
 import AmenityList from '@/components/house/AmenityList';
 import { summarizeRules, type RuleAnswer } from '@/lib/rules';
 import VerifiedBadge from '@/components/VerifiedBadge';
-import { formatVisitMonth, parseDateParam } from '@/lib/dates';
+import { formatDate, formatDateRange, formatVisitMonth, parseDateParam } from '@/lib/dates';
 import type { LucideIcon } from 'lucide-react';
 import { Link, getPathname } from '@/i18n/navigation';
 import { routing, type Locale } from '@/i18n/routing';
@@ -137,6 +138,38 @@ export default async function HousePage({ params }: { params: Params }) {
     { state: ruleSummary.pets.state, label: ruleLabel(ruleSummary.pets, t('petsAllowed'), t('petsNotAllowed'), 'petsSome') },
     { state: ruleSummary.smoking.state, label: ruleLabel(ruleSummary.smoking, t('smokingAllowed'), t('smokingNotAllowed'), 'smokingSome') },
   ];
+  // Holiday prices still to come, for the whole house or per unit (shown as arrival – departure)
+  const today = new Date().toISOString().slice(0, 10);
+  const specialLines = [
+    ...(house.pricing.specials ?? []).map((s) => ({ s, unit: '' })),
+    ...(house.units ?? []).flatMap((u) => (u.specials ?? []).map((s) => ({ s, unit: u.name }))),
+  ]
+    .filter(({ s }) => s.lastNight >= today)
+    .sort((a, b) => a.s.firstNight.localeCompare(b.s.firstNight))
+    .map(({ s, unit }) => {
+      const first = parseDateParam(s.firstNight)!;
+      // Party price: for a party on any day from first to last (days, not nights)
+      if (s.maxGuests != null) {
+        const last = parseDateParam(s.lastNight)!;
+        return t('specialLineParty', {
+          label: s.label || t('specialDefault'),
+          unit,
+          count: s.maxGuests,
+          dates: s.firstNight === s.lastNight ? formatDate(first, locale) : formatDateRange(first, last, locale),
+          price: eur(s.price),
+        });
+      }
+      const departure = parseDateParam(s.lastNight)!;
+      departure.setDate(departure.getDate() + 1);
+      const values = {
+        label: s.label || t('specialDefault'),
+        unit,
+        dates: formatDateRange(first, departure, locale),
+        price: eur(s.price),
+      };
+      const line = unit ? t('specialLineUnit', values) : t('specialLine', values);
+      return s.minNights ? `${line} (${t('specialMin', { count: s.minNights })})` : line;
+    });
   // Distances and nearby places (admin → "Udaljenosti"), one per line
   const nearbyText = house.nearby ? house.nearby[locale as Locale] || house.nearby.sr : '';
   const nearbyLines = nearbyText.split('\n').map((line) => line.trim()).filter(Boolean);
@@ -293,6 +326,19 @@ export default async function HousePage({ params }: { params: Params }) {
               <div id="delovi" className="scroll-mt-32">
                 <HouseUnits units={house.units!} />
               </div>
+            )}
+
+            {specialLines.length > 0 && (
+              <section className="rounded-2xl bg-primary p-5 text-white">
+                <h2 className="inline-flex items-center gap-2 font-serif text-xl font-bold">
+                  <Sparkles className="size-5 text-accent" aria-hidden /> {t('specialTitle')}
+                </h2>
+                <ul className="mt-3 space-y-1.5 text-white/90">
+                  {specialLines.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+              </section>
             )}
 
             <section id="pravila" className="scroll-mt-32">

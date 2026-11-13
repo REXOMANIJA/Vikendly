@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { getSupabase } from '@/lib/supabase/public';
-import type { Category, Destination, House, HouseUnit, PartyPrice, PriceTier, RatingSummary, Review } from '@/types';
+import type { Category, Destination, Holiday, House, HouseUnit, PartyPrice, PriceTier, RatingSummary, Review, SpecialPrice } from '@/types';
 
 /**
  * All data access goes through this file. Components never talk to Supabase directly.
@@ -208,16 +208,104 @@ const loadHouses = cache(async (): Promise<(House & { featuredRank: number | nul
       .select(`*, ${related}${withUnits ? ', house_units(*)' : ''}`)
       .eq('is_published', true)
       .order('name');
-  const [first, reviews] = await Promise.all([query(true), loadReviews()]);
+  const [first, reviews, specials] = await Promise.all([query(true), loadReviews(), loadSpecialPrices()]);
   let { data, error } = first;
   // Before migration 0010 the units table doesn't exist yet: load the houses without units
   if (error && /house_units/.test(error.message)) ({ data, error } = await query(false));
   if (error) throw new Error(`Could not load houses: ${error.message}`);
   return (data as unknown as HouseRow[]).map((row) => {
-    const house = toHouse(row);
+    const house = withSpecialPrices(toHouse(row), specials);
     const rating = summarize(reviews.filter((r) => r.houseId === house.id));
     return rating ? { ...house, rating } : house;
   });
+});
+
+type SpecialPriceRow = {
+  house_id: string;
+  unit_id: string | null;
+  label: string | null;
+  first_night: string;
+  last_night: string;
+  price: number | string;
+  min_nights: number | null;
+  /** Party size for a party-only space (migration 0017) */
+  max_guests?: number | null;
+};
+
+/** Holiday prices of all houses. Empty before migration 0016 (no table yet). */
+const loadSpecialPrices = cache(async (): Promise<SpecialPriceRow[]> => {
+  if (useSampleData) return [];
+  const { data, error } = await getSupabase()
+    .from('house_special_prices')
+    // All columns, so this keeps working before and after migration 0017 (max_guests)
+    .select('*')
+    .order('first_night');
+  if (error) console.error('Could not load special prices:', error.message);
+  return error ? [] : (data as SpecialPriceRow[]);
+});
+
+export const toSpecialPrice = (r: SpecialPriceRow): SpecialPrice => ({
+  label: r.label?.trim() || undefined,
+  firstNight: r.first_night,
+  lastNight: r.last_night,
+  price: Number(r.price),
+  minNights: r.min_nights ?? undefined,
+  maxGuests: r.max_guests ?? undefined,
+});
+
+/** Puts each special price on its house (no unit) or on its unit */
+function withSpecialPrices<T extends House>(house: T, rows: SpecialPriceRow[]): T {
+  const mine = rows.filter((r) => r.house_id === house.id);
+  if (!mine.length) return house;
+  return {
+    ...house,
+    pricing: { ...house.pricing, specials: mine.filter((r) => !r.unit_id).map(toSpecialPrice) },
+    units: house.units?.map((u) => ({ ...u, specials: mine.filter((r) => r.unit_id === u.id).map(toSpecialPrice) })),
+  };
+}
+
+type HolidayRow = {
+  id: string;
+  slug: string;
+  name_sr: string;
+  name_en: string;
+  text_sr: string;
+  text_en: string;
+  check_in: string;
+  check_out: string;
+  image_url: string | null;
+  holiday_houses: { house_id: string }[];
+};
+
+/**
+ * Holiday offers that are switched on and not over yet, soonest first.
+ * Empty before migration 0016 (no table yet).
+ */
+const loadHolidays = cache(async (): Promise<Holiday[]> => {
+  if (useSampleData) return [];
+  // Keep an offer up until its departure day
+  const today = new Date().toISOString().slice(0, 10);
+  const { data, error } = await getSupabase()
+    .from('holidays')
+    .select('id, slug, name_sr, name_en, text_sr, text_en, check_in, check_out, image_url, holiday_houses(house_id)')
+    .eq('is_active', true)
+    .gte('check_out', today)
+    .order('check_in');
+  if (error) {
+    // Shown in the server log, so a database problem doesn't just quietly hide the offer
+    console.error('Could not load holidays:', error.message);
+    return [];
+  }
+  return (data as HolidayRow[]).map((h) => ({
+    id: h.id,
+    slug: h.slug,
+    name: { sr: h.name_sr, en: h.name_en },
+    text: { sr: h.text_sr, en: h.text_en },
+    checkIn: h.check_in,
+    checkOut: h.check_out,
+    imageUrl: h.image_url ?? undefined,
+    houseIds: h.holiday_houses.map((x) => x.house_id),
+  }));
 });
 
 /** Approved guest reviews, newest first. Empty before migration 0013 (no table yet). */
@@ -354,4 +442,20 @@ export async function getReviewInvite(token: string): Promise<ReviewInvite | und
     checkOut: r.check_out ?? undefined,
     status: r.status,
   };
+}
+
+// ───────────── Holidays ─────────────
+
+/** Holiday offers switched on in admin and not over yet, soonest first */
+export async function getActiveHolidays(): Promise<Holiday[]> {
+  return loadHolidays();
+}
+
+export async function getHolidayBySlug(slug: string): Promise<Holiday | undefined> {
+  return (await loadHolidays()).find((h) => h.slug === slug);
+}
+
+/** Published houses ticked for a holiday, in the order of the house list */
+export async function getHolidayHouses(holiday: Holiday): Promise<House[]> {
+  return (await loadHouses()).filter((h) => holiday.houseIds.includes(h.id));
 }

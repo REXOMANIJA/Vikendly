@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Check, CircleCheck, Loader2, PawPrint, Send, Sparkles, Users } from 'lucide-react';
 import type { House } from '@/types';
-import { getBookables, getNightlyRates, hasUnits, isVenue, partyLimit, WHOLE_HOUSE, type Bookable } from '@/lib/pricing';
+import { getBookables, getNightlyRates, hasUnits, isVenue, partyLimit, stayMinNights, WHOLE_HOUSE, type Bookable } from '@/lib/pricing';
 import { checkSelection, quoteSelection, suggestForStay, type Selection, type SelectionProblem } from '@/lib/booking';
 import { formatDateRange, parseDateParam } from '@/lib/dates';
 import { submitBookingRequest, type BookingRequestResult } from '@/lib/actions';
@@ -182,7 +182,11 @@ export default function PriceCalculator({
   }, [inDate?.getTime(), outDate?.getTime(), JSON.stringify(selections), house, groupSize]);
 
   const quote = inDate && outDate && complete && !problem ? quoteSelection(house, inDate, outDate, selections) : undefined;
-  const tooShort = quote && !quote.partyOnly && quote.nights < pricing.minNights;
+  // Holiday nights can ask for a longer stay than usual
+  const minNights = inDate && outDate ? stayMinNights(house, inDate, outDate) : pricing.minNights;
+  const tooShort = quote && !quote.partyOnly && quote.nights < minNights;
+  // Some chosen nights are at a holiday price
+  const specialNights = quote ? Math.max(0, ...quote.lines.map((l) => l.stay.specialNights ?? 0)) : 0;
   const canSend = Boolean(quote && !tooShort);
 
   const onSubmit = (e: React.FormEvent) => {
@@ -401,6 +405,12 @@ export default function PriceCalculator({
                       value={eur(quote.lines[0].stay.weekendNights * quote.lines[0].stay.weekendRate)}
                     />
                   )}
+                  {(quote.lines[0].stay.specialNights ?? 0) > 0 && (
+                    <Row
+                      label={t('specialLine', { count: quote.lines[0].stay.specialNights! })}
+                      value={eur(quote.lines[0].stay.specialTotal!)}
+                    />
+                  )}
                 </>
               ) : (
                 quote.lines.map((l) => (
@@ -434,9 +444,14 @@ export default function PriceCalculator({
                 {t('perPerson', { price: eur(Math.round(quote.total / quote.guests)) })}
               </p>
             )}
+            {specialNights > 0 && !onlyStay && (
+              <p className="mt-1 text-right text-sm text-text/70">{t('specialIncluded', { count: specialNights })}</p>
+            )}
             {tooShort && (
               <p className="mt-3 rounded-lg bg-accent/10 px-4 py-3 text-sm text-accent-dark">
-                {t('tooFewNights', { count: pricing.minNights })}
+                {minNights > pricing.minNights
+                  ? t('tooFewNightsHoliday', { count: minNights })
+                  : t('tooFewNights', { count: minNights })}
               </p>
             )}
           </>

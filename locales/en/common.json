@@ -344,7 +344,10 @@
       "linePartyOnly": "{name}: party, {count, plural, one {# guest} other {# guests}}",
       "unitPrice": "{price} per night",
       "suggested": "We picked the best-value option for {count, plural, one {# guest} other {# guests}}. You can change it.",
-      "venueGuests": "People at the party"
+      "venueGuests": "People at the party",
+      "specialLine": "{count, plural, one {# night} other {# nights}} at the holiday price",
+      "specialIncluded": "Includes the holiday price for {count, plural, one {# night} other {# nights}}.",
+      "tooFewNightsHoliday": "Over the holidays the minimum stay is {count, plural, one {# night} other {# nights}}."
     },
     "sleeps": "Sleeps {count, plural, one {up to # guest} other {up to # guests}}",
     "dayCapacity": "Parties and gatherings: {count, plural, one {up to # guest} other {up to # guests}}",
@@ -440,7 +443,13 @@
       "rules": "Rules",
       "reviews": "Reviews",
       "location": "Location"
-    }
+    },
+    "specialTitle": "Holiday prices",
+    "specialLine": "{label}: {dates}, {price} per night",
+    "specialLineUnit": "{label} ({unit}): {dates}, {price} per night",
+    "specialMin": "at least {count, plural, one {# night} other {# nights}}",
+    "specialDefault": "Holiday",
+    "specialLineParty": "{label} ({unit}, party up to {count, plural, one {# guest} other {# guests}}): {dates}, {price}"
   },
   "datePicker": {
     "label": "Dates",
@@ -693,5 +702,21 @@
       "tooMany": "Too many attempts. Please try again in an hour.",
       "server": "Your review was not sent because of an error on our side. Please try again in a few minutes."
     }
+  },
+  "holiday": {
+    "eyebrow": "Holiday offer",
+    "nights": "{count, plural, one {# night} other {# nights}}, {dates}",
+    "seeAll": "All available houses",
+    "freeCount": "{count, plural, one {# house available} other {# houses available}}",
+    "metaTitle": "{name}: available weekend houses | Vikendly",
+    "howItWorks": "Prices are for the whole stay on these dates. On the house page you can change the dates and number of guests and send a free request; we check with the owner.",
+    "empty": "All houses for these holidays are booked right now. Get in touch and we will try to find something for you.",
+    "contact": "Contact us",
+    "back": "All houses",
+    "cardLabel": "for {nights}",
+    "fromTotal": "from {price} for the whole stay",
+    "countdown": "{count, plural, one {# day to go} other {# days to go}}",
+    "started": "The holidays have started",
+    "cta": "See available houses"
   }
 }

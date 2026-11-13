@@ -1,4 +1,4 @@
-import type { House, HouseRules, PartyPrice, PriceCalculation, PriceTier, PricingRule } from '@/types';
+import type { House, HouseRules, PartyPrice, PriceCalculation, PriceTier, PricingRule, SpecialPrice } from '@/types';
 
 // Weekend nights: Friday (5) and Saturday (6)
 const WEEKEND_DAYS = [5, 6];
@@ -49,7 +49,13 @@ export function getBookables(house: House): Bookable[] {
     capacity: u.capacity,
     dayCapacity: u.dayCapacity,
     // The minimum stay is set for the whole listing
-    pricing: { weekdayPrice: u.weekdayPrice, weekendPrice: u.weekendPrice, minNights: house.pricing.minNights, tiers: u.tiers ?? [] },
+    pricing: {
+      weekdayPrice: u.weekdayPrice,
+      weekendPrice: u.weekendPrice,
+      minNights: house.pricing.minNights,
+      tiers: u.tiers ?? [],
+      specials: u.specials ?? [],
+    },
     rules: u.rules,
     // Party prices only for party-only spaces
     partyPrices: u.partyOnly ? u.partyPrices : [],
@@ -107,28 +113,68 @@ export function countNights(checkIn: Date, checkOut: Date): number {
   return Math.round((checkOut.getTime() - checkIn.getTime()) / DAY_MS);
 }
 
+/** "yyyy-MM-dd" of a date in local time (compared with special price dates as text) */
+const dayKey = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+/** The special price for the night that starts on `date`, if any (the first matching one wins) */
+export function specialFor(specials: SpecialPrice[] | undefined, date: Date): SpecialPrice | undefined {
+  if (!specials?.length) return undefined;
+  const key = dayKey(date);
+  // Rows with a party size are party prices, not nightly prices
+  return specials.find((s) => s.maxGuests == null && s.firstNight <= key && key <= s.lastNight);
+}
+
 function priceNights(pricing: PricingRule, capacity: number, checkIn: Date, checkOut: Date, guests: number): PriceCalculation {
   const nights = countNights(checkIn, checkOut);
   const { weekdayPrice, weekendPrice, tier } = ratesFor(pricing, capacity, guests);
 
   let weekdayNights = 0;
   let weekendNights = 0;
+  let specialNights = 0;
+  let specialTotal = 0;
   const currentDate = new Date(checkIn);
   for (let i = 0; i < Math.max(nights, 0); i++) {
-    if (WEEKEND_DAYS.includes(currentDate.getDay())) weekendNights++;
+    // A holiday price replaces the normal price for that night, whatever the group size
+    const special = specialFor(pricing.specials, currentDate);
+    if (special) {
+      specialNights++;
+      specialTotal += special.price;
+    } else if (WEEKEND_DAYS.includes(currentDate.getDay())) weekendNights++;
     else weekdayNights++;
     currentDate.setDate(currentDate.getDate() + 1);
   }
 
   return {
-    total: weekdayNights * weekdayPrice + weekendNights * weekendPrice,
+    total: weekdayNights * weekdayPrice + weekendNights * weekendPrice + specialTotal,
     nights: Math.max(nights, 0),
     weekdayNights,
     weekendNights,
     weekdayRate: weekdayPrice,
     weekendRate: weekendPrice,
     tierMaxGuests: tier?.maxGuests,
+    ...(specialNights > 0 ? { specialNights, specialTotal } : {}),
   };
+}
+
+/**
+ * Shortest stay allowed for these dates: the listing's minimum, or longer when the stay includes
+ * a holiday night that asks for more (e.g. Nova godina: at least 3 nights). Party-only bookings
+ * have no minimum and are not checked here.
+ */
+export function stayMinNights(house: House, checkIn: Date, checkOut: Date): number {
+  let min = house.pricing.minNights;
+  const specials = getBookables(house).flatMap((b) => (b.pricing.specials ?? []).filter((s) => s.maxGuests == null));
+  if (!specials.length) return min;
+  const date = new Date(checkIn);
+  for (let i = 0; i < countNights(checkIn, checkOut); i++) {
+    for (const s of specials) {
+      const key = dayKey(date);
+      if (s.minNights && s.firstNight <= key && key <= s.lastNight) min = Math.max(min, s.minNights);
+    }
+    date.setDate(date.getDate() + 1);
+  }
+  return min;
 }
 
 /** Price for a stay: each night at the weekday or weekend rate for this group size. No extra fees. */
@@ -158,9 +204,17 @@ export const isWeekendDay = (date: Date) => WEEKEND_DAYS.includes(date.getDay())
  * when the party is on a Friday or Saturday (`weekend`), otherwise the weekday price.
  * `null` = parties are allowed but the owner set no price for this size (agreed in person).
  */
-export function getPartyPrice(b: Bookable, people: number, weekend: boolean): number | null {
+export function getPartyPrice(b: Bookable, people: number, weekend: boolean, day?: Date): number | null {
   const level = b.partyPrices.find((p) => people <= p.maxGuests);
   if (!level) return null;
+  // A holiday price for this party size on that day replaces the normal one
+  if (day && b.pricing.specials?.length) {
+    const key = dayKey(day);
+    const special = b.pricing.specials.find(
+      (s) => s.maxGuests === level.maxGuests && s.firstNight <= key && key <= s.lastNight
+    );
+    if (special) return special.price;
+  }
   return weekend ? level.weekendPrice : level.weekdayPrice;
 }
 
@@ -223,7 +277,7 @@ function quoteParty(house: House, day: Date, guests: number): PriceCalculation |
   const weekend = isWeekendDay(day);
   const options = getBookables(house)
     .filter((b) => people <= partyLimit(b))
-    .map((b) => ({ b, price: getPartyPrice(b, people, weekend) }))
+    .map((b) => ({ b, price: getPartyPrice(b, people, weekend, day) }))
     .filter((o): o is { b: Bookable; price: number } => o.price !== null)
     .sort((a, c) => a.price - c.price);
   if (!options.length) return undefined;

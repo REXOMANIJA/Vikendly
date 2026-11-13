@@ -13,6 +13,7 @@ import { shrinkPhoto } from '@/lib/shrink-photo';
 import type { AdminHouse } from '@/lib/admin-data';
 import UnitsEditor, { type UnitFormRow } from '@/components/admin/UnitsEditor';
 import { type PartyPriceRow } from '@/components/admin/PartyPricesEditor';
+import SpecialPricesEditor, { WHOLE, type SpecialRow } from '@/components/admin/SpecialPricesEditor';
 
 type Options = {
   destinations: { id: string; name: string }[];
@@ -25,7 +26,9 @@ type FormState = Omit<
   HouseInput,
   | 'capacity' | 'day_capacity' | 'bedrooms' | 'bathrooms' | 'weekday_price' | 'weekend_price'
   | 'min_nights' | 'featured_rank' | 'price_tiers' | 'lat' | 'lng' | 'verified_at' | 'party_prices' | 'units'
+  | 'special_prices'
 > & {
+  special_prices: SpecialRow[];
   capacity: string;
   day_capacity: string;
   bedrooms: string;
@@ -53,9 +56,52 @@ const empty: FormState = {
   parties_allowed: false, pets_allowed: false, smoking_allowed: false,
   check_in_time: '15:00', check_out_time: '11:00',
   address: '', lat: '', lng: '', owner_phone: '',
-  is_published: false, featured_rank: '', verified_at: '', party_prices: [], units: [],
+  is_published: false, featured_rank: '', verified_at: '', party_prices: [], units: [], special_prices: [],
   category_ids: [], amenity_ids: [], photos: [],
 };
+
+/** Form key of a party size in a party-only space ("unit@30") */
+const partyPlace = (unitKey: string, maxGuests: number | string) => `${unitKey}@${maxGuests}`;
+
+/**
+ * Where a holiday price can go: the whole house, each place with beds (nightly price), and each
+ * party size of a party-only space (price of the party)
+ */
+function specialPlaces(units: UnitFormRow[]) {
+  if (units.length === 0) return [{ key: WHOLE, name: '', index: null as number | null, maxGuests: null as number | null }];
+  return units.flatMap((u, i) =>
+    u.party_only
+      ? u.party_prices
+          .filter((p) => Number(p.max_guests) > 0)
+          .map((p) => ({ key: partyPlace(u.key, p.max_guests), name: `${u.name || 'Prostor'}, do ${p.max_guests} osoba`, index: i as number | null, maxGuests: Number(p.max_guests) as number | null }))
+      : [{ key: u.key, name: u.name || 'Jedinica', index: i as number | null, maxGuests: null as number | null }]
+  );
+}
+
+/**
+ * Holiday prices from the database (one row per place) → one form row per date range,
+ * with a price field for each place
+ */
+function specialRows(h: AdminHouse): SpecialRow[] {
+  const rows = new Map<string, SpecialRow>();
+  for (const s of h.special_prices) {
+    const id = [s.label, s.first_night, s.last_night, s.min_nights ?? ''].join('|');
+    const row = rows.get(id) ?? {
+      key: crypto.randomUUID(),
+      label: s.label,
+      first_night: s.first_night,
+      last_night: s.last_night,
+      min_nights: s.min_nights === null ? '' : String(s.min_nights),
+      prices: {},
+    };
+    const unit = s.unit_index === null ? undefined : h.units[s.unit_index];
+    // Party-only space: one price per party size, kept under "unit@size"
+    const place = !unit ? WHOLE : s.max_guests != null ? partyPlace(unit.id, s.max_guests) : unit.id;
+    if (place) row.prices[place] = String(s.price);
+    rows.set(id, row);
+  }
+  return [...rows.values()];
+}
 
 function fromHouse(h: AdminHouse): FormState {
   return {
@@ -82,6 +128,7 @@ function fromHouse(h: AdminHouse): FormState {
     featured_rank: h.featured_rank === null ? '' : String(h.featured_rank),
     verified_at: h.verified_at ?? '',
     party_prices: h.party_prices.map(priceRow),
+    special_prices: specialRows(h),
     units: h.units.map((u) => ({
       ...u,
       key: u.id,
@@ -244,6 +291,21 @@ export default function HouseForm({
         party_prices: u.party_prices.map(priceNumbers),
         price_tiers: u.price_tiers.map(priceNumbers),
       })),
+      // One saved row per place that has a holiday price (units matched by position)
+      special_prices: form.special_prices.flatMap((r) =>
+        specialPlaces(form.units)
+          .filter((p) => (r.prices[p.key] ?? '').trim() !== '')
+          .map((p) => ({
+            unit_index: p.index,
+            label: r.label,
+            first_night: r.first_night,
+            last_night: r.last_night,
+            price: num(r.prices[p.key]),
+            // A party price is for one day, so no minimum stay
+            min_nights: p.maxGuests === null ? optionalNum(r.min_nights) : null,
+            max_guests: p.maxGuests,
+          }))
+      ),
     };
     startTransition(async () => {
       const result = await saveHouse(payload);
@@ -442,6 +504,26 @@ export default function HouseForm({
         </div>
         <UnitsEditor units={form.units} onChange={(units) => set('units', units)} />
         {fieldError('units')}
+      </section>
+
+      {/* ── Posebne cene (praznici) ── */}
+      <section className={box} id="field-special_prices">
+        <div>
+          <h2 className={h2}>
+            Posebne cene za praznike <span className="font-sans text-base font-normal text-text/60">(opciono)</span>
+          </h2>
+          <p className="mt-1 text-sm text-text/70">
+            Cena po noći za određene noći (Nova godina, Božić, Srpska Nova godina, Uskrs…), kako ste se dogovorili
+            sa vlasnikom. Za te noći zamenjuje običnu cenu i cene za manje grupe. Ako je upisan najkraći boravak,
+            gost koji uzima neku od tih noći mora ostati bar toliko.
+          </p>
+        </div>
+        <SpecialPricesEditor
+          rows={form.special_prices}
+          places={specialPlaces(form.units).map((p) => ({ key: p.key, name: p.name, party: p.maxGuests !== null }))}
+          onChange={(rows) => set('special_prices', rows)}
+        />
+        {fieldError('special_prices')}
       </section>
 
       {/* ── Opis ── */}
