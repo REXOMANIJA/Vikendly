@@ -1,5 +1,6 @@
 import { listBookingRequests } from '@/lib/admin-data';
 import BookingRequestList from '@/components/admin/BookingRequestList';
+import TestErrorButton from '@/components/admin/TestErrorButton';
 
 export default async function BookingRequestsPage() {
   const requests = await listBookingRequests();
@@ -12,6 +13,7 @@ export default async function BookingRequestsPage() {
         Najnoviji prvi · {requests.length} ukupno · {newCount} {newCount === 1 ? 'novi' : 'novih'}
       </p>
       <BookingRequestList requests={requests} />
+      <TestErrorButton />
     </>
   );
 }

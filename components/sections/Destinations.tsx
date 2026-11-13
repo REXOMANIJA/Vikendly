@@ -40,7 +40,7 @@ export default function Destinations({
               country={t(`countries.${destination.country}`)}
               houseCount={t('houseCount', { count: houseCounts[destination.id] ?? 0 })}
               featured={i === 0}
-              className={i === 0 ? 'col-span-2 min-h-64 lg:row-span-2' : ''}
+              className={i === 0 ? 'col-span-2 min-h-64 lg:row-span-2' : 'min-h-44'}
             />
           ))}
         </div>

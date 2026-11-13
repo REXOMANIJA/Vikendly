@@ -571,3 +571,13 @@ export async function deleteReview(id: string): Promise<ActionResult> {
   revalidatePath('/admin', 'layout');
   return { ok: true };
 }
+
+/**
+ * "Probna greška": fails on purpose so the team can check that error alerts reach Telegram
+ * (instrumentation.ts → lib/error-alert.ts). Admins only. Alerts are sent only on the live
+ * site, and the same error at most once every 30 minutes.
+ */
+export async function triggerTestError(): Promise<never> {
+  await requireAdmin();
+  throw new Error(`Probna greška iz admina (test obaveštenja) – ${new Date().toISOString()}`);
+}

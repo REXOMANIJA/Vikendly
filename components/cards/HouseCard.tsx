@@ -21,6 +21,8 @@ interface HouseCardProps {
   guests?: number;
   /** Dates/guests to carry to the house page so its price calculator is prefilled */
   linkQuery?: Record<string, string | number>;
+  /** The quote is the cheapest option, shown as "Od €X" instead of "€X ukupno" */
+  fromPrice?: boolean;
 }
 
 const eur = (n: number) => `€${Math.round(n)}`;
@@ -34,6 +36,7 @@ export default function HouseCard({
   quoteLabel,
   guests,
   linkQuery,
+  fromPrice = false,
 }: HouseCardProps) {
   const t = useTranslations('houseCard');
   const { capacity, name, rules } = house;
@@ -136,8 +139,14 @@ export default function HouseCard({
             <>
               <p className="flex flex-wrap items-baseline justify-between gap-x-3">
                 <span>
-                  <span className="text-xl font-bold text-primary">{eur(quote.total)}</span>
-                  <span className="text-sm text-text/70"> {t('totalWord')}</span>
+                  {fromPrice ? (
+                    <span className="text-xl font-bold text-primary">{t('from', { price: eur(quote.total) })}</span>
+                  ) : (
+                    <>
+                      <span className="text-xl font-bold text-primary">{eur(quote.total)}</span>
+                      <span className="text-sm text-text/70"> {t('totalWord')}</span>
+                    </>
+                  )}
                 </span>
                 {guests && guests > 1 && (
                   <span className="text-sm font-medium text-accent-dark">

@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Vikend kuća u prirodi">
+  <!-- Vikendly illustration for "Zašto Vikendly?": A-frame weekend house at sunset, pines,
+       fire pit, string lights and the "verified" check. Colours from app/globals.css. -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6d3bd"/>
+      <stop offset="0.55" stop-color="#f7e6d6"/>
+      <stop offset="1" stop-color="#f5f1e8"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd59a" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#ffd59a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b5a4b"/>
+      <stop offset="1" stop-color="#1a3c34"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky and sun -->
+  <rect width="800" height="600" fill="url(#sky)"/>
+  <circle cx="590" cy="215" r="120" fill="#e07a5f" opacity="0.12"/>
+  <circle cx="590" cy="215" r="72" fill="#e07a5f" opacity="0.85"/>
+  <!-- Birds -->
+  <path d="M175 205q10-9 20 0q10-9 20 0" fill="none" stroke="#1a3c34" stroke-width="3" stroke-linecap="round" opacity="0.45"/>
+  <path d="M232 178q7-6 14 0q7-6 14 0" fill="none" stroke="#1a3c34" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/>
+
+  <!-- Hills, far to near -->
+  <path d="M0 360 C120 300 210 315 300 340 S470 290 560 315 S720 330 800 300 V600 H0Z" fill="#1a3c34" opacity="0.18"/>
+  <path d="M0 405 C110 360 230 370 330 395 S520 350 640 370 S760 395 800 380 V600 H0Z" fill="#1a3c34" opacity="0.35"/>
+  <path d="M0 470 C150 440 300 445 420 458 S650 440 800 455 V600 H0Z" fill="url(#ground)"/>
+
+  <!-- Pines left -->
+  <g fill="#1a3c34">
+    <rect x="96" y="420" width="10" height="40" fill="#123029"/>
+    <path d="M101 285 L150 380 H128 L163 440 H39 L74 380 H52Z"/>
+    <rect x="178" y="440" width="8" height="30" fill="#123029"/>
+    <path d="M182 345 L214 405 H200 L224 452 H140 L164 405 H150Z" opacity="0.92"/>
+  </g>
+  <!-- Pines right -->
+  <g fill="#1a3c34">
+    <rect x="697" y="410" width="10" height="45" fill="#123029"/>
+    <path d="M702 270 L752 368 H730 L766 432 H638 L674 368 H652Z"/>
+    <rect x="630" y="435" width="8" height="30" fill="#123029"/>
+    <path d="M634 350 L662 404 H650 L672 446 H596 L618 404 H606Z" opacity="0.9"/>
+  </g>
+
+  <!-- Warm glow behind the house -->
+  <circle cx="400" cy="420" r="150" fill="url(#glow)" opacity="0.55"/>
+
+  <!-- A-frame house -->
+  <path d="M400 255 L520 480 H280Z" fill="#a84b2e"/>
+  <path d="M400 255 L520 480 H498 L400 295 L302 480 H280Z" fill="#8f3e25"/>
+  <path d="M400 300 L478 470 H322Z" fill="#ece4d3"/>
+  <!-- Planks -->
+  <g stroke="#d9cdb4" stroke-width="2">
+    <line x1="375" y1="355" x2="425" y2="355"/>
+    <line x1="360" y1="388" x2="440" y2="388"/>
+    <line x1="345" y1="421" x2="455" y2="421"/>
+  </g>
+  <!-- Lit windows and door -->
+  <path d="M400 318 L420 350 H380Z" fill="#ffd59a"/>
+  <rect x="337" y="398" width="34" height="34" rx="3" fill="#ffd59a"/>
+  <line x1="354" y1="398" x2="354" y2="432" stroke="#e0b276" stroke-width="2"/>
+  <rect x="429" y="398" width="34" height="34" rx="3" fill="#ffd59a"/>
+  <line x1="446" y1="398" x2="446" y2="432" stroke="#e0b276" stroke-width="2"/>
+  <path d="M386 470 V440 a14 14 0 0 1 28 0 V470Z" fill="#1a3c34"/>
+  <circle cx="408" cy="456" r="2" fill="#ffd59a"/>
+  <!-- Deck -->
+  <rect x="268" y="476" width="264" height="10" rx="3" fill="#7a3520"/>
+  <g fill="#7a3520"><rect x="282" y="486" width="6" height="14"/><rect x="512" y="486" width="6" height="14"/></g>
+
+  <!-- String lights from the roof to the pine -->
+  <path d="M400 262 Q540 330 640 352" fill="none" stroke="#1a3c34" stroke-width="2" opacity="0.6"/>
+  <g fill="#ffd59a" stroke="#e0a85c" stroke-width="1.5">
+    <circle cx="430" cy="279" r="5"/>
+    <circle cx="462" cy="295" r="5"/>
+    <circle cx="495" cy="310" r="5"/>
+    <circle cx="530" cy="323" r="5"/>
+    <circle cx="566" cy="335" r="5"/>
+    <circle cx="603" cy="344" r="5"/>
+  </g>
+
+  <!-- Fire pit with logs and flames -->
+  <ellipse cx="580" cy="530" rx="48" ry="12" fill="#123029"/>
+  <g fill="#ece4d3">
+    <ellipse cx="545" cy="526" rx="11" ry="8"/><ellipse cx="567" cy="532" rx="11" ry="8"/>
+    <ellipse cx="591" cy="533" rx="11" ry="8"/><ellipse cx="614" cy="527" rx="11" ry="8"/>
+  </g>
+  <circle cx="580" cy="505" r="46" fill="url(#glow)" opacity="0.8"/>
+  <path d="M580 470 C598 492 598 512 580 522 C562 512 562 492 580 470Z" fill="#e07a5f"/>
+  <path d="M580 488 C590 500 590 512 580 518 C570 512 570 500 580 488Z" fill="#ffd59a"/>
+  <path d="M562 519 L598 507" stroke="#7a3520" stroke-width="6" stroke-linecap="round"/>
+  <path d="M562 507 L598 519" stroke="#8f3e25" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Path to the door -->
+  <path d="M388 500 C380 540 330 565 300 600 H372 C392 568 412 540 412 500Z" fill="#ece4d3" opacity="0.18"/>
+
+  <!-- "Provereno uživo" check badge -->
+  <g transform="translate(150 150)">
+    <circle r="52" fill="#ffffff" opacity="0.92"/>
+    <circle r="40" fill="none" stroke="#1a3c34" stroke-width="5"/>
+    <path d="M-18 1 L-5 14 L20 -12" fill="none" stroke="#1a3c34" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- Small € tag: total price up front -->
+  <g transform="translate(690 120) rotate(12)">
+    <path d="M-34 -22 H22 L40 0 L22 22 H-34Z" fill="#ffffff" opacity="0.92"/>
+    <circle cx="24" cy="0" r="5" fill="#f6d3bd"/>
+    <text x="-6" y="11" text-anchor="middle" font-family="Georgia, serif" font-size="32" font-weight="700" fill="#a84b2e">€</text>
+  </g>
+</svg>

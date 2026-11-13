@@ -38,23 +38,24 @@ export default function FreeThisWeekend({
         {/* Phones: one row you swipe sideways (the next card peeks in), so the homepage stays
             short; tablet/desktop: a normal grid */}
         <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3">
-          {houses.map((house) => (
-            <div key={house.id} className={`${houses.length > 1 ? 'w-[85%]' : 'w-full'} shrink-0 snap-start sm:w-auto`}>
-            <HouseCard
-              house={house}
-              destinationName={destinationOf(house)?.name}
-              // Venues show their "from" party price instead of a weekend stay
-              quote={isVenue(house) ? undefined : quoteStay(house, checkIn, checkOut, house.capacity)}
-              quoteLabel={t('quoteLabel', { count: house.capacity })}
-              guests={house.capacity}
-              linkQuery={{
-                checkIn: toDateParam(checkIn),
-                checkOut: toDateParam(checkOut),
-                guests: house.capacity,
-              }}
-            />
-            </div>
-          ))}
+          {houses.map((house) => {
+            // "From" price: the cheapest way to spend this weekend there, i.e. the cheapest unit
+            // (or smaller-group price) for the smallest group. Venues show their party price instead.
+            const quote = isVenue(house) ? undefined : quoteStay(house, checkIn, checkOut, 1);
+            const parts = quote?.units?.filter(Boolean) ?? [];
+            return (
+              <div key={house.id} className={`${houses.length > 1 ? 'w-[85%]' : 'w-full'} shrink-0 snap-start sm:w-auto`}>
+                <HouseCard
+                  house={house}
+                  destinationName={destinationOf(house)?.name}
+                  quote={quote}
+                  fromPrice
+                  quoteLabel={parts.length ? t('fromLabelUnit', { unit: parts.join(' + ') }) : t('fromLabel')}
+                  linkQuery={{ checkIn: toDateParam(checkIn), checkOut: toDateParam(checkOut) }}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

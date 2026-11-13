@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Search, X } from 'lucide-react';
 import { useRouter } from '@/i18n/navigation';
@@ -23,7 +23,6 @@ export default function SearchBar({ destinations }: { destinations: Destination[
 
   // On phones the form starts as a compact bar and opens on tap; on tablet/desktop it's always open
   const [expanded, setExpanded] = useState(false);
-  const nameRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState('');
   const [destination, setDestination] = useState('');
@@ -33,9 +32,8 @@ export default function SearchBar({ destinations }: { destinations: Destination[
   const [guests, setGuests] = useState('');
   const [budget, setBudget] = useState('');
 
-  useEffect(() => {
-    if (expanded) nameRef.current?.focus();
-  }, [expanded]);
+  // Opening the form on a phone does not jump into the name field: that would pop up the
+  // keyboard and cover the form, while most people search by destination and dates
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,7 +95,6 @@ export default function SearchBar({ destinations }: { destinations: Destination[
               <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text/40" aria-hidden />
               <input
                 id="house-name"
-                ref={nameRef}
                 type="search"
                 value={name}
                 onChange={(e) => setName(e.target.value)}

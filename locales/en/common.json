@@ -41,7 +41,7 @@
       "compactHint": "Name · Destination · Dates",
       "close": "Close search",
       "name": "House name",
-      "namePlaceholder": "e.g. Vila Ribnica",
+      "namePlaceholder": "Search by name",
       "dates": "Dates",
       "guestsPlaceholder": "How many",
       "budgetPlaceholder": "No limit"
@@ -82,8 +82,9 @@
   "freeThisWeekend": {
     "title": "Picks for this weekend",
     "seeAll": "See all houses",
-    "subtitle": "Total weekend prices, for a full house.",
-    "quoteLabel": "weekend for {count, plural, one {# guest} other {# guests}}"
+    "subtitle": "Lowest price for the whole weekend – for a smaller group or one part of the place.",
+    "fromLabel": "for this weekend, best deal",
+    "fromLabelUnit": "for this weekend: {unit}"
   },
   "houseCard": {
     "guests": "{count, plural, one {# guest} other {# guests}}",
@@ -118,7 +119,7 @@
     "filters": {
       "filters": "Filters",
       "name": "House name",
-      "namePlaceholder": "e.g. Vila Ribnica",
+      "namePlaceholder": "Search by name",
       "destination": "Destination",
       "anyDestination": "All destinations",
       "dates": "Dates",
@@ -175,7 +176,7 @@
     },
     "eyebrow": "Why us",
     "intro": "We are not another huge listings site. We pick fewer houses, check them in person and show everything you need to know before you go.",
-    "imageAlt": "Wooden party room at the Kutak u Vraniću house"
+    "imageAlt": "Illustration: weekend house in nature"
   },
   "howItWorks": {
     "title": "How it works",

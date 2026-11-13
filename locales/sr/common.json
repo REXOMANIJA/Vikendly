@@ -41,7 +41,7 @@
       "compactHint": "Naziv · Destinacija · Datumi",
       "close": "Zatvorite pretragu",
       "name": "Naziv kuće",
-      "namePlaceholder": "npr. Vila Ribnica",
+      "namePlaceholder": "Unesite naziv",
       "dates": "Datumi",
       "guestsPlaceholder": "Broj osoba",
       "budgetPlaceholder": "Bez limita"
@@ -82,8 +82,9 @@
   "freeThisWeekend": {
     "title": "Izdvojeno za ovaj vikend",
     "seeAll": "Pogledajte sve kuće",
-    "subtitle": "Ukupne cene za vikend, za punu kuću.",
-    "quoteLabel": "vikend za {count, plural, one {# osobu} few {# osobe} other {# osoba}}"
+    "subtitle": "Najniža cena za ceo vikend – za manju ekipu ili jedan deo objekta.",
+    "fromLabel": "za ovaj vikend, najpovoljnija opcija",
+    "fromLabelUnit": "za ovaj vikend: {unit}"
   },
   "houseCard": {
     "guests": "{count, plural, one {# gost} few {# gosta} other {# gostiju}}",
@@ -118,7 +119,7 @@
     "filters": {
       "filters": "Filteri",
       "name": "Naziv kuće",
-      "namePlaceholder": "npr. Vila Ribnica",
+      "namePlaceholder": "Unesite naziv",
       "destination": "Destinacija",
       "anyDestination": "Sve destinacije",
       "dates": "Datumi",
@@ -175,7 +176,7 @@
     },
     "eyebrow": "Zašto mi",
     "intro": "Nismo još jedan veliki oglasnik. Biramo manji broj kuća, lično ih proveravamo i pokazujemo sve što treba da znate pre nego što krenete.",
-    "imageAlt": "Drvena sala za druženje u kući Kutak u Vraniću"
+    "imageAlt": "Ilustracija: vikend kuća u prirodi"
   },
   "howItWorks": {
     "title": "Kako radi",

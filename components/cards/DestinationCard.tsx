@@ -33,7 +33,9 @@ export default function DestinationCard({
     <Link
       href={{ pathname: '/search', query: { destination: slug } }}
       transitionTypes={['nav-forward']}
-      className={`group relative block min-h-44 overflow-hidden rounded-2xl shadow-md transition-shadow hover:shadow-xl focus-visible:outline-2 focus-visible:outline-accent ${className}`}
+      // Height comes from the page (min-h-… or aspect-…), never both: a minimum height together with
+      // a 4:3 shape made tiles wider than their column on bigger phones, so they overlapped
+      className={`group relative block min-w-0 overflow-hidden rounded-2xl shadow-md transition-shadow hover:shadow-xl focus-visible:outline-2 focus-visible:outline-accent ${className}`}
     >
       <ViewTransition name={`destination-${id}`} share="vk-morph" default="none">
         <Image
