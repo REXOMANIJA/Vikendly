@@ -23,8 +23,8 @@ P2 = can come after launch
 
 ### Code work, no input needed
 
-Nothing open. Waiting on the owner: **run migration `0013_venues_and_reviews.sql`** (needed for
-venues N2 and reviews E7; the site works without it, those two features just stay off).
+Nothing open. Waiting on the owner: **run migration `0014_house_rules_text.sql`** (house rules as
+free text in admin; without it the text is not saved).
 
 ### Running the business (owner, outside the code)
 
@@ -37,6 +37,14 @@ venues N2 and reviews E7; the site works without it, those two features just sta
 | G7 | P2 | Google Search Console: verified, `sitemap.xml` submitted. Check "Pages" report after a few days. |
 
 ---
+
+## Done (13 Nov 2026, third round)
+
+- **Similar houses** on the house page are a sideways-swipe row on phones.
+- **IONOS website checker** (13 Nov): pages now send only the texts interactive parts need (`lib/client-messages.ts`): homepage 222 → 205 KB, ~30 KB compressed. The "no CDN" note is wrong (Vercel is a CDN). Homepage Google description lengthened to ~155 characters. Not done: "500+ words on the homepage" (would make the phone homepage longer; needs the owner's content).
+
+- **House rules as text:** admin → house → "Pravila kuće" (Serbian + English, optional); shown on the house page under the rule icons, English falls back to Serbian (migration 0014).
+- Phone search opens without the keyboard; name hint "Unesite naziv"; destination tiles no longer overlap; featured houses show "Od €X" (cheapest option); drawn graphic in "Zašto Vikendly"; Telegram test-error button in admin → Upiti.
 
 ## Done (13 Nov 2026, second round)
 

@@ -20,7 +20,7 @@ Supabase. Alerts: Telegram bot @VikendlyBot.
   words, no jargon. Show results (what changed on the site), not code.
 - **"Save and upload" = commit and push to `main`.** Never commit or push without being asked.
   Before pushing, scan the staged diff for secrets (Telegram token, keys) and leftover `TEMP-PREVIEW`.
-- **Database changes:** write a new numbered file in `supabase/migrations/` (next is `0014_…`), make
+- **Database changes:** write a new numbered file in `supabase/migrations/` (next is `0015_…`), make
   it safe to run twice (`if not exists`, `create or replace`, guarded `update`s), and ask the owner
   to run it in Supabase → SQL Editor. Never assume it ran: check with a read-only REST query using
   the publishable key from `.env.local` (e.g. `curl "$URL/rest/v1/table?select=col&limit=1" -H "apikey: $KEY"`).
@@ -80,7 +80,7 @@ react-day-picker 10 · lucide-react (no brand icons) · Jest · Vercel Analytics
 
 ## Database status
 
-Migrations **0001–0012 have all been run** in Supabase (checked 12 Nov 2026). **0013_venues_and_reviews.sql written 13 Nov, not yet confirmed run** – check with a REST query on `reviews` before relying on it (code works without it: no reviews, venues can't be saved). Tables of note:
+Migrations **0001–0012 have all been run** in Supabase (checked 12 Nov 2026). **0013 (venues, reviews) run 13 Nov. 0014_house_rules_text.sql (free-text rules `rules_sr`/`rules_en`) written 13 Nov – confirm it ran** (code works without it; rules text just isn't saved). Tables of note:
 `houses`, `house_units`, `house_price_tiers`, `house_photos`, `booking_requests` (with `details`,
 `party_guests`), `reviews` (0013: token link per confirmed booking, approved before public), `owner_applications`, `rate_limits`, `destinations` (id = URL slug, fixed after
 creation). Save function: `admin_save_house(jsonb)` – redefine it fully in any migration that adds
@@ -108,8 +108,9 @@ The same must exist in Vercel. Template: `.env.example`.
   edit scripts in the scratchpad as `.cjs` files. Re-read the result. Files may have CRLF endings.
 - A `'use client'` file can't export plain values to server components (they become client
   references) – shared constants/types go in a normal module (e.g. `lib/search.ts`).
-- next-intl sends **all** messages to the browser, so grepping page HTML for a text proves nothing;
-  check the rendered DOM. ICU plurals: Serbian needs `one/few/other`.
+- next-intl sends only the namespaces listed in `lib/client-messages.ts` to the browser. A new
+  `useTranslations('x')` in a `'use client'` component needs `'x'` added there (test checks paths).
+  Check texts in the rendered DOM. ICU plurals: Serbian needs `one/few/other`.
 - When the preview pane is hidden or tiny: `requestAnimationFrame` doesn't run, so Suspense sections
   (the booking box) don't hydrate and view transitions stall – show the pane (`show_pane preview`),
   and use DOM checks instead of screenshots if the pane is very small.

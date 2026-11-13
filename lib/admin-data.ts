@@ -36,6 +36,9 @@ export type AdminHouse = {
   min_nights: number;
   description_sr: string;
   description_en: string;
+  /** Missing until migration 0014 is run */
+  rules_sr?: string | null;
+  rules_en?: string | null;
   parties_allowed: boolean;
   pets_allowed: boolean;
   smoking_allowed: boolean;

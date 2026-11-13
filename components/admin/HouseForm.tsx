@@ -49,7 +49,7 @@ const empty: FormState = {
   slug: '', name: '', destination_id: '',
   capacity: '', day_capacity: '', bedrooms: '', bathrooms: '', price_tiers: [],
   weekday_price: '', weekend_price: '', min_nights: '2',
-  description_sr: '', description_en: '',
+  description_sr: '', description_en: '', rules_sr: '', rules_en: '',
   parties_allowed: false, pets_allowed: false, smoking_allowed: false,
   check_in_time: '15:00', check_out_time: '11:00',
   address: '', lat: '', lng: '', owner_phone: '',
@@ -60,6 +60,8 @@ const empty: FormState = {
 function fromHouse(h: AdminHouse): FormState {
   return {
     ...h,
+    rules_sr: h.rules_sr ?? '',
+    rules_en: h.rules_en ?? '',
     capacity: String(h.capacity),
     day_capacity: h.day_capacity === null ? '' : String(h.day_capacity),
     bedrooms: h.bedrooms === null ? '' : String(h.bedrooms),
@@ -455,6 +457,36 @@ export default function HouseForm({
             onChange={(e) => set('description_en', e.target.value)} required />
           {fieldError('description_en')}
         </div>
+      </section>
+
+      {/* ── Pravila kuće (tekst) ── */}
+      <section className={box}>
+        <div>
+          <h2 className={h2}>
+            Pravila kuće <span className="font-sans text-base font-normal text-text/60">(opciono)</span>
+          </h2>
+          <p className="mt-1 text-sm text-text/70">
+            Sva pravila u jednom tekstu, prikazuju se na stranici kuće pod „Pravila kuće“. Svako pravilo u novom
+            redu, npr. „Muzika napolju do 23h“, „Depozit 50 € vraća se po odlasku“, „Posteljina i peškiri su
+            uključeni“. Kućice za žurke, ljubimce i pušenje i vreme dolaska/odlaska ostaju jer po njima
+            gosti pretražuju.
+          </p>
+        </div>
+        {([
+          ['rules_sr', 'Na srpskom'],
+          ['rules_en', 'Na engleskom'],
+        ] as const).map(([key, text]) => (
+          <div key={key} id={`field-${key}`}>
+            <label htmlFor={key} className={label}>{text}</label>
+            <textarea id={key} rows={6} maxLength={4000} className={`${input} h-auto py-2`} value={form[key]}
+              placeholder={key === 'rules_sr' ? 'Mir posle 23h\nBez žurki u Brvnari\nDepozit …' : 'Quiet after 11 pm\n…'}
+              onChange={(e) => set(key, e.target.value)} />
+            {key === 'rules_en' && (
+              <p className="mt-1 text-xs text-text/60">Ako ostavite prazno, na engleskoj stranici se prikazuje srpski tekst.</p>
+            )}
+            {fieldError(key)}
+          </div>
+        ))}
       </section>
 
       {/* ── Fotografije ── */}

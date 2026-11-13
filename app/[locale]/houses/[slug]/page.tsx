@@ -122,6 +122,8 @@ export default async function HousePage({ params }: { params: Params }) {
   const withUnits = hasUnits(house);
   // Event venue: nobody sleeps there, booked per party day
   const venue = isVenue(house);
+  // Admin's rules text; the English page falls back to Serbian when no English text was written
+  const rulesText = house.rulesText ? house.rulesText[locale as Locale] || house.rulesText.sr : '';
 
   const ruleItems = [
     { ok: rules.partiesAllowed, label: rules.partiesAllowed ? t('partiesAllowed') : t('partiesNotAllowed') },
@@ -249,7 +251,7 @@ export default async function HousePage({ params }: { params: Params }) {
             {withUnits && <HouseUnits units={house.units!} />}
 
             {/* A venue's rules are all in its party space cards above, so this list would be empty */}
-            <section hidden={venue}>
+            <section hidden={venue && !rulesText}>
               <h2 className="font-serif text-2xl font-bold text-primary">{t('rulesTitle')}</h2>
               <ul className="mt-4 space-y-3">
                 {!withUnits && (
@@ -285,6 +287,12 @@ export default async function HousePage({ params }: { params: Params }) {
                   </li>
                 ))}
               </ul>
+              {/* Everything else, in the owner's words (admin → "Pravila kuće") */}
+              {rulesText && (
+                <div className="mt-5 rounded-2xl bg-white p-5 ring-1 ring-primary/10">
+                  <p className="whitespace-pre-line leading-relaxed text-text/85">{rulesText}</p>
+                </div>
+              )}
             </section>
 
             {house.rating && <HouseReviews reviews={reviews} summary={house.rating} locale={locale} />}
@@ -312,9 +320,12 @@ export default async function HousePage({ params }: { params: Params }) {
         {similar.length > 0 && (
           <section className="mt-16">
             <h2 className="font-serif text-2xl md:text-3xl font-bold text-primary mb-6">{t('similarTitle')}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Phones: one row you swipe sideways, like "Izdvojeno za ovaj vikend"; wider screens: a grid */}
+            <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3">
               {similar.map((h) => (
-                <HouseCard key={h.id} house={h} destinationName={destinationOf(h.destinationId)?.name} />
+                <div key={h.id} className={`${similar.length > 1 ? 'w-[85%]' : 'w-full'} shrink-0 snap-start sm:w-auto`}>
+                  <HouseCard house={h} destinationName={destinationOf(h.destinationId)?.name} />
+                </div>
               ))}
             </div>
           </section>

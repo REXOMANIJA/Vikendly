@@ -23,6 +23,9 @@ export type HouseInput = {
   min_nights: number;
   description_sr: string;
   description_en: string;
+  /** House rules as free text, shown under "Pravila kuće" (optional, migration 0014) */
+  rules_sr: string;
+  rules_en: string;
   parties_allowed: boolean;
   pets_allowed: boolean;
   smoking_allowed: boolean;
@@ -241,6 +244,8 @@ function validateHouse(h: HouseInput): ActionResult<never> | null {
   }
   if (h.description_sr.trim().length < 20) return fail('Opis na srpskom je prekratak (bar 20 znakova).', 'description_sr');
   if (h.description_en.trim().length < 20) return fail('Opis na engleskom je prekratak (bar 20 znakova).', 'description_en');
+  if ((h.rules_sr ?? '').trim().length > 4000) return fail('Pravila na srpskom su predugačka (najviše 4000 znakova).', 'rules_sr');
+  if ((h.rules_en ?? '').trim().length > 4000) return fail('Pravila na engleskom su predugačka (najviše 4000 znakova).', 'rules_en');
   if (h.address.trim().length < 3) return fail('Unesite adresu.', 'address');
   for (const field of ['check_in_time', 'check_out_time'] as const) {
     if (!/^\d{2}:\d{2}$/.test(h[field])) return fail('Vreme upišite kao 15:00.', field);
@@ -278,6 +283,8 @@ export async function saveHouse(raw: HouseInput): Promise<ActionResult<{ id: str
       name: input.name.trim(),
       description_sr: input.description_sr.trim(),
       description_en: input.description_en.trim(),
+      rules_sr: (input.rules_sr ?? '').trim(),
+      rules_en: (input.rules_en ?? '').trim(),
       address: input.address.trim(),
       featured_rank: input.featured_rank ?? '',
       verified_at: input.verified_at ?? '',

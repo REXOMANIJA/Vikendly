@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { Playfair_Display, Inter } from 'next/font/google';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import { pickMessages } from '@/lib/client-messages';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { site } from '@/lib/site';
@@ -75,7 +76,8 @@ export default async function LocaleLayout({
         <Suspense fallback={null}>
           <NavigationProgress />
         </Suspense>
-        <NextIntlClientProvider>
+        {/* Only the texts interactive parts need are sent to the browser (lib/client-messages.ts) */}
+        <NextIntlClientProvider messages={pickMessages(await getMessages())}>
           <Header />
           <main>{children}</main>
           <Footer />

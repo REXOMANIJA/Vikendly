@@ -47,6 +47,9 @@ type HouseRow = {
   house_price_tiers: { max_guests: number; weekday_price: number; weekend_price: number }[];
   /** Missing until migration 0010 is run */
   party_prices?: unknown;
+  /** House rules text; missing until migration 0014 is run */
+  rules_sr?: string | null;
+  rules_en?: string | null;
   house_units?: UnitRow[];
 };
 
@@ -157,6 +160,10 @@ function toHouse(row: HouseRow): House & { featuredRank: number | null } {
       checkInTime: row.check_in_time,
       checkOutTime: row.check_out_time,
     },
+    rulesText:
+      row.rules_sr?.trim() || row.rules_en?.trim()
+        ? { sr: row.rules_sr?.trim() ?? '', en: row.rules_en?.trim() ?? '' }
+        : undefined,
     location: {
       address: row.address,
       lat: row.lat ?? undefined,

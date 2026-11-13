@@ -98,6 +98,8 @@ export interface House {
   photos: string[];
   description: LocalizedText;
   rules: HouseRules;
+  /** All house rules as written by the admin (migration 0014); missing = none written */
+  rulesText?: LocalizedText;
   location: {
     address: string;
     lat?: number;
