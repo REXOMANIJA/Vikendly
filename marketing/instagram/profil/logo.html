@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<title>Vikendly – profilna slika</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=block" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 3240px; height: 1080px; overflow: hidden; }
+  body { display: flex; }
+  .tile { width: 1080px; height: 1080px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .word { font-family: 'Playfair Display', serif; font-weight: 700; letter-spacing: -2px; }
+</style>
+</head>
+<body>
+  <!-- A: house + sun on green (same mark as the website icon) -->
+  <div class="tile" style="background:#1a3c34;">
+    <svg width="830" height="830" style="margin-left:-40px;" viewBox="0 0 40 40">
+      <circle cx="27.6" cy="12.6" r="4.6" fill="#e07a5f"/>
+      <path d="M8.5 31V20.6L18.2 12.6l9.7 8V31z" fill="#f5f1e8" stroke="#f5f1e8" stroke-width="1" stroke-linejoin="round"/>
+      <rect x="15.6" y="23.4" width="5.2" height="7.6" rx="1.2" fill="#1a3c34"/>
+    </svg>
+  </div>
+
+  <!-- B: mark + name on green -->
+  <div class="tile" style="background:#1a3c34;">
+    <svg width="440" height="440" viewBox="0 0 40 40" style="margin-top:-40px;">
+      <circle cx="27.6" cy="12.6" r="4.6" fill="#e07a5f"/>
+      <path d="M8.5 31V20.6L18.2 12.6l9.7 8V31z" fill="#f5f1e8" stroke="#f5f1e8" stroke-width="1" stroke-linejoin="round"/>
+      <rect x="15.6" y="23.4" width="5.2" height="7.6" rx="1.2" fill="#1a3c34"/>
+    </svg>
+    <div class="word" style="font-size:150px; color:#f5f1e8; margin-top:-10px;">Vikendly<span style="color:#e07a5f;">.</span></div>
+  </div>
+
+  <!-- C: light version on sand -->
+  <div class="tile" style="background:#f5f1e8;">
+    <svg width="830" height="830" style="margin-left:-40px;" viewBox="0 0 40 40">
+      <circle cx="27.6" cy="12.6" r="4.6" fill="#e07a5f"/>
+      <path d="M8.5 31V20.6L18.2 12.6l9.7 8V31z" fill="#1a3c34" stroke="#1a3c34" stroke-width="1" stroke-linejoin="round"/>
+      <rect x="15.6" y="23.4" width="5.2" height="7.6" rx="1.2" fill="#f5f1e8"/>
+    </svg>
+  </div>
+</body>
+</html>

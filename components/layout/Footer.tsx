@@ -2,7 +2,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import LanguageSwitcher from './LanguageSwitcher';
 import Logo from './Logo';
-import { Mail, Phone } from 'lucide-react';
+import { Camera, Mail, Phone } from 'lucide-react';
 import { phoneDigits, site } from '@/lib/site';
 
 const links = [
@@ -38,6 +38,18 @@ export default function Footer() {
                 <li>
                   <a href={`mailto:${site.email}`} className="inline-flex items-center gap-2 hover:text-white">
                     <Mail className="size-4" aria-hidden /> {site.email}
+                  </a>
+                </li>
+              )}
+              {site.instagram && (
+                <li>
+                  <a
+                    href={`https://instagram.com/${site.instagram}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 hover:text-white"
+                  >
+                    <Camera className="size-4" aria-hidden /> Instagram @{site.instagram}
                   </a>
                 </li>
               )}

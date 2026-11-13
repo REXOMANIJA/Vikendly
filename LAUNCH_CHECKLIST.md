@@ -16,7 +16,7 @@ P2 = can come after launch
 |---|-----|------|----------------|
 | B4 | P1 | **"O nama" (About us) page** – who is behind Vikendly. Important for owners' trust. | A few sentences about the team and why Vikendly exists; optional photo. Then add `/o-nama` + footer link. |
 | A5 | P1 | **English house descriptions** – English pages show the Serbian text. | Owner writes them in admin (or asks for a translation of the Serbian text to review). |
-| — | P1 | **Instagram / Facebook** link on Kontakt page and footer. | Account name → `lib/site.ts` (`instagram`). |
+| — | P2 | **Facebook** link (Instagram @vikendly_ is done: Kontakt page + footer, 13 Nov). | Facebook page name, if there will be one. |
 | — | P1 | **Commission %** on the owners page (now "agreed when we meet"). | Owner decides whether to show it. |
 | — | P1 | **Legal entity** in privacy policy and terms (now "Vikendly tim"). | Business name, address, PIB, MB once registered → `lib/site.ts` + `content/legal.ts`. Legal texts should be read by a lawyer. |
 | — | P1 | **Real houses with photos.** Only 1 published house (Kutak u Vraniću); 12 sample houses are hidden in admin. | Owner adds houses. Sample houses can be deleted in admin → Kuće → "Skrivene". |

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<title>Vikendly – karusel za vlasnike</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&display=block" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1a3c34;
+    --bg: #f5f1e8;
+    --accent: #e07a5f;
+    --accent-dark: #a84b2e;
+    --sand: #ece4d3;
+    --ink: #22302c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 5400px; height: 1350px; overflow: hidden; background: var(--bg); }
+  body { font-family: 'Inter', sans-serif; color: var(--ink); position: relative; }
+  .abs { position: absolute; }
+  body, .serif { font-variant-numeric: lining-nums; }
+  .serif { font-family: 'Playfair Display', serif; }
+  .blob { position: absolute; background: var(--sand); border-radius: 50%; }
+
+  .logo { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 44px; color: var(--primary); letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+
+  .photo { position: absolute; overflow: hidden; border-radius: 36px; box-shadow: 0 30px 60px -25px rgba(26,60,52,.45); }
+  .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .polaroid { position: absolute; background: #fff; padding: 22px 22px 80px; border-radius: 10px; box-shadow: 0 30px 60px -25px rgba(26,60,52,.5); }
+  .polaroid img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 4px; }
+  .polaroid .cap { position: absolute; left: 0; right: 0; bottom: 20px; text-align: center; font-family: 'Playfair Display', serif; font-style: italic; font-size: 34px; color: var(--primary); }
+
+  .pill { position: absolute; display: inline-flex; align-items: center; gap: 14px; background: #fff; color: var(--primary); font-weight: 600; font-size: 30px; padding: 18px 30px; border-radius: 999px; box-shadow: 0 16px 40px -18px rgba(26,60,52,.5); white-space: nowrap; }
+  .pill .dot { width: 16px; height: 16px; border-radius: 50%; background: var(--accent); }
+
+  .step-no { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 150px; line-height: 1; color: transparent; -webkit-text-stroke: 3px var(--accent); }
+  .step-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 88px; line-height: 1.02; color: var(--primary); letter-spacing: -1px; }
+  .step-text { font-size: 36px; line-height: 1.4; color: #3d4a46; }
+  .kicker { font-size: 26px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--accent-dark); }
+
+  .card { position: absolute; background: #fff; border-radius: 34px; box-shadow: 0 40px 80px -30px rgba(26,60,52,.45); padding: 40px 44px; }
+  .row { display: flex; justify-content: space-between; align-items: baseline; padding: 22px 0; border-bottom: 2px solid var(--sand); font-size: 32px; color: #3d4a46; }
+  .row:last-child { border-bottom: 0; }
+  .row b { font-family: 'Playfair Display', serif; font-size: 44px; color: var(--primary); }
+  .row b.accent { color: var(--accent-dark); font-family: 'Inter', sans-serif; font-size: 30px; }
+
+  .toggle { position: absolute; display: flex; align-items: center; justify-content: space-between; gap: 30px; width: 470px; background: #fff; border-radius: 22px; padding: 22px 28px; font-size: 30px; font-weight: 600; color: var(--primary); box-shadow: 0 16px 40px -18px rgba(26,60,52,.5); }
+  .toggle .sw { width: 76px; height: 42px; border-radius: 999px; background: var(--primary); position: relative; flex: none; }
+  .toggle .sw::after { content: ''; position: absolute; top: 5px; right: 5px; width: 32px; height: 32px; border-radius: 50%; background: #fff; }
+  .toggle .sw.off { background: #cfc8b8; }
+  .toggle .sw.off::after { right: auto; left: 5px; }
+  .toggle .val { font-family: 'Playfair Display', serif; font-size: 36px; }
+
+  .bubble { position: absolute; background: #fff; border-radius: 34px; padding: 30px 36px; font-size: 32px; line-height: 1.35; box-shadow: 0 30px 60px -25px rgba(26,60,52,.45); }
+  .bubble.green { background: var(--primary); color: #fff; }
+  .bubble small { display: block; font-size: 22px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-dark); margin-bottom: 8px; }
+
+  .check { display: flex; align-items: center; gap: 20px; font-size: 32px; color: var(--bg); margin-bottom: 22px; }
+  .check i { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); flex: none; display: flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+
+  <div class="blob" style="left:-200px; top:-260px; width:900px; height:700px;"></div>
+  <div class="blob" style="left:1700px; top:900px; width:1100px; height:800px;"></div>
+  <div class="blob" style="left:3000px; top:-380px; width:1000px; height:760px;"></div>
+
+  <svg class="abs" style="left:4080px; top:0;" width="1320" height="1350" viewBox="0 0 1320 1350">
+    <path d="M240 0 C 380 300, 120 520, 300 760 C 440 950, 180 1150, 330 1350 L1320 1350 L1320 0 Z" fill="#1a3c34"/>
+  </svg>
+
+  <!-- dashed trail through all five slides -->
+  <svg class="abs" style="left:0; top:0;" width="5400" height="1350" viewBox="0 0 5400 1350">
+    <path d="M 880 650 C 1050 600, 1250 420, 1330 560
+             C 1420 720, 1300 1280, 1800 1280
+             C 2200 1280, 2250 700, 2500 640
+             C 2800 570, 2600 1290, 3000 1290
+             C 3300 1300, 3700 1310, 4000 1300
+             C 4300 1290, 4500 1250, 4610 1190"
+          fill="none" stroke="#e07a5f" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 22"/>
+  </svg>
+
+  <!-- ============ SLIDE 1 ============ -->
+  <div class="logo abs" style="left:80px; top:80px;">Vikendly<span>.</span></div>
+  <div class="abs" style="left:770px; top:92px; font-size:30px; font-weight:600; color:var(--primary);">Prevucite &rarr;</div>
+  <div class="kicker abs" style="left:80px; top:200px;">Za vlasnike</div>
+  <h1 class="serif abs" style="left:76px; top:250px; font-size:108px; line-height:1; font-weight:700; color:var(--primary); letter-spacing:-2px;">
+    Imate vikend<br>kuću?<br><em style="color:var(--accent);">Mi dovodimo<br>goste.</em>
+  </h1>
+  <div class="photo" style="left:80px; top:780px; width:1240px; height:490px;">
+    <img src="../../../public/images/categories/family.jpg" style="object-position:50% 55%;">
+  </div>
+  <div class="pill" style="left:120px; top:1170px;"><span class="dot"></span>Objava je besplatna</div>
+
+  <!-- ============ SLIDE 2 ============ -->
+  <div class="step-no abs" style="left:1440px; top:110px;">01</div>
+  <div class="step-title abs" style="left:1440px; top:270px;">Bez troškova<br>unapred</div>
+  <p class="step-text abs" style="left:1440px; top:480px; width:640px;">
+    Plaćate samo proviziju kada vam gost dođe preko nas.
+  </p>
+  <div class="card" style="left:1440px; top:690px; width:600px; transform:rotate(-2deg);">
+    <div class="row">Objava oglasa <b>0 din</b></div>
+    <div class="row">Mesečna pretplata <b>0 din</b></div>
+    <div class="row">Provizija <b class="accent">samo za goste<br>koje dovedemo</b></div>
+  </div>
+
+  <!-- ============ SLIDE 3 ============ -->
+  <div class="step-no abs" style="left:2620px; top:110px;">02</div>
+  <div class="step-title abs" style="left:2620px; top:270px;">Vi<br>odlučujete</div>
+  <p class="step-text abs" style="left:2620px; top:480px; width:560px;">
+    Sami birate cene, termine i pravila kuće.
+  </p>
+  <div class="polaroid" style="left:2060px; top:700px; width:520px; height:500px; transform:rotate(-4deg);">
+    <img src="../../../public/images/categories/pool.jpg">
+    <div class="cap">vaša kuća, vaša pravila</div>
+  </div>
+  <div class="toggle" style="left:2680px; top:680px;">Cene <span class="val">vi birate</span></div>
+  <div class="toggle" style="left:2680px; top:800px;">Min. broj noći <span class="val">2</span></div>
+  <div class="toggle" style="left:2680px; top:920px;">Žurke <span class="sw"></span></div>
+  <div class="toggle" style="left:2680px; top:1040px;">Ljubimci <span class="sw off"></span></div>
+
+  <!-- ============ SLIDE 4 ============ -->
+  <div class="step-no abs" style="left:3340px; top:110px;">03</div>
+  <div class="step-title abs" style="left:3340px; top:270px;">Mi radimo<br>ostalo</div>
+  <p class="step-text abs" style="left:3340px; top:480px; width:640px;">
+    Pišemo oglas i pričamo sa gostima. Za svaki upit vas zovemo – vi samo potvrdite termin.
+  </p>
+  <div class="bubble" style="left:3340px; top:740px; width:540px; border-bottom-left-radius:8px;">
+    <small>Novi upit</small>6 osoba, petak–nedelja. Da li je kuća slobodna?
+  </div>
+  <div class="bubble green" style="left:3560px; top:1010px; width:360px; border-bottom-right-radius:8px;">
+    Slobodna je, dogovoreno!
+  </div>
+  <div class="photo" style="left:3990px; top:760px; width:600px; height:470px; transform:rotate(3deg); border:14px solid #fff; border-radius:30px;">
+    <img src="../../../public/images/hero-weekend-house.jpg" style="object-position:40% 50%;">
+  </div>
+
+  <!-- ============ SLIDE 5 ============ -->
+  <div class="logo abs" style="left:5070px; top:80px; color:var(--bg);">Vikendly<span>.</span></div>
+  <div class="kicker abs" style="left:4640px; top:250px; color:var(--accent);">Izdajte svoju kuću</div>
+  <h2 class="serif abs" style="left:4636px; top:300px; font-size:104px; line-height:1; font-weight:700; color:var(--bg); letter-spacing:-2px;">
+    Prijavite<br>kuću.<br><em style="color:var(--accent);">Mi vas<br>zovemo.</em>
+  </h2>
+  <div class="abs" style="left:4640px; top:770px; width:700px;">
+    <div class="check"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></i>Besplatna objava</div>
+    <div class="check"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></i>Bez mesečne pretplate</div>
+    <div class="check"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></i>Oglas uklanjate kad poželite</div>
+  </div>
+  <div class="abs" style="left:4640px; top:1110px; background:var(--accent); color:#fff; font-weight:700; font-size:38px; padding:26px 40px; border-radius:999px;">vikendly.com/za-vlasnike</div>
+</body>
+</html>

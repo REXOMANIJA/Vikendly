@@ -10,7 +10,7 @@ export const site = {
   email: 'info@vikendly.com',
   /** Shown as written; also used for call / WhatsApp / Viber links */
   phone: '+381 64 477 3663',
-  instagram: '', // e.g. 'vikendly.rs' (without @)
+  instagram: 'vikendly_', // without @
   /** Date the privacy policy and terms were last changed */
   legalUpdated: '2026-11-13',
 };
