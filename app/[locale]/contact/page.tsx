@@ -69,7 +69,7 @@ export default async function ContactPage({ params }: { params: Params }) {
                   <Camera className="size-4" aria-hidden /> {t('instagram')}
                 </p>
                 <a
-                  href={`https://instagram.com/${site.instagram}`}
+                  href={`https://www.instagram.com/${site.instagram}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-2 flex items-center gap-1 font-serif text-2xl font-bold text-primary hover:text-accent-dark"

@@ -44,7 +44,7 @@ export default function Footer() {
               {site.instagram && (
                 <li>
                   <a
-                    href={`https://instagram.com/${site.instagram}`}
+                    href={`https://www.instagram.com/${site.instagram}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 hover:text-white"
