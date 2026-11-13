@@ -85,26 +85,9 @@ export default function SearchBar({ destinations }: { destinations: Destination[
           </button>
         </div>
 
-        {/* Phones: name, destination and dates full width; guests + budget side by side */}
-        <div className="grid grid-cols-2 lg:grid-cols-[1.1fr_1fr_1.25fr_0.7fr_0.8fr] gap-3 md:gap-4">
-          <div className="col-span-2 lg:col-span-1">
-            <label htmlFor="house-name" className={labelClass}>
-              {t('name')}
-            </label>
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text/40" aria-hidden />
-              <input
-                id="house-name"
-                type="search"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={t('namePlaceholder')}
-                maxLength={80}
-                className={`${fieldClass} pl-9`}
-              />
-            </div>
-          </div>
-
+        {/* Where → when → how many → budget; the house name (rarely known) last.
+            Phones: destination, dates and name full width; guests + budget side by side */}
+        <div className="grid grid-cols-2 lg:grid-cols-[1fr_1.25fr_0.7fr_0.8fr_1fr] gap-3 md:gap-4">
           <div className="col-span-2 lg:col-span-1">
             <label htmlFor="destination" className={labelClass}>
               {t('destination')}
@@ -173,6 +156,24 @@ export default function SearchBar({ destinations }: { destinations: Destination[
               placeholder={t('budgetPlaceholder')}
               className={fieldClass}
             />
+          </div>
+
+          <div className="col-span-2 lg:col-span-1">
+            <label htmlFor="house-name" className={labelClass}>
+              {t('name')}
+            </label>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text/40" aria-hidden />
+              <input
+                id="house-name"
+                type="search"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={t('namePlaceholder')}
+                maxLength={80}
+                className={`${fieldClass} pl-9`}
+              />
+            </div>
           </div>
         </div>
 

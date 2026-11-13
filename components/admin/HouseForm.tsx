@@ -49,7 +49,7 @@ const empty: FormState = {
   slug: '', name: '', destination_id: '',
   capacity: '', day_capacity: '', bedrooms: '', bathrooms: '', price_tiers: [],
   weekday_price: '', weekend_price: '', min_nights: '2',
-  description_sr: '', description_en: '', rules_sr: '', rules_en: '',
+  description_sr: '', description_en: '', rules_sr: '', rules_en: '', nearby_sr: '', nearby_en: '',
   parties_allowed: false, pets_allowed: false, smoking_allowed: false,
   check_in_time: '15:00', check_out_time: '11:00',
   address: '', lat: '', lng: '', owner_phone: '',
@@ -62,6 +62,8 @@ function fromHouse(h: AdminHouse): FormState {
     ...h,
     rules_sr: h.rules_sr ?? '',
     rules_en: h.rules_en ?? '',
+    nearby_sr: h.nearby_sr ?? '',
+    nearby_en: h.nearby_en ?? '',
     capacity: String(h.capacity),
     day_capacity: h.day_capacity === null ? '' : String(h.day_capacity),
     bedrooms: h.bedrooms === null ? '' : String(h.bedrooms),
@@ -663,6 +665,34 @@ export default function HouseForm({
             </button>
           )}
         </div>
+        {/* Distances / nearby (migration 0015), shown under the map on the house page */}
+        <div className="space-y-3">
+          <div>
+            <h3 className="font-semibold text-primary">
+              Udaljenosti i okolina <span className="font-normal text-text/60">(opciono)</span>
+            </h3>
+            <p className="text-sm text-text/70">
+              Svaka stavka u novom redu, npr. „45 min od centra Beograda“, „Prodavnica 2 km“, „Jezero 500 m peške“.
+              Prikazuje se ispod mape.
+            </p>
+          </div>
+          {([
+            ['nearby_sr', 'Na srpskom'],
+            ['nearby_en', 'Na engleskom'],
+          ] as const).map(([key, text]) => (
+            <div key={key} id={`field-${key}`}>
+              <label htmlFor={key} className={label}>{text}</label>
+              <textarea id={key} rows={4} maxLength={1000} className={`${input} h-auto py-2`} value={form[key]}
+                placeholder={key === 'nearby_sr' ? '45 min od centra Beograda\nProdavnica 2 km\nJezero 500 m' : '45 min from central Belgrade\n…'}
+                onChange={(e) => set(key, e.target.value)} />
+              {key === 'nearby_en' && (
+                <p className="mt-1 text-xs text-text/60">Ako ostavite prazno, na engleskoj stranici se prikazuje srpski tekst.</p>
+              )}
+              {fieldError(key)}
+            </div>
+          ))}
+        </div>
+
         <div id="field-owner_phone" className="md:max-w-sm">
           <label htmlFor="owner_phone" className={label}>Telefon vlasnika</label>
           <input id="owner_phone" type="tel" className={input} placeholder="+381 6x xxx xxxx" required

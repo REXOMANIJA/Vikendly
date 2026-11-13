@@ -1,5 +1,5 @@
 import type { House, PriceCalculation } from '@/types';
-import { calculateBookablePrice, countNights, getBookables, getPartyPrice, isWeekendDay, partyLimit, type Bookable } from '@/lib/pricing';
+import { calculateBookablePrice, countNights, getBookables, getPartyPrice, isWeekendDay, partyLimit, quoteStay, type Bookable } from '@/lib/pricing';
 
 /**
  * What a guest asks for: one line per unit (or one line for a whole house), each with the
@@ -101,10 +101,26 @@ export function suggestSelection(house: House, guests: number, unitNames?: strin
     return party.map((b) => ({ id: b.id, guests: 0, partyGuests: Math.min(Math.max(guests, 1), partyLimit(b)) }));
   }
   const picked = unitNames?.length ? withBeds.filter((b) => unitNames.includes(b.name)) : withBeds.slice(0, 1);
+  // Fill the biggest units first, like quoteStay, so the price matches the one on the cards
   let left = Math.max(guests, 1);
-  return picked.map((b) => {
-    const here = Math.min(b.capacity, Math.max(left, 1));
+  const people = new Map<string, number>();
+  for (const b of [...picked].sort((a, c) => c.capacity - a.capacity)) {
+    const here = Math.max(1, Math.min(b.capacity, left));
     left -= here;
-    return { id: b.id, guests: here, partyGuests: 0 };
-  });
+    people.set(b.id, here);
+  }
+  // Listed in the order the units are shown
+  return picked.map((b) => ({ id: b.id, guests: people.get(b.id)!, partyGuests: 0 }));
+}
+
+/**
+ * The units to preselect for a group on these dates: the cheapest combination of places with
+ * beds that fits everyone (or, for an event venue, the cheapest party space). Empty when
+ * nothing fits or the dates are not complete.
+ */
+export function suggestForStay(house: House, checkIn: Date | undefined, checkOut: Date | undefined, guests: number): Selection[] {
+  if (!checkIn || !checkOut || checkOut <= checkIn || guests < 1) return [];
+  const units = quoteStay(house, checkIn, checkOut, guests)?.units;
+  if (!units?.length) return [];
+  return suggestSelection(house, guests, units);
 }

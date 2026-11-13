@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { ArrowDownUp, BadgeCheck, Loader2, Search, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowDownUp, BadgeCheck, CalendarDays, Loader2, MapPin, Search, SlidersHorizontal, Users, X } from 'lucide-react';
+import { formatDateRange, parseDateParam } from '@/lib/dates';
 import { useRouter } from '@/i18n/navigation';
 import DateRangePicker from '@/components/DateRangePicker';
 import { groupByCountry } from '@/lib/destinations';
@@ -35,6 +36,20 @@ export default function SearchFilters({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
+  // The filter box has scrolled out of view (above the screen)
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [outOfView, setOutOfView] = useState(false);
+  useEffect(() => {
+    const box = boxRef.current;
+    if (!box) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setOutOfView(!entry.isIntersecting && entry.boundingClientRect.top < 0),
+      // Counts as gone once it is hidden behind the header
+      { rootMargin: '-64px 0px 0px 0px' }
+    );
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, []);
   // Typed fields only apply on Enter / leaving the field, so results don't jump while typing
   const [q, setQ] = useState(values.q ?? '');
   const [guests, setGuests] = useState(values.guests ?? '');
@@ -61,31 +76,9 @@ export default function SearchFilters({
     (k) => values[k as keyof SearchValues]
   ).length;
 
+  // Order follows how guests think: where → when → how many → budget; a house name is rare, so last
   const fields = (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[1.1fr_1fr_1.3fr_0.6fr_0.7fr]">
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          apply({ q: q.trim() || undefined });
-        }}
-      >
-        <label htmlFor="f-q" className={labelClass}>
-          {t('name')}
-        </label>
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text/40" aria-hidden />
-          <input
-            id="f-q"
-            type="search"
-            value={q}
-            maxLength={80}
-            placeholder={t('namePlaceholder')}
-            onChange={(e) => setQ(e.target.value)}
-            onBlur={() => q.trim() !== (values.q ?? '') && apply({ q: q.trim() || undefined })}
-            className={`${fieldClass} pl-9`}
-          />
-        </div>
-      </form>
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[1fr_1.3fr_0.6fr_0.7fr_1fr]">
       <div>
         <label htmlFor="f-destination" className={labelClass}>
           {t('destination')}
@@ -155,8 +148,45 @@ export default function SearchFilters({
           className={fieldClass}
         />
       </div>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          apply({ q: q.trim() || undefined });
+        }}
+      >
+        <label htmlFor="f-q" className={labelClass}>
+          {t('name')}
+        </label>
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text/40" aria-hidden />
+          <input
+            id="f-q"
+            type="search"
+            value={q}
+            maxLength={80}
+            placeholder={t('namePlaceholder')}
+            onChange={(e) => setQ(e.target.value)}
+            onBlur={() => q.trim() !== (values.q ?? '') && apply({ q: q.trim() || undefined })}
+            className={`${fieldClass} pl-9`}
+          />
+        </div>
+      </form>
     </div>
   );
+
+  // ── Stays reachable while scrolling: once the box is out of view, a slim bar (desktop) or a
+  // floating button (phone) brings the guest back to it ──
+  const destinationName = destinations.find((d) => d.slug === values.destination)?.name;
+  const inDate = parseDateParam(values.checkIn);
+  const outDate = parseDateParam(values.checkOut);
+  const guestCount = parseInt(values.guests ?? '', 10) || 0;
+  const backTo = (fieldId?: string) => {
+    setOpen(true);
+    boxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Focus after the scroll so the page doesn't jump
+    if (fieldId) window.setTimeout(() => document.getElementById(fieldId)?.focus({ preventScroll: true }), 450);
+  };
+  const summaryPart = 'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 hover:bg-primary/8';
 
   const chips = (
     <div className="flex flex-wrap items-center gap-2">
@@ -210,7 +240,54 @@ export default function SearchFilters({
   );
 
   return (
-    <div className="mb-8 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-primary/10 md:p-5">
+    <>
+    {outOfView && (
+      <>
+        {/* Desktop: slim bar under the header with the current search */}
+        <div className="vk-menu-in fixed inset-x-0 top-16 z-40 hidden border-b border-primary/10 bg-white/95 shadow-sm backdrop-blur md:block">
+          <div className="container mx-auto flex items-center gap-1 px-4 py-2 text-sm font-medium text-primary">
+            <button type="button" onClick={() => backTo('f-destination')} className={summaryPart}>
+              <MapPin className="size-4 text-accent-dark" aria-hidden />
+              {destinationName ?? t('anyDestination')}
+            </button>
+            <span className="text-text/30" aria-hidden>·</span>
+            <button type="button" onClick={() => backTo('f-dates')} className={summaryPart}>
+              <CalendarDays className="size-4 text-accent-dark" aria-hidden />
+              {inDate && outDate ? formatDateRange(inDate, outDate, locale) : t('anyDates')}
+            </button>
+            <span className="text-text/30" aria-hidden>·</span>
+            <button type="button" onClick={() => backTo('f-guests')} className={summaryPart}>
+              <Users className="size-4 text-accent-dark" aria-hidden />
+              {guestCount > 0 ? t('guestCount', { count: guestCount }) : t('guests')}
+            </button>
+            <button
+              type="button"
+              onClick={() => backTo()}
+              className="ml-auto inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-white hover:bg-accent-dark"
+            >
+              <SlidersHorizontal className="size-4" aria-hidden />
+              {t('filters')}
+              {activeCount > 0 && (
+                <span className="flex size-5 items-center justify-center rounded-full bg-white text-xs text-primary">{activeCount}</span>
+              )}
+            </button>
+          </div>
+        </div>
+        {/* Phone: floating button at the bottom */}
+        <button
+          type="button"
+          onClick={() => backTo()}
+          className="vk-menu-in fixed bottom-5 left-1/2 z-40 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white shadow-xl md:hidden"
+        >
+          <SlidersHorizontal className="size-4" aria-hidden />
+          {t('filters')}
+          {activeCount > 0 && (
+            <span className="flex size-5 items-center justify-center rounded-full bg-white text-xs text-primary">{activeCount}</span>
+          )}
+        </button>
+      </>
+    )}
+    <div ref={boxRef} className="mb-8 scroll-mt-20 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-primary/10 md:p-5">
       {/* Phones: button that opens the filters, sort always visible */}
       <div className="flex items-center justify-between gap-3 md:hidden">
         <button
@@ -249,6 +326,7 @@ export default function SearchFilters({
         </div>
       </div>
     </div>
+    </>
   );
 }
 

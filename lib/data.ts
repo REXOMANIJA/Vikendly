@@ -50,6 +50,9 @@ type HouseRow = {
   /** House rules text; missing until migration 0014 is run */
   rules_sr?: string | null;
   rules_en?: string | null;
+  /** Distances / nearby places; missing until migration 0015 is run */
+  nearby_sr?: string | null;
+  nearby_en?: string | null;
   house_units?: UnitRow[];
 };
 
@@ -163,6 +166,10 @@ function toHouse(row: HouseRow): House & { featuredRank: number | null } {
     rulesText:
       row.rules_sr?.trim() || row.rules_en?.trim()
         ? { sr: row.rules_sr?.trim() ?? '', en: row.rules_en?.trim() ?? '' }
+        : undefined,
+    nearby:
+      row.nearby_sr?.trim() || row.nearby_en?.trim()
+        ? { sr: row.nearby_sr?.trim() ?? '', en: row.nearby_en?.trim() ?? '' }
         : undefined,
     location: {
       address: row.address,

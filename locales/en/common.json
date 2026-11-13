@@ -134,7 +134,13 @@
       "sortCapacity": "Most space",
       "clear": "Clear filters",
       "loading": "Loading",
-      "budgetHint": "The budget is for the whole stay, so it applies once you pick dates."
+      "budgetHint": "The budget is for the whole stay, so it applies once you pick dates.",
+      "anyDates": "Any dates",
+      "guestCount": "{count, plural, one {# guest} other {# guests}}",
+      "change": "Change search",
+      "viewLabel": "Show results as",
+      "viewList": "List",
+      "viewMap": "Map"
     },
     "empty": {
       "title": "No houses match this search",
@@ -150,6 +156,10 @@
       },
       "clearAll": "Clear all filters",
       "suggestions": "You might like"
+    },
+    "map": {
+      "open": "View house",
+      "noPin": "{count, plural, one {# house has} other {# houses have}} no exact location and {count, plural, one {is} other {are}} not on the map."
     }
   },
   "whyVikendly": {
@@ -226,7 +236,10 @@
         "text": "We stop by, meet you, and your house gets a “Verified in person” badge that gives guests confidence."
       }
     },
-    "moreLink": "All about listing with Vikendly"
+    "moreLink": "All about listing with Vikendly",
+    "bannerTitle": "Own a weekend house?",
+    "bannerText": "List it with Vikendly. Listing is free, we bring the guests, and you decide the prices and dates.",
+    "bannerButton": "List your house"
   },
   "footer": {
     "tagline": "Handpicked weekend houses in Serbia and the region.",
@@ -328,7 +341,10 @@
       "dayGuests": "up to {count, plural, one {# guest} other {# guests}} during the day",
       "dayGuestsNote": "Up to {day} people can come during the day; up to {sleeps} can stay overnight.",
       "partyDate": "Party date",
-      "linePartyOnly": "{name}: party, {count, plural, one {# guest} other {# guests}}"
+      "linePartyOnly": "{name}: party, {count, plural, one {# guest} other {# guests}}",
+      "unitPrice": "{price} per night",
+      "suggested": "We picked the best-value option for {count, plural, one {# guest} other {# guests}}. You can change it.",
+      "venueGuests": "People at the party"
     },
     "sleeps": "Sleeps {count, plural, one {up to # guest} other {up to # guests}}",
     "dayCapacity": "Parties and gatherings: {count, plural, one {up to # guest} other {up to # guests}}",
@@ -371,7 +387,8 @@
         "tooMany": "You have sent several requests in a short time. Please wait a little and try again.",
         "units": "Please check your choice of where to stay.",
         "party": "Please check the number of party guests."
-      }
+      },
+      "contactTitle": "Your details"
     },
     "map": {
       "iframeTitle": "Map: {name}",
@@ -393,7 +410,9 @@
       "partyOnly": "Parties only, no overnight stays",
       "partyUpTo": "Up to {count, plural, one {# guest} other {# guests}} at a party",
       "dayGuests": "Up to {count, plural, one {# guest} other {# guests}} during the day",
-      "partiesOk": "Parties allowed"
+      "partiesOk": "Parties allowed",
+      "perNightSame": "{price} per night",
+      "perNightHintSame": "same price on weekdays and weekends"
     },
     "rules": {
       "partyPrice": "Party price (weekdays / weekend): {levels}. Paid once per stay."
@@ -405,6 +424,22 @@
       "starsLabel": "{average} out of 5 stars",
       "count": "{count, plural, one {# review} other {# reviews}}",
       "verifiedOnly": "only guests who stayed here"
+    },
+    "rulesTimesUnit": "{unit}: check-in from {in}, check-out by {out}",
+    "partiesSome": "Parties allowed only in: {units}",
+    "petsSome": "Pets allowed only in: {units}",
+    "smokingSome": "Smoking allowed only in: {units}",
+    "amenitiesMore": "Show all ({count})",
+    "amenitiesLess": "Show less",
+    "nearbyTitle": "Distances and nearby",
+    "nav": {
+      "label": "Page sections",
+      "about": "About",
+      "amenities": "Amenities",
+      "units": "Units",
+      "rules": "Rules",
+      "reviews": "Reviews",
+      "location": "Location"
     }
   },
   "datePicker": {

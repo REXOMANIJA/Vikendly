@@ -24,7 +24,11 @@ import {
   DoorOpen,
   CalendarDays,
   BadgeCheck,
+  CircleDot,
+  Route,
 } from 'lucide-react';
+import AmenityList from '@/components/house/AmenityList';
+import { summarizeRules, type RuleAnswer } from '@/lib/rules';
 import VerifiedBadge from '@/components/VerifiedBadge';
 import { formatVisitMonth, parseDateParam } from '@/lib/dates';
 import type { LucideIcon } from 'lucide-react';
@@ -114,7 +118,6 @@ export default async function HousePage({ params }: { params: Params }) {
   ]);
   const destinationOf = (id: string) => destinations.find((d) => d.id === id);
   const destination = destinationOf(house.destinationId);
-  const { rules } = house;
   const tVerified = await getTranslations('verified');
   const verifiedOn = parseDateParam(house.verifiedAt);
   const hasDayCapacity = house.dayCapacity != null && house.dayCapacity > house.capacity;
@@ -125,11 +128,28 @@ export default async function HousePage({ params }: { params: Params }) {
   // Admin's rules text; the English page falls back to Serbian when no English text was written
   const rulesText = house.rulesText ? house.rulesText[locale as Locale] || house.rulesText.sr : '';
 
+  // Parties, pets, smoking and times for the whole listing (combined from the units when it has them)
+  const ruleSummary = summarizeRules(house);
+  const ruleLabel = (answer: RuleAnswer, yes: string, no: string, some: string) =>
+    answer.state === 'yes' ? yes : answer.state === 'no' ? no : t(some as 'partiesSome', { units: answer.units.join(', ') });
   const ruleItems = [
-    { ok: rules.partiesAllowed, label: rules.partiesAllowed ? t('partiesAllowed') : t('partiesNotAllowed') },
-    { ok: rules.petsAllowed, label: rules.petsAllowed ? t('petsAllowed') : t('petsNotAllowed') },
-    { ok: rules.smokingAllowed, label: rules.smokingAllowed ? t('smokingAllowed') : t('smokingNotAllowed') },
+    { state: ruleSummary.parties.state, label: ruleLabel(ruleSummary.parties, t('partiesAllowed'), t('partiesNotAllowed'), 'partiesSome') },
+    { state: ruleSummary.pets.state, label: ruleLabel(ruleSummary.pets, t('petsAllowed'), t('petsNotAllowed'), 'petsSome') },
+    { state: ruleSummary.smoking.state, label: ruleLabel(ruleSummary.smoking, t('smokingAllowed'), t('smokingNotAllowed'), 'smokingSome') },
   ];
+  // Distances and nearby places (admin → "Udaljenosti"), one per line
+  const nearbyText = house.nearby ? house.nearby[locale as Locale] || house.nearby.sr : '';
+  const nearbyLines = nearbyText.split('\n').map((line) => line.trim()).filter(Boolean);
+
+  // Quick links to the parts of this page (desktop)
+  const sectionLinks = [
+    { id: 'opis', label: t('nav.about') },
+    house.amenities.length > 0 && { id: 'sadrzaj', label: t('nav.amenities') },
+    withUnits && { id: 'delovi', label: t('nav.units') },
+    { id: 'pravila', label: t('nav.rules') },
+    house.rating && { id: 'ocene', label: t('nav.reviews') },
+    { id: 'lokacija', label: t('nav.location') },
+  ].filter((x): x is { id: string; label: string } => Boolean(x));
 
   // Lets Google show the house with photo, place, price and stars in search results (G8)
   const structuredData = houseStructuredData({
@@ -213,6 +233,24 @@ export default async function HousePage({ params }: { params: Params }) {
         <div className="mt-10 grid gap-10 lg:grid-cols-12">
           {/* Details */}
           <div className="space-y-10 lg:col-span-7">
+            {/* Desktop: links to each part of the page, stay under the header while scrolling */}
+            <nav
+              aria-label={t('nav.label')}
+              className="sticky top-16 z-20 -mx-2 -mb-4 hidden border-b border-primary/10 bg-background/95 px-2 backdrop-blur lg:block"
+            >
+              <ul className="flex gap-1">
+                {sectionLinks.map((s) => (
+                  <li key={s.id}>
+                    <a
+                      href={`#${s.id}`}
+                      className="inline-block border-b-2 border-transparent px-3 py-3 text-sm font-semibold text-text/70 transition-colors hover:border-accent hover:text-primary"
+                    >
+                      {s.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
             {verifiedOn && (
               <section className="flex gap-4 rounded-2xl border border-primary/15 bg-primary/5 p-5">
                 <BadgeCheck className="size-8 shrink-0 text-primary" strokeWidth={1.75} aria-hidden />
@@ -224,7 +262,7 @@ export default async function HousePage({ params }: { params: Params }) {
                 </div>
               </section>
             )}
-            <section>
+            <section id="opis" className="scroll-mt-32">
               <h2 className="font-serif text-2xl font-bold text-primary">{t('aboutTitle')}</h2>
               <p className="mt-3 text-lg leading-relaxed text-text/85">
                 {house.description[locale as Locale]}
@@ -232,34 +270,42 @@ export default async function HousePage({ params }: { params: Params }) {
             </section>
 
             {house.amenities.length > 0 && (
-              <section>
+              <section id="sadrzaj" className="scroll-mt-32">
                 <h2 className="font-serif text-2xl font-bold text-primary">{t('amenitiesTitle')}</h2>
-                <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <AmenityList
+                  moreLabel={t('amenitiesMore', { count: house.amenities.length })}
+                  lessLabel={t('amenitiesLess')}
+                >
                   {house.amenities.map((id) => {
                     const Icon = amenityIcons[id] ?? Check;
                     return (
-                      <li key={id} className="flex items-center gap-3 rounded-xl bg-white p-3">
+                      <span key={id} className="contents">
                         <Icon className="size-5 shrink-0 text-primary" strokeWidth={1.75} aria-hidden />
                         <span>{tAmenity(id as 'wifi')}</span>
-                      </li>
+                      </span>
                     );
                   })}
-                </ul>
+                </AmenityList>
               </section>
             )}
 
-            {withUnits && <HouseUnits units={house.units!} />}
+            {withUnits && (
+              <div id="delovi" className="scroll-mt-32">
+                <HouseUnits units={house.units!} />
+              </div>
+            )}
 
-            {/* A venue's rules are all in its party space cards above, so this list would be empty */}
-            <section hidden={venue && !rulesText}>
+            <section id="pravila" className="scroll-mt-32">
               <h2 className="font-serif text-2xl font-bold text-primary">{t('rulesTitle')}</h2>
               <ul className="mt-4 space-y-3">
-                {!withUnits && (
-                  <li className="flex items-center gap-3">
-                    <Clock className="size-5 text-primary" aria-hidden />
-                    {t('checkInTime', { time: rules.checkInTime })} · {t('checkOutTime', { time: rules.checkOutTime })}
+                {ruleSummary.times.map((time) => (
+                  <li key={time.unit ?? 'all'} className="flex items-center gap-3">
+                    <Clock className="size-5 shrink-0 text-primary" aria-hidden />
+                    {time.unit
+                      ? t('rulesTimesUnit', { unit: time.unit, in: time.checkIn, out: time.checkOut })
+                      : `${t('checkInTime', { time: time.checkIn })} · ${t('checkOutTime', { time: time.checkOut })}`}
                   </li>
-                )}
+                ))}
                 {/* A venue is booked for one day, so there is no minimum stay */}
                 {!venue && (
                   <li className="flex items-center gap-3">
@@ -276,12 +322,14 @@ export default async function HousePage({ params }: { params: Params }) {
                     })}
                   </li>
                 )}
-                {!withUnits && ruleItems.map(({ ok, label }) => (
-                  <li key={label} className="flex items-center gap-3">
-                    {ok ? (
-                      <Check className="size-5 text-primary" aria-hidden />
+                {ruleItems.map(({ state, label }) => (
+                  <li key={label} className="flex items-start gap-3">
+                    {state === 'yes' ? (
+                      <Check className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
+                    ) : state === 'no' ? (
+                      <X className="mt-0.5 size-5 shrink-0 text-accent-dark" aria-hidden />
                     ) : (
-                      <X className="size-5 text-accent-dark" aria-hidden />
+                      <CircleDot className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
                     )}
                     {label}
                   </li>
@@ -297,7 +345,7 @@ export default async function HousePage({ params }: { params: Params }) {
 
             {house.rating && <HouseReviews reviews={reviews} summary={house.rating} locale={locale} />}
 
-            <section>
+            <section id="lokacija" className="scroll-mt-32">
               <h2 className="mb-4 font-serif text-2xl font-bold text-primary">{t('locationTitle')}</h2>
               <HouseMap
                 name={house.name}
@@ -306,6 +354,19 @@ export default async function HousePage({ params }: { params: Params }) {
                 lng={house.location.lng}
                 placeLabel={destination ? `${destination.name}, ${tCountry(destination.country)}` : undefined}
               />
+              {nearbyLines.length > 0 && (
+                <div className="mt-5">
+                  <h3 className="font-semibold text-primary">{t('nearbyTitle')}</h3>
+                  <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                    {nearbyLines.map((line) => (
+                      <li key={line} className="flex items-start gap-2.5 rounded-xl bg-white px-3 py-2.5 text-sm text-text/85">
+                        <Route className="mt-0.5 size-4 shrink-0 text-accent-dark" aria-hidden />
+                        {line}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </section>
           </div>
 

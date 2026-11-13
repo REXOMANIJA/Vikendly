@@ -100,6 +100,8 @@ export interface House {
   rules: HouseRules;
   /** All house rules as written by the admin (migration 0014); missing = none written */
   rulesText?: LocalizedText;
+  /** Distances and places nearby, one per line, shown under the map (migration 0015) */
+  nearby?: LocalizedText;
   location: {
     address: string;
     lat?: number;

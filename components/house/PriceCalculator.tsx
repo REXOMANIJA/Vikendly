@@ -3,10 +3,10 @@
 import { Suspense, useMemo, useState, useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { Check, CircleCheck, Loader2, PawPrint, Send, Users } from 'lucide-react';
+import { Check, CircleCheck, Loader2, PawPrint, Send, Sparkles, Users } from 'lucide-react';
 import type { House } from '@/types';
-import { getBookables, getNightlyRates, hasUnits, isVenue, partyLimit, quoteStay, type Bookable } from '@/lib/pricing';
-import { checkSelection, quoteSelection, suggestSelection, type Selection, type SelectionProblem } from '@/lib/booking';
+import { getBookables, getNightlyRates, hasUnits, isVenue, partyLimit, WHOLE_HOUSE, type Bookable } from '@/lib/pricing';
+import { checkSelection, quoteSelection, suggestForStay, type Selection, type SelectionProblem } from '@/lib/booking';
 import { formatDateRange, parseDateParam } from '@/lib/dates';
 import { submitBookingRequest, type BookingRequestResult } from '@/lib/actions';
 import DateRangePicker from '@/components/DateRangePicker';
@@ -51,41 +51,100 @@ export default function PriceCalculator({
   const multi = hasUnits(house);
   const bookables = useMemo(() => getBookables(house), [house]);
 
+  // Event venue (only party spaces): one day, and the group size is the number of people at the party
+  const venue = isVenue(house);
+  // Places with beds together: the most people who can sleep here
+  const bedCapacity = bookables.filter((b) => !b.partyOnly).reduce((sum, b) => sum + b.capacity, 0);
+
   const [checkIn, setCheckIn] = useState(initialCheckIn);
   const [checkOut, setCheckOut] = useState(initialCheckOut);
-  const [lines, setLines] = useState<Record<string, LineState>>(() => {
-    // Coming from search with a group size: preselect what fits (for units, the cheapest combination)
-    const inDate = parseDateParam(initialCheckIn);
-    const outDate = parseDateParam(initialCheckOut);
-    const unitNames =
-      multi && initialGuests && inDate && outDate && outDate > inDate
-        ? quoteStay(house, inDate, outDate, initialGuests)?.units
-        : undefined;
-    // A venue with a single party space: that space is always the one being booked
-    const venueSingle = isVenue(house) && bookables.length === 1;
-    const preset =
-      (multi && !unitNames && !venueSingle) ? [] : suggestSelection(house, initialGuests ?? 1, unitNames);
-    return Object.fromEntries(
+  // How many people (asked first, together with the dates). For a house rented as one this is
+  // its guest count; with units it is used to suggest the cheapest units that fit.
+  const [group, setGroup] = useState(initialGuests ? String(initialGuests) : '');
+  // Group size the current unit choice was suggested for (null = the guest chose it themselves)
+  const [suggestedFor, setSuggestedFor] = useState<number | null>(() =>
+    multi && initialGuests &&
+    suggestForStay(house, parseDateParam(initialCheckIn), parseDateParam(initialCheckOut), initialGuests).length
+      ? initialGuests
+      : null
+  );
+
+  /** Line states for a suggestion: the suggested units ticked, others unticked (an added party space stays) */
+  const linesFrom = (suggestion: Selection[], current?: Record<string, LineState>) =>
+    Object.fromEntries(
       bookables.map((b) => {
-        const p = preset.find((x) => x.id === b.id);
+        const p = suggestion.find((x) => x.id === b.id);
+        if (!p && current && b.partyOnly && !venue) return [b.id, current[b.id]];
         return [
           b.id,
           {
             selected: !multi || !!p,
-            guests: p && initialGuests && p.guests ? String(p.guests) : '',
-            partyGuests: p && initialGuests && p.partyGuests ? String(p.partyGuests) : '',
+            guests: p?.guests ? String(p.guests) : '',
+            partyGuests: p?.partyGuests ? String(p.partyGuests) : '',
           },
         ];
       })
-    );
+    ) as Record<string, LineState>;
+
+  const [lines, setLines] = useState<Record<string, LineState>>(() => {
+    if (!multi) return linesFrom(initialGuests ? [{ id: WHOLE_HOUSE, guests: initialGuests, partyGuests: 0 }] : []);
+    // Coming from search with dates and a group size: preselect the cheapest units that fit
+    const suggestion = initialGuests
+      ? suggestForStay(house, parseDateParam(initialCheckIn), parseDateParam(initialCheckOut), initialGuests)
+      : [];
+    // A venue with a single party space: that space is always the one being booked
+    if (!suggestion.length && venue && bookables.length === 1) return linesFrom([{ id: bookables[0].id, guests: 0, partyGuests: 0 }]);
+    return linesFrom(suggestion);
   });
   const [contact, setContact] = useState({ name: '', phone: '', email: '', message: '', website: '' });
   const [result, setResult] = useState<BookingRequestResult | null>(null);
   const [pending, startTransition] = useTransition();
 
+  /** The guest changed a unit themselves: from now on their choice is kept */
   const update = (id: string, changes: Partial<LineState>) => {
     setLines((all) => ({ ...all, [id]: { ...all[id], ...changes } }));
+    setSuggestedFor(null);
     setResult(null);
+  };
+
+  /** Ticks the cheapest units for this group and these dates (listings with units only) */
+  const suggest = (nextIn: string, nextOut: string, nextGroup: string) => {
+    const people = parseInt(nextGroup, 10) || 0;
+    if (!multi || people < 1) return;
+    const suggestion = suggestForStay(house, parseDateParam(nextIn), parseDateParam(nextOut), people);
+    if (!suggestion.length) {
+      // Venue whose price for this size is agreed in person: still fill in the people
+      if (venue) {
+        setLines((all) =>
+          Object.fromEntries(
+            bookables.map((b) => [b.id, all[b.id].selected ? { ...all[b.id], partyGuests: String(Math.min(people, partyLimit(b))) } : all[b.id]])
+          )
+        );
+      }
+      return;
+    }
+    setLines((all) => linesFrom(suggestion, all));
+    setSuggestedFor(people);
+  };
+
+  const onGroupChange = (value: string) => {
+    setGroup(value);
+    setResult(null);
+    if (!multi) {
+      setLines((all) => ({ ...all, [WHOLE_HOUSE]: { ...all[WHOLE_HOUSE], guests: value } }));
+      return;
+    }
+    // A new group size is a fresh start: suggest again even if units were changed by hand
+    suggest(checkIn, checkOut, value);
+  };
+
+  const onDatesChange = (nextIn: string, nextOut: string) => {
+    setCheckIn(nextIn);
+    setCheckOut(nextOut);
+    setResult(null);
+    // Keep a choice the guest made by hand; otherwise suggest for the new dates
+    const untouched = suggestedFor !== null || bookables.every((b) => !lines[b.id].selected);
+    if (untouched) suggest(nextIn, nextOut, group);
   };
 
   const inDate = parseDateParam(checkIn);
@@ -98,8 +157,11 @@ export default function PriceCalculator({
         : { id: b.id, guests: parseInt(lines[b.id].guests, 10) || 0, partyGuests: 0 }
     );
   const isPartyOnly = (id: string) => bookables.find((b) => b.id === id)?.partyOnly === true;
-  // Only party-only spaces chosen: the guest picks one day instead of a stay
-  const oneDay = selections.length > 0 && selections.every((s) => isPartyOnly(s.id));
+  // A venue, or only party-only spaces chosen: the guest picks one day instead of a stay
+  const oneDay = venue || (selections.length > 0 && selections.every((s) => isPartyOnly(s.id)));
+  const groupSize = parseInt(group, 10) || 0;
+  // Most people this listing takes at once (beds, or for a venue its biggest party space)
+  const groupMax = venue ? Math.max(0, ...bookables.map(partyLimit)) : bedCapacity;
   // Price only once every chosen unit has its numbers filled in
   const complete =
     selections.length > 0 && selections.every((s) => (isPartyOnly(s.id) ? s.partyGuests > 0 : s.guests > 0));
@@ -111,12 +173,13 @@ export default function PriceCalculator({
   };
   const problem = useMemo(() => {
     if (inDate && outDate && outDate <= inDate) return t('invalidDates');
+    if (multi && groupSize > groupMax) return t('tooManyGuests', { count: groupMax });
     // Check what has been typed so far (e.g. too many guests) without waiting for every field
     const typed = selections.filter((s) => s.guests > 0 || s.partyGuests > 0);
     const found = typed.length ? checkSelection(house, typed) : null;
     return found ? problemText(found) : null;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inDate?.getTime(), outDate?.getTime(), JSON.stringify(selections), house]);
+  }, [inDate?.getTime(), outDate?.getTime(), JSON.stringify(selections), house, groupSize]);
 
   const quote = inDate && outDate && complete && !problem ? quoteSelection(house, inDate, outDate, selections) : undefined;
   const tooShort = quote && !quote.partyOnly && quote.nights < pricing.minNights;
@@ -191,11 +254,53 @@ export default function PriceCalculator({
     >
       <h2 className="font-serif text-2xl font-bold text-primary">{tb('title')}</h2>
 
+      {/* 1. When and how many (people think "when?" first) */}
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <DateRangePicker
+          id="calc-dates"
+          label={oneDay ? t('partyDate') : tDates('label')}
+          single={oneDay}
+          checkIn={checkIn}
+          checkOut={checkOut}
+          onChange={onDatesChange}
+          className="col-span-2"
+        />
+        <div className="col-span-2">
+          <label htmlFor="calc-guests" className={labelClass}>{venue ? t('venueGuests') : t('guestsLabel')}</label>
+          <input
+            id="calc-guests"
+            type="number"
+            min="1"
+            max={multi ? groupMax : whole.capacity}
+            inputMode="numeric"
+            value={group}
+            // A house rented as one needs the number; with units it only drives the suggestion
+            required={!multi}
+            onChange={(e) => onGroupChange(e.target.value)}
+            placeholder={`1–${multi ? groupMax : whole.capacity}`}
+            className={fieldClass}
+          />
+        </div>
+        {!multi && partyLimit(whole) > whole.capacity && (
+          <p className="col-span-2 flex items-start gap-2 rounded-lg bg-background px-3 py-2 text-sm text-text/80">
+            <Users className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+            {t('dayGuestsNote', { day: partyLimit(whole), sleeps: whole.capacity })}
+          </p>
+        )}
+      </div>
+
+      {/* 2. What: units (suggested automatically) or the house's prices */}
       {multi ? (
-        // ── Units: pick one or more ──
-        <fieldset className="mt-4">
+        <fieldset className="mt-5">
           <legend className="font-semibold text-primary">{t('unitsTitle')}</legend>
-          <p className="text-sm text-text/60">{t('unitsHint')}</p>
+          {suggestedFor ? (
+            <p className="mt-1 flex items-start gap-1.5 text-sm text-primary">
+              <Sparkles className="mt-0.5 size-4 shrink-0" aria-hidden />
+              {t('suggested', { count: suggestedFor })}
+            </p>
+          ) : (
+            <p className="text-sm text-text/60">{t('unitsHint')}</p>
+          )}
           <div className="mt-3 space-y-3">
             {bookables.map((b) => {
               const line = lines[b.id];
@@ -222,7 +327,9 @@ export default function PriceCalculator({
                       ) : (
                       <span className="block text-xs text-text/70">
                         {t('unitSleeps', { count: b.capacity })} ·{' '}
-                        {t('unitPrices', { weekday: eur(b.pricing.weekdayPrice), weekend: eur(b.pricing.weekendPrice) })}
+                        {b.pricing.weekdayPrice === b.pricing.weekendPrice
+                          ? t('unitPrice', { price: eur(b.pricing.weekdayPrice) })
+                          : t('unitPrices', { weekday: eur(b.pricing.weekdayPrice), weekend: eur(b.pricing.weekendPrice) })}
                         {(b.pricing.tiers ?? []).length > 0 &&
                           ` · ${t('fromGroup', { price: eur(Math.min(...b.pricing.tiers!.map((x) => x.weekdayPrice))) })}`}
                       </span>
@@ -273,39 +380,7 @@ export default function PriceCalculator({
         <WholeHouseRates house={house} guestCount={parseInt(wholeLine.guests, 10) || 0} />
       )}
 
-      {/* Stay */}
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        <DateRangePicker
-          id="calc-dates"
-          label={oneDay ? t('partyDate') : tDates('label')}
-          single={oneDay}
-          checkIn={checkIn}
-          checkOut={checkOut}
-          onChange={(nextIn, nextOut) => {
-            setCheckIn(nextIn);
-            setCheckOut(nextOut);
-            setResult(null);
-          }}
-          className="col-span-2"
-        />
-        {!multi && (
-          <div className="col-span-2 space-y-3">
-            <div>
-              <label htmlFor="calc-guests" className={labelClass}>{t('guestsLabel')}</label>
-              <input id="calc-guests" type="number" min="1" max={whole.capacity} inputMode="numeric" value={wholeLine.guests} required
-                onChange={(e) => update(whole.id, { guests: e.target.value })} placeholder={`1–${whole.capacity}`} className={fieldClass} />
-            </div>
-            {partyLimit(whole) > whole.capacity && (
-              <p className="flex items-start gap-2 rounded-lg bg-background px-3 py-2 text-sm text-text/80">
-                <Users className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
-                {t('dayGuestsNote', { day: partyLimit(whole), sleeps: whole.capacity })}
-              </p>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Price */}
+      {/* 3. Price */}
       <div className="mt-5" aria-live="polite">
         {problem ? (
           <p className="rounded-lg bg-accent/10 px-4 py-3 text-sm text-accent-dark">{problem}</p>
@@ -366,13 +441,17 @@ export default function PriceCalculator({
             )}
           </>
         ) : (
-          <p className="text-sm text-text/70">{multi && selections.length === 0 ? t('problems.none') : t('pickDates')}</p>
+          <p className="text-sm text-text/70">
+            {multi && inDate && outDate && selections.length === 0 ? t('problems.none') : t('pickDates')}
+          </p>
         )}
       </div>
 
-      {/* Guest contact */}
-      <fieldset className="mt-6 space-y-3 border-t border-primary/10 pt-5">
+      {/* 4. Guest contact: only once there is a price, so the box doesn't start as a long form */}
+      {canSend && (
+      <fieldset className="mt-6 space-y-3 border-t border-primary/10 pt-5 vk-menu-in">
         <legend className="sr-only">{tb('contactLegend')}</legend>
+        <p className="font-semibold text-primary" aria-hidden>{tb('contactTitle')}</p>
         <p className="text-sm text-text/70">{tb('howItWorks')}</p>
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
@@ -403,13 +482,14 @@ export default function PriceCalculator({
             onChange={(e) => setContact({ ...contact, message: e.target.value })}
             className={`${fieldClass} h-auto resize-none py-2`} />
         </div>
-        {/* Spam trap: hidden from people, bots fill it in */}
-        <div aria-hidden="true" className="absolute -left-[9999px] h-0 overflow-hidden">
-          <label htmlFor="req-website">Website</label>
-          <input id="req-website" tabIndex={-1} autoComplete="off" value={contact.website}
-            onChange={(e) => setContact({ ...contact, website: e.target.value })} />
-        </div>
       </fieldset>
+      )}
+      {/* Spam trap: hidden from people, bots fill it in */}
+      <div aria-hidden="true" className="absolute -left-[9999px] h-0 overflow-hidden">
+        <label htmlFor="req-website">Website</label>
+        <input id="req-website" tabIndex={-1} autoComplete="off" value={contact.website}
+          onChange={(e) => setContact({ ...contact, website: e.target.value })} />
+      </div>
 
       {errorText && (
         <p role="alert" className="mt-4 rounded-lg bg-accent/10 px-4 py-3 text-sm text-accent-dark">{errorText}</p>

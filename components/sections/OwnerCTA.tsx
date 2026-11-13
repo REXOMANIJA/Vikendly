@@ -1,7 +1,6 @@
 import { useTranslations } from 'next-intl';
-import { ArrowRight, Users, SlidersHorizontal, BadgeCheck } from 'lucide-react';
+import { ArrowRight, BadgeCheck, KeyRound, SlidersHorizontal, Users } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
-import OwnerApplicationForm from '@/components/OwnerApplicationForm';
 
 const benefits = [
   { key: 'guests', icon: Users },
@@ -9,43 +8,44 @@ const benefits = [
   { key: 'visit', icon: BadgeCheck },
 ] as const;
 
-/** Homepage "Za vlasnike" block: short pitch + application form. Full details are on /za-vlasnike. */
+/**
+ * Homepage "Za vlasnike": a short banner that leads to /za-vlasnike. The homepage is for guests,
+ * so the full application form lives only on the owners page.
+ */
 export default function OwnerCTA() {
   const t = useTranslations('ownerCTA');
 
   return (
-    <section id="list-your-house" className="py-16 md:py-20 bg-sand">
-      <div className="container mx-auto px-4 grid gap-10 lg:grid-cols-2 lg:gap-16 items-center">
-        {/* Left: why list with us */}
-        <div>
-          <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-accent-dark">{t('eyebrow')}</p>
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-primary text-balance">{t('title')}</h2>
-          <p className="mt-4 text-text/75 leading-relaxed">{t('description')}</p>
-          <ul className="mt-8 space-y-5">
-            {benefits.map(({ key, icon: Icon }) => (
-              <li key={key} className="flex gap-4">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-primary">
-                  <Icon className="size-5" strokeWidth={1.75} aria-hidden />
-                </span>
-                <div>
-                  <h3 className="font-semibold text-primary">{t(`benefits.${key}.title`)}</h3>
-                  <p className="text-sm text-text/70">{t(`benefits.${key}.text`)}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <Link
-            href="/owners"
-            className="mt-8 inline-flex items-center gap-2 font-semibold text-accent-dark hover:text-primary"
-          >
-            {t('moreLink')}
-            <ArrowRight className="size-4" aria-hidden />
-          </Link>
-        </div>
-
-        {/* Right: the form, as a light card */}
-        <div className="rounded-2xl bg-white p-6 md:p-8 shadow-xl">
-          <OwnerApplicationForm />
+    <section id="list-your-house" className="py-12 md:py-16">
+      <div className="container mx-auto px-4">
+        <div className="relative overflow-hidden rounded-3xl bg-primary px-6 py-8 text-white shadow-lg md:px-12 md:py-10">
+          {/* Soft decorative circle, keeps the banner from looking flat */}
+          <span aria-hidden className="pointer-events-none absolute -right-16 -top-20 size-64 rounded-full bg-accent/20 blur-2xl" />
+          <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between md:gap-10">
+            <div className="max-w-2xl">
+              <p className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-accent">
+                <KeyRound className="size-4" aria-hidden />
+                {t('eyebrow')}
+              </p>
+              <h2 className="mt-2 font-serif text-3xl font-bold text-balance md:text-4xl">{t('bannerTitle')}</h2>
+              <p className="mt-3 leading-relaxed text-white/80">{t('bannerText')}</p>
+              <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/90">
+                {benefits.map(({ key, icon: Icon }) => (
+                  <li key={key} className="inline-flex items-center gap-1.5">
+                    <Icon className="size-4 text-accent" aria-hidden />
+                    {t(`benefits.${key}.title`)}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <Link
+              href="/owners"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-accent-dark px-6 py-3.5 font-semibold text-white transition-colors hover:bg-white hover:text-primary"
+            >
+              {t('bannerButton')}
+              <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          </div>
         </div>
       </div>
     </section>

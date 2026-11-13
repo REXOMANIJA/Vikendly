@@ -24,6 +24,19 @@ const securityHeaders = [
 const nextConfig = {
   allowedDevOrigins: ['127.0.0.1'],
   poweredByHeader: false,
+  async redirects() {
+    return [
+      // The Serbian search page moved from /sr/search to /sr/pretraga (shared links keep working;
+      // the ?destination=… part is carried over)
+      { source: '/sr/search', destination: '/sr/pretraga', permanent: true },
+      // People who shorten a house address (/sr/kuce/ime → /sr/kuce) land on all houses, not a 404
+      { source: '/sr/kuce', destination: '/sr/pretraga', permanent: false },
+      { source: '/sr/houses', destination: '/sr/pretraga', permanent: false },
+      { source: '/en/houses', destination: '/en/search', permanent: false },
+      { source: '/en/kuce', destination: '/en/search', permanent: false },
+      { source: '/en/pretraga', destination: '/en/search', permanent: false },
+    ];
+  },
   async headers() {
     return [
       { source: '/:path*', headers: securityHeaders },

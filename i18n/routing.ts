@@ -7,7 +7,11 @@ export const routing = defineRouting({
   // Always link with the internal name, e.g. { pathname: '/houses/[slug]', params: { slug } }.
   pathnames: {
     '/': '/',
-    '/search': '/search',
+    // Old /sr/search links redirect to /sr/pretraga (next.config.mjs)
+    '/search': {
+      sr: '/pretraga',
+      en: '/search',
+    },
     '/destinations': {
       sr: '/destinacije',
       en: '/destinations',

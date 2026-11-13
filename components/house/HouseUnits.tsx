@@ -65,9 +65,13 @@ export default function HouseUnits({ units }: { units: HouseUnit[] }) {
               <h3 className="font-serif text-xl font-bold text-primary">{u.name}</h3>
               <p className="mt-1">
                 <span className="text-lg font-semibold text-primary">
-                  {t('perNight', { weekday: eur(u.weekdayPrice), weekend: eur(u.weekendPrice) })}
+                  {u.weekdayPrice === u.weekendPrice
+                    ? t('perNightSame', { price: eur(u.weekdayPrice) })
+                    : t('perNight', { weekday: eur(u.weekdayPrice), weekend: eur(u.weekendPrice) })}
                 </span>
-                <span className="block text-xs text-text/60">{t('perNightHint')}</span>
+                <span className="block text-xs text-text/60">
+                  {u.weekdayPrice === u.weekendPrice ? t('perNightHintSame') : t('perNightHint')}
+                </span>
               </p>
               <ul className="mt-4 space-y-2 text-sm text-text/85">
                 <li className="flex items-center gap-2">

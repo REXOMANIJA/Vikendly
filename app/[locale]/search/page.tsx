@@ -2,14 +2,16 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { localizedAlternates } from '@/lib/seo';
 import { getHouses, getDestinations, getCategories, getCategoryBySlug, getHouseCountsByDestination } from '@/lib/data';
-import { getLowestNightlyPrice, maxGuestsOf, quoteStay } from '@/lib/pricing';
+import { getLowestNightlyPrice, isVenue, maxGuestsOf, quoteStay } from '@/lib/pricing';
 import { parseDateParam } from '@/lib/dates';
 import { slugify } from '@/lib/slug';
-import { Link } from '@/i18n/navigation';
+import { Link, getPathname } from '@/i18n/navigation';
+import type { Locale } from '@/i18n/routing';
 import HouseCard from '@/components/cards/HouseCard';
 import { SearchX } from 'lucide-react';
 import SearchFilters from '@/components/search/SearchFilters';
-import { SORTS, type SearchValues } from '@/lib/search';
+import ResultsView from '@/components/search/ResultsView';
+import { SORTS, type MapPoint, type SearchValues } from '@/lib/search';
 import { ViewTransition } from 'react';
 import Image from 'next/image';
 import { isVector } from '@/lib/images';
@@ -170,6 +172,34 @@ export default async function SearchPage({
   }
   if (guests) stayQuery.guests = String(guests);
 
+  // Map view: houses with a map pin, with the same price the card shows
+  const tCard = await getTranslations('houseCard');
+  const euro = (n: number) => `€${Math.round(n)}`;
+  const linkSuffix = Object.keys(stayQuery).length ? `?${new URLSearchParams(stayQuery)}` : '';
+  const mapPoints: MapPoint[] = results.flatMap(({ house, quote }) => {
+    const { lat, lng } = house.location;
+    if (lat == null || lng == null) return [];
+    const lowest = getLowestNightlyPrice(house);
+    const photo = house.photos[0];
+    return [
+      {
+        id: house.id,
+        name: house.name,
+        place: destinationOf(house.destinationId)?.name,
+        lat,
+        lng,
+        href:
+          getPathname({ locale: locale as Locale, href: { pathname: '/houses/[slug]', params: { slug: house.slug } } }) +
+          linkSuffix,
+        pin: euro(quote ? quote.total : lowest),
+        price: quote
+          ? `${euro(quote.total)} ${tCard('totalWord')}`
+          : `${tCard('from', { price: euro(lowest) })}${isVenue(house) ? tCard('perParty') : tCard('perNight')}`,
+        photo: photo ? (isVector(photo) ? photo : `/_next/image?url=${encodeURIComponent(photo)}&w=384&q=70`) : undefined,
+      },
+    ];
+  });
+
   return (
     <div className="container mx-auto px-4 py-6 md:py-10">
       {banner && (
@@ -252,18 +282,25 @@ export default async function SearchPage({
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {results.map(({ house, quote }) => (
-            <HouseCard
-              key={house.id}
-              house={house}
-              destinationName={destinationOf(house.destinationId)?.name}
-              quote={quote}
-              guests={guests}
-              linkQuery={stayQuery}
-            />
-          ))}
-        </div>
+        <ResultsView
+          points={mapPoints}
+          hiddenCount={results.length - mapPoints.length}
+          openLabel={t('map.open')}
+          noPinText={t('map.noPin', { count: results.length - mapPoints.length })}
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {results.map(({ house, quote }) => (
+              <HouseCard
+                key={house.id}
+                house={house}
+                destinationName={destinationOf(house.destinationId)?.name}
+                quote={quote}
+                guests={guests}
+                linkQuery={stayQuery}
+              />
+            ))}
+          </div>
+        </ResultsView>
       )}
     </div>
   );

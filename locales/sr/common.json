@@ -134,7 +134,13 @@
       "sortCapacity": "Najviše mesta",
       "clear": "Obrišite filtere",
       "loading": "Učitavanje",
-      "budgetHint": "Budžet važi za ceo boravak, pa se primenjuje tek kada izaberete datume."
+      "budgetHint": "Budžet važi za ceo boravak, pa se primenjuje tek kada izaberete datume.",
+      "anyDates": "Bilo kada",
+      "guestCount": "{count, plural, one {# gost} few {# gosta} other {# gostiju}}",
+      "change": "Promenite pretragu",
+      "viewLabel": "Prikaz rezultata",
+      "viewList": "Lista",
+      "viewMap": "Mapa"
     },
     "empty": {
       "title": "Nema kuća za ovu pretragu",
@@ -150,6 +156,10 @@
       },
       "clearAll": "Obrišite sve filtere",
       "suggestions": "Možda vam se dopadne"
+    },
+    "map": {
+      "open": "Pogledajte kuću",
+      "noPin": "{count, plural, one {# kuća nema} few {# kuće nemaju} other {# kuća nema}} tačnu lokaciju i nije na mapi."
     }
   },
   "whyVikendly": {
@@ -226,7 +236,10 @@
         "text": "Svratimo do vas, upoznamo se, a kuća dobija oznaku „Provereno uživo“ koja gostima uliva poverenje."
       }
     },
-    "moreLink": "Sve o izdavanju preko Vikendly-ja"
+    "moreLink": "Sve o izdavanju preko Vikendly-ja",
+    "bannerTitle": "Imate vikend kuću?",
+    "bannerText": "Izdajte je preko Vikendly-ja. Oglašavanje je besplatno, mi dovodimo goste, a vi odlučujete o cenama i terminima.",
+    "bannerButton": "Izdajte svoju kuću"
   },
   "footer": {
     "tagline": "Pažljivo odabrane vikend kuće u Srbiji i regionu.",
@@ -328,7 +341,10 @@
       "dayGuests": "tokom dana do {count, plural, one {# osobe} few {# osobe} other {# osoba}}",
       "dayGuestsNote": "Tokom dana može doći do {day} osoba; noćenje je za najviše {sleeps}.",
       "partyDate": "Datum žurke",
-      "linePartyOnly": "{name}: žurka, {count, plural, one {# osoba} few {# osobe} other {# osoba}}"
+      "linePartyOnly": "{name}: žurka, {count, plural, one {# osoba} few {# osobe} other {# osoba}}",
+      "unitPrice": "{price} po noći",
+      "suggested": "Predložili smo najpovoljniji smeštaj za {count, plural, one {# osobu} few {# osobe} other {# osoba}}. Možete ga promeniti.",
+      "venueGuests": "Broj osoba na žurci"
     },
     "sleeps": "Noćenje: {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}",
     "dayCapacity": "Žurka ili druženje: {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}",
@@ -371,7 +387,8 @@
         "tooMany": "Poslali ste više upita za kratko vreme. Sačekajte malo pa pokušajte ponovo, ili nas pozovite.",
         "units": "Proverite izbor smeštaja.",
         "party": "Proverite broj osoba na žurci."
-      }
+      },
+      "contactTitle": "Vaši podaci"
     },
     "map": {
       "iframeTitle": "Mapa: {name}",
@@ -393,7 +410,9 @@
       "partyOnly": "Samo za žurke, bez noćenja",
       "partyUpTo": "Do {count, plural, one {# osobe} few {# osobe} other {# osoba}} na žurci",
       "dayGuests": "Tokom dana do {count, plural, one {# osobe} few {# osobe} other {# osoba}}",
-      "partiesOk": "Žurke dozvoljene"
+      "partiesOk": "Žurke dozvoljene",
+      "perNightSame": "{price} po noći",
+      "perNightHintSame": "ista cena radnim danima i vikendom"
     },
     "rules": {
       "partyPrice": "Cena žurke (radnim danima / vikend): {levels}. Plaća se jednom po boravku."
@@ -405,6 +424,22 @@
       "starsLabel": "{average} od 5 zvezdica",
       "count": "{count, plural, one {# ocena} few {# ocene} other {# ocena}}",
       "verifiedOnly": "samo gosti koji su boravili ovde"
+    },
+    "rulesTimesUnit": "{unit}: dolazak od {in}, odlazak do {out}",
+    "partiesSome": "Žurke su dozvoljene samo u: {units}",
+    "petsSome": "Kućni ljubimci su dozvoljeni samo u: {units}",
+    "smokingSome": "Pušenje je dozvoljeno samo u: {units}",
+    "amenitiesMore": "Prikaži sve ({count})",
+    "amenitiesLess": "Prikaži manje",
+    "nearbyTitle": "Udaljenosti i okolina",
+    "nav": {
+      "label": "Delovi stranice",
+      "about": "Opis",
+      "amenities": "Sadržaj",
+      "units": "Delovi",
+      "rules": "Pravila",
+      "reviews": "Utisci",
+      "location": "Lokacija"
     }
   },
   "datePicker": {
