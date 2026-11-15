@@ -23,9 +23,12 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Keep anchored sections from hiding under the sticky header */
-section[id] {
-  scroll-margin-top: 5rem;
+/* Keep anchored sections from hiding under the sticky header. In the base layer so a page's
+   own scroll-mt-* class wins (the house page needs more room for its sticky section links). */
+@layer base {
+  section[id] {
+    scroll-margin-top: 5rem;
+  }
 }
 
 @utility no-scrollbar {
