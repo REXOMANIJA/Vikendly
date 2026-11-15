@@ -20,7 +20,7 @@ P2 = can come after launch
 | — | P1 | **Commission %** on the owners page (now "agreed when we meet"). | Owner decides whether to show it. |
 | — | P1 | **Legal entity** in privacy policy and terms (now "Vikendly tim"). | Business name, address, PIB, MB once registered → `lib/site.ts` + `content/legal.ts`. Legal texts should be read by a lawyer. |
 | — | P1 | **Real houses with photos.** Only 1 published house (Kutak u Vraniću); 12 sample houses are hidden in admin. | Owner adds houses. Sample houses can be deleted in admin → Kuće → "Skrivene". |
-| — | P1 | **Demo houses (0018):** 5 example houses (Zlatibor, Kopaonik, Fruška Gora, Ripanj, Drina) to show future owners. Not real places. | Owner runs `0018_demo_houses.sql` in Supabase. Delete them when real houses arrive (command at the top of the file). |
+| — | P1 | **Demo houses (0018 run, 0019 new):** 10 example houses to show future owners. Not real places. House pages no longer show the address, only the area and the map pin. | Owner runs `0019_more_demo_houses.sql` in Supabase. Delete demo houses when real ones arrive (commands at the top of 0018 and 0019). |
 
 ### Code work, no input needed
 

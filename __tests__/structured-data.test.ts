@@ -27,7 +27,7 @@ describe('house structured data (Google)', () => {
     expect(data).toMatchObject({
       '@type': 'LodgingBusiness',
       name: 'Kuća na Tari',
-      address: { streetAddress: 'Kaluđerske bare', addressLocality: 'Tara', addressCountry: 'RS' },
+      address: { addressLocality: 'Tara', addressCountry: 'RS' },
       geo: { latitude: 43.9, longitude: 19.5 },
       priceRange: '€80+',
     });

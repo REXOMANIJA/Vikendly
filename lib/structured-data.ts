@@ -36,7 +36,6 @@ export function houseStructuredData({
     image: house.photos.slice(0, 8).map(absolute),
     address: {
       '@type': 'PostalAddress',
-      streetAddress: house.location.address,
       ...(destinationName ? { addressLocality: destinationName } : {}),
       ...(country && COUNTRY[country] ? { addressCountry: COUNTRY[country] } : {}),
     },

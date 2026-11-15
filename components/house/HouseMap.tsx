@@ -4,7 +4,7 @@ import { mapDirectionsUrl, mapEmbedUrl, mapOpenUrl } from '@/lib/maps';
 
 /**
  * Google map with a pin on the house, plus "open in Google Maps" and "directions" buttons.
- * Uses exact coordinates when the admin set them, otherwise the address.
+ * Uses exact coordinates when the admin set them, otherwise the address (which is never shown as text).
  */
 export default function HouseMap({
   name,
@@ -46,8 +46,9 @@ export default function HouseMap({
             <MapPin className="size-5" aria-hidden />
           </span>
           <div>
-            <p className="font-medium text-text">{address}</p>
-            {placeLabel && <p className="text-sm text-text/60">{placeLabel}</p>}
+            {/* The address itself is not shown (only used to place the pin when there are no
+                coordinates); guests see the area, the team gives the exact address after booking */}
+            {placeLabel && <p className="font-medium text-text">{placeLabel}</p>}
             {!exact && <p className="mt-1 text-xs text-text/60">{t('approximate')}</p>}
           </div>
         </div>

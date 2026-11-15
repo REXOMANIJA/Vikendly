@@ -20,7 +20,7 @@ Supabase. Alerts: Telegram bot @VikendlyBot.
   words, no jargon. Show results (what changed on the site), not code.
 - **"Save and upload" = commit and push to `main`.** Never commit or push without being asked.
   Before pushing, scan the staged diff for secrets (Telegram token, keys) and leftover `TEMP-PREVIEW`.
-- **Database changes:** write a new numbered file in `supabase/migrations/` (next is `0019_…`), make
+- **Database changes:** write a new numbered file in `supabase/migrations/` (next is `0020_…`), make
   it safe to run twice (`if not exists`, `create or replace`, guarded `update`s), and ask the owner
   to run it in Supabase → SQL Editor. Never assume it ran: check with a read-only REST query using
   the publishable key from `.env.local` (e.g. `curl "$URL/rest/v1/table?select=col&limit=1" -H "apikey: $KEY"`).
@@ -89,7 +89,7 @@ react-day-picker 10 · lucide-react (no brand icons) · Jest · Vercel Analytics
 
 ## Database status
 
-Migrations **0001–0012 have all been run** in Supabase (checked 12 Nov 2026). **0013 (venues, reviews) run 13 Nov. 0014 (free-text rules) run (checked 13 Nov). 0015 (nearby text), 0016 (holidays, special prices) and 0017 (holiday read fix, party holiday prices) run 13 Nov. 0018 (5 demo houses, written 16 Nov) – check whether it ran.** Tables of note:
+Migrations **0001–0012 have all been run** in Supabase (checked 12 Nov 2026). **0013 (venues, reviews) run 13 Nov. 0014 (free-text rules) run (checked 13 Nov). 0015 (nearby text), 0016 (holidays, special prices) and 0017 (holiday read fix, party holiday prices) run 13 Nov. 0018 (5 demo houses) run 16 Nov. 0019 (5 more demo houses, written 16 Nov) – check whether it ran.** Tables of note:
 `houses`, `house_units`, `house_price_tiers`, `house_photos`, `booking_requests` (with `details`,
 `party_guests`), `reviews` (0013: token link per confirmed booking, approved before public), `owner_applications`, `rate_limits`, `destinations` (id = URL slug, fixed after
 creation). Save function: `admin_save_house(jsonb)` – redefine it fully in any migration that adds
