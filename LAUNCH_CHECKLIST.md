@@ -21,6 +21,7 @@ P2 = can come after launch
 | — | P1 | **Legal entity** in privacy policy and terms (now "Vikendly tim"). | Business name, address, PIB, MB once registered → `lib/site.ts` + `content/legal.ts`. Legal texts should be read by a lawyer. |
 | — | P1 | **Real houses with photos.** Only 1 published house (Kutak u Vraniću); 12 sample houses are hidden in admin. | Owner adds houses. Sample houses can be deleted in admin → Kuće → "Skrivene". |
 | — | P1 | **Demo houses (0018 run, 0019 new):** 10 example houses to show future owners. Not real places. House pages no longer show the address, only the area and the map pin. | Owner runs `0019_more_demo_houses.sql` in Supabase. Delete demo houses when real ones arrive (commands at the top of 0018 and 0019). |
+| — | P1 | **Partner houses (0020):** 5 real houses (Miris Bora, Tarski proplanak, Konak kod Munje on Tara; Dobrila, Zlatiborski katuni on Zlatibor), owners agreed. Prices are Booking.com prices for 2 people. | Owner runs `0020_partner_houses.sql`, then confirms prices, capacity and owner phone numbers in admin. |
 
 ### Code work, no input needed
 

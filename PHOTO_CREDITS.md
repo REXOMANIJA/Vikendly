@@ -63,3 +63,9 @@ Each page is `https://unsplash.com/photos/<code>`.
 | Planinska vila Jahorina (Jahorina) | `jahorina-1…4.jpg` | BTQWx51keUY, ZxsCUanD3Io, QvT33bwGnIM, zVwBT5i2SoE |
 | Seoska kuća Šargan (Mokra Gora) | `mokragora-1…3.jpg` | kj1R2T69jhQ, FPhpVpwUviA, qTZGn2Sk_Us |
 | Brvnara pod Durmitorom (Durmitor) | `durmitor-1…4.jpg` | qkJhJOefs-Y, 6pR1UB6ihsQ, vxjVQqhiKNA, xUhzoprik7k |
+
+## Partner houses (files in `public/images/houses/<house>/`, migration `0020_partner_houses.sql`)
+
+Real houses listed with their owners' permission (16 Nov 2026). Photos are the owners' own,
+taken from each property's Booking.com page (15 per house, 01 = cover): Brvnara Miris Bora,
+Brvnara Tarski proplanak, Konak kod Munje, Dobrila apartmani, Zlatiborski katuni.
