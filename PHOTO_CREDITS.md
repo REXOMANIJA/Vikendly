@@ -37,3 +37,19 @@ Not a photo: the Vlasina destination is an illustration (`public/images/destinat
 because no free photo of Vlasina was available.
 
 House photos must always be real photos of the house, supplied by the owner.
+
+## Demo houses (files in `public/images/demo/`, migration `0018_demo_houses.sql`)
+
+Five example listings to show future owners how a house page looks. They are **not real places**;
+the photos are free Unsplash photos (checked "Free Photo" on each page, 16 Nov 2026). Delete the
+houses and this folder once real houses replace them (the delete command is at the top of 0018).
+
+| House | Files | Unsplash pages |
+|---|---|---|
+| Brvnara Jelova Kosa (Zlatibor) | `zlatibor-1…4.jpg` | tm1qqeuhbLE, D-IPwXyS9J4, DNt5A4T0-Rs, rP0OTFdVaak |
+| Apartman Sunčani vrh (Kopaonik) | `kopaonik-1…3.jpg` | gB7Pk-j-Pg0, qis-hFSFILQ, r3dQ0K3nDzg |
+| Kuća među vinogradima (Fruška Gora) | `fruska-1…4.jpg` | zpuIXbRXEfE, WHwu_Pzo37s, gbplWlQZMco, eyqzXh5unoc |
+| Vila sa bazenom Ripanj (Beograd) | `avala-1…5.jpg` | 04AR3aq4NfE, LFTBo4Hu44E, qlE_rpH3_1c, kzX1Vv6-Wgk, IoGqOxDrCvg |
+| Brvnara na obali Drine (Drina) | `drina-1…4.jpg` | GEtyMJ4ffN8, 24ijoyY0Hrs, Uoh1UV2cAEs, JCIMLvIrZJI |
+
+Each page is `https://unsplash.com/photos/<code>`.
