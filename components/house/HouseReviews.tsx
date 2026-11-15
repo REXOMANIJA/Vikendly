@@ -21,7 +21,7 @@ export default async function HouseReviews({
   const average = summary.average.toLocaleString(locale === 'en' ? 'en' : 'sr-Latn', { minimumFractionDigits: 1 });
 
   return (
-    <section id="ocene" className="scroll-mt-32">
+    <section id="ocene" className="scroll-mt-40">
       <h2 className="font-serif text-2xl font-bold text-primary">{t('title')}</h2>
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <span className="font-serif text-4xl font-bold text-primary">{average}</span>

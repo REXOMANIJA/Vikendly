@@ -269,7 +269,7 @@ export default async function HousePage({ params }: { params: Params }) {
             {/* Desktop: links to each part of the page, stay under the header while scrolling */}
             <nav
               aria-label={t('nav.label')}
-              className="sticky top-16 z-20 -mx-2 -mb-4 hidden border-b border-primary/10 bg-background/95 px-2 backdrop-blur lg:block"
+              className="sticky top-16 z-20 -mx-2 hidden border-b border-primary/10 bg-background/95 px-2 backdrop-blur lg:block"
             >
               <ul className="flex gap-1">
                 {sectionLinks.map((s) => (
@@ -295,7 +295,7 @@ export default async function HousePage({ params }: { params: Params }) {
                 </div>
               </section>
             )}
-            <section id="opis" className="scroll-mt-32">
+            <section id="opis" className="scroll-mt-40">
               <h2 className="font-serif text-2xl font-bold text-primary">{t('aboutTitle')}</h2>
               <p className="mt-3 text-lg leading-relaxed text-text/85">
                 {house.description[locale as Locale]}
@@ -303,7 +303,7 @@ export default async function HousePage({ params }: { params: Params }) {
             </section>
 
             {house.amenities.length > 0 && (
-              <section id="sadrzaj" className="scroll-mt-32">
+              <section id="sadrzaj" className="scroll-mt-40">
                 <h2 className="font-serif text-2xl font-bold text-primary">{t('amenitiesTitle')}</h2>
                 <AmenityList
                   moreLabel={t('amenitiesMore', { count: house.amenities.length })}
@@ -323,7 +323,7 @@ export default async function HousePage({ params }: { params: Params }) {
             )}
 
             {withUnits && (
-              <div id="delovi" className="scroll-mt-32">
+              <div id="delovi" className="scroll-mt-40">
                 <HouseUnits units={house.units!} />
               </div>
             )}
@@ -341,7 +341,7 @@ export default async function HousePage({ params }: { params: Params }) {
               </section>
             )}
 
-            <section id="pravila" className="scroll-mt-32">
+            <section id="pravila" className="scroll-mt-40">
               <h2 className="font-serif text-2xl font-bold text-primary">{t('rulesTitle')}</h2>
               <ul className="mt-4 space-y-3">
                 {ruleSummary.times.map((time) => (
@@ -391,7 +391,7 @@ export default async function HousePage({ params }: { params: Params }) {
 
             {house.rating && <HouseReviews reviews={reviews} summary={house.rating} locale={locale} />}
 
-            <section id="lokacija" className="scroll-mt-32">
+            <section id="lokacija" className="scroll-mt-40">
               <h2 className="mb-4 font-serif text-2xl font-bold text-primary">{t('locationTitle')}</h2>
               <HouseMap
                 name={house.name}
