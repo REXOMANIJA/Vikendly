@@ -89,7 +89,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const destination = await getDestinationById(house.destinationId);
   const description = house.description[locale as Locale];
 
-  // Each language has its own URL (/sr/kuce/… and /en/houses/…), so tell Google about both
+  // Each language has its own URL (/kuce/… and /en/houses/…), so tell Google about both
   const url = (l: Locale) => getPathname({ locale: l, href: { pathname: '/houses/[slug]', params: { slug } } });
 
   return {

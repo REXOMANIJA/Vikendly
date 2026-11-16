@@ -154,7 +154,7 @@ export default function HolidayManager({
                   <input id="hol-name-sr" className={input} required maxLength={80} value={editing.name_sr}
                     onChange={(e) => setEditing({ ...editing, name_sr: e.target.value })} />
                   <p className="mt-1 text-xs text-text/60">
-                    Adresa: …/sr/praznici/<strong>{editing.id ? holidays.find((h) => h.id === editing.id)?.slug : slugify(editing.name_sr)}</strong>
+                    Adresa: …/praznici/<strong>{editing.id ? holidays.find((h) => h.id === editing.id)?.slug : slugify(editing.name_sr)}</strong>
                     {editing.id ? ' (ne menja se)' : ''}
                   </p>
                 </div>
@@ -277,7 +277,7 @@ export default function HolidayManager({
                 <button type="button" onClick={() => startEdit(h)} aria-label={`Izmenite ${h.name_sr}`}
                   className="rounded-lg p-2 text-primary hover:bg-primary/10"><Pencil className="size-4" /></button>
                 {h.is_active && !over && (
-                  <a href={`/sr/praznici/${h.slug}`} target="_blank" aria-label="Otvorite na sajtu"
+                  <a href={`/praznici/${h.slug}`} target="_blank" aria-label="Otvorite na sajtu"
                     className="rounded-lg p-2 text-primary hover:bg-primary/10"><ExternalLink className="size-4" /></a>
                 )}
                 <button type="button" onClick={() => remove(h)} disabled={pending} aria-label={`Obrišite ${h.name_sr}`}

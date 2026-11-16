@@ -26,12 +26,16 @@ const nextConfig = {
   poweredByHeader: false,
   async redirects() {
     return [
-      // The Serbian search page moved from /sr/search to /sr/pretraga (shared links keep working;
-      // the ?destination=… part is carried over)
-      { source: '/sr/search', destination: '/sr/pretraga', permanent: true },
-      // People who shorten a house address (/sr/kuce/ime → /sr/kuce) land on all houses, not a 404
-      { source: '/sr/kuce', destination: '/sr/pretraga', permanent: false },
-      { source: '/sr/houses', destination: '/sr/pretraga', permanent: false },
+      // Serbian pages have no /sr prefix any more (vikendly.com/kuce/…); other old /sr/… links
+      // are redirected by next-intl. The Serbian search page also moved from /search to /pretraga
+      // (shared links keep working; the ?destination=… part is carried over)
+      { source: '/sr/search', destination: '/pretraga', permanent: true },
+      { source: '/search', destination: '/pretraga', permanent: true },
+      // People who shorten a house address (/kuce/ime → /kuce) land on all houses, not a 404
+      { source: '/sr/kuce', destination: '/pretraga', permanent: false },
+      { source: '/kuce', destination: '/pretraga', permanent: false },
+      { source: '/sr/houses', destination: '/pretraga', permanent: false },
+      { source: '/houses', destination: '/pretraga', permanent: false },
       { source: '/en/houses', destination: '/en/search', permanent: false },
       { source: '/en/kuce', destination: '/en/search', permanent: false },
       { source: '/en/pretraga', destination: '/en/search', permanent: false },

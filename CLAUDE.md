@@ -86,6 +86,8 @@ react-day-picker 10 · lucide-react (no brand icons) · Jest · Vercel Analytics
   shows on the homepage (`HolidayOffer`) and at `/sr/praznici/[slug]`. The site has no availability
   calendar: the team ticks houses they confirmed are free.
 - Everyone starts on Serbian (`localeDetection: false` in `i18n/routing.ts`); EN only via the switch.
+  Serbian URLs have **no prefix** (`localePrefix: 'as-needed'`: `/kuce/…`, `/pretraga`), English is `/en/…`;
+  old `/sr/…` links redirect. Admin links to the public site use plain `/kuce/…`.
 
 ## Database status
 

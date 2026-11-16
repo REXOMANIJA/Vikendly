@@ -3,7 +3,7 @@ import createMiddleware from 'next-intl/middleware';
 import { createServerClient } from '@supabase/ssr';
 import { routing } from './i18n/routing';
 
-// Public site: redirects "/" to /sr or /en and translates localized URLs (/sr/kuce/… → houses/[slug]).
+// Public site: serves Serbian without a prefix and English under /en, and translates localized URLs (/kuce/… → houses/[slug]).
 const handleI18n = createMiddleware(routing);
 
 /**

@@ -38,6 +38,12 @@ Nothing open. Migrations 0015–0017 have run (13 Nov). Holiday "Nova godina 202
 
 ---
 
+## Done (16 Nov 2026)
+
+- **Serbian addresses without `/sr`:** vikendly.com, vikendly.com/kuce/…, /pretraga…; English stays under `/en/…`.
+  Old `/sr/…` links redirect to the same page. Sitemap, canonicals and admin "open on site" links updated.
+  After deploy: resubmit `sitemap.xml` in Google Search Console.
+
 ## Done (13 Nov 2026, fourth round)
 
 - **UI/UX tasks** U1–U3, U6, U8–U13, U15–U17, U21 (see `UI_UX_TASKS.md`): booking box dates-first with suggested units, combined house rules, compact amenities, section links, "Udaljenosti i okolina" (0015), sticky search filters, `/sr/pretraga` + redirects, results map, owner banner on the homepage.

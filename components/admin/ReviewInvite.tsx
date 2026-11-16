@@ -39,7 +39,7 @@ export default function ReviewInvite({
   const [pending, startTransition] = useTransition();
 
   const link = review
-    ? `${site.url}${locale === 'en' ? `/en/review/${review.token}` : `/sr/ocena/${review.token}`}`
+    ? `${site.url}${locale === 'en' ? `/en/review/${review.token}` : `/ocena/${review.token}`}`
     : '';
   const firstName = guestName.trim().split(/\s+/)[0];
   const message =

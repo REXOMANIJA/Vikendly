@@ -726,7 +726,7 @@ export async function saveHoliday(input: HolidayInput): Promise<ActionResult<{ i
     const { error } = await supabase.from('holidays').update(fields).eq('id', id);
     if (error) return err(`Čuvanje nije uspelo: ${missing(error.message)}`);
   } else {
-    // The address (/sr/praznici/nova-godina-2027) comes from the name and stays fixed afterwards
+    // The address (/praznici/nova-godina-2027) comes from the name and stays fixed afterwards
     const slug = slugify(name_sr);
     if (!slug) return err('Naziv mora sadržati bar jedno slovo.');
     const { data, error } = await supabase.from('holidays').insert({ ...fields, slug }).select('id').single();

@@ -142,7 +142,7 @@ export default function HouseList({
               <div className="flex gap-2">
                 {h.is_published && (
                   <a
-                    href={`/sr/kuce/${h.slug}`}
+                    href={`/kuce/${h.slug}`}
                     target="_blank"
                     className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm hover:bg-primary/10"
                   >

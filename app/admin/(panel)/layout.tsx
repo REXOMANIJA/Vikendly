@@ -72,7 +72,7 @@ export default async function AdminPanelLayout({ children }: { children: React.R
                 </span>
               )}
             </Link>
-            <a href="/sr" target="_blank" className={nav}><ExternalLink className="size-4" aria-hidden /> Sajt</a>
+            <a href="/" target="_blank" className={nav}><ExternalLink className="size-4" aria-hidden /> Sajt</a>
           </nav>
           <span className="hidden text-sm text-text/60 sm:inline">{admin.email}</span>
           <form action={signOut}>

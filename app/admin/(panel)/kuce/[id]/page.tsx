@@ -26,7 +26,7 @@ export default async function EditHousePage({
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-serif text-3xl font-bold text-primary">{house.name}</h1>
         {house.is_published && (
-          <a href={`/sr/kuce/${house.slug}`} target="_blank"
+          <a href={`/kuce/${house.slug}`} target="_blank"
             className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm hover:bg-primary/10">
             <ExternalLink className="size-4" aria-hidden /> Pogledajte na sajtu
           </a>

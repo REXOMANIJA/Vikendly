@@ -47,7 +47,7 @@ export default function ReviewRow({ review }: { review: AdminReview }) {
           <p className="flex items-center gap-2 font-semibold text-primary">
             {review.house_name}
             {review.house_slug && (
-              <a href={`/sr/kuce/${review.house_slug}#ocene`} target="_blank" className="text-text/50 hover:text-primary" aria-label="Otvorite kuću na sajtu">
+              <a href={`/kuce/${review.house_slug}#ocene`} target="_blank" className="text-text/50 hover:text-primary" aria-label="Otvorite kuću na sajtu">
                 <ExternalLink className="size-3.5" />
               </a>
             )}

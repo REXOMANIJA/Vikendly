@@ -66,7 +66,7 @@ export default function BookingRequestRow({ request }: { request: BookingRequest
             <Home className="size-4" aria-hidden />
             {request.house_name}
             {request.house_slug && (
-              <a href={`/sr/kuce/${request.house_slug}`} target="_blank" className="text-text/50 hover:text-primary" aria-label="Otvorite kuću na sajtu">
+              <a href={`/kuce/${request.house_slug}`} target="_blank" className="text-text/50 hover:text-primary" aria-label="Otvorite kuću na sajtu">
                 <ExternalLink className="size-3.5" />
               </a>
             )}

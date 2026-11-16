@@ -17,7 +17,7 @@ function Switcher({ variant }: { variant: 'light' | 'dark' }) {
   const switchLocale = (newLocale: Locale) => {
     const query = Object.fromEntries(searchParams.entries());
     // Keeps the current page (incl. its [slug]) and search filters; only the language changes,
-    // e.g. /sr/kuce/vila-ribnica → /en/houses/vila-ribnica
+    // e.g. /kuce/vila-ribnica → /en/houses/vila-ribnica
     router.replace(
       // @ts-expect-error -- pathname and params always belong together here
       { pathname, params, query },

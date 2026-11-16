@@ -361,7 +361,7 @@ export default function HouseForm({
           <div id="field-slug" className="md:col-span-2">
             <label htmlFor="slug" className={label}>Adresa stranice</label>
             <div className="flex items-center rounded-lg border border-gray-300 bg-background focus-within:ring-2 focus-within:ring-primary">
-              <span className="pl-3 text-sm text-text/60 whitespace-nowrap">vikendly.com/sr/kuce/</span>
+              <span className="pl-3 text-sm text-text/60 whitespace-nowrap">vikendly.com/kuce/</span>
               <input id="slug" className="h-11 w-full bg-transparent px-1 focus:outline-none" value={form.slug}
                 onChange={(e) => { setSlugTouched(true); set('slug', slugify(e.target.value)); }} required />
             </div>

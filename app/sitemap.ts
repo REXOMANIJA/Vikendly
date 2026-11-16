@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const housePages = (await getHouses()).flatMap((house) =>
     locales.map((locale) => ({
-      // /sr/kuce/vila-ribnica, /en/houses/vila-ribnica
+      // /kuce/vila-ribnica, /en/houses/vila-ribnica
       url:
         baseUrl +
         getPathname({ locale, href: { pathname: '/houses/[slug]', params: { slug: house.slug } } }),
@@ -25,19 +25,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...locales.map((locale) => ({
-      url: `${baseUrl}/${locale}`,
+      // vikendly.com (Serbian), vikendly.com/en
+      url: locale === 'sr' ? baseUrl : `${baseUrl}/${locale}`,
       lastModified: now,
       changeFrequency: 'daily' as const,
       priority: 1,
     })),
     ...locales.map((locale) => ({
-      // /sr/pretraga, /en/search
+      // /pretraga, /en/search
       url: baseUrl + getPathname({ locale, href: '/search' }),
       lastModified: now,
       changeFrequency: 'daily' as const,
       priority: 0.8,
     })),
-    // Holiday offers while they are on (/sr/praznici/nova-godina-2027)
+    // Holiday offers while they are on (/praznici/nova-godina-2027)
     ...(await getActiveHolidays()).flatMap((holiday) =>
       locales.map((locale) => ({
         url: baseUrl + getPathname({ locale, href: { pathname: '/holidays/[slug]', params: { slug: holiday.slug } } }),
@@ -47,7 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }))
     ),
     ...locales.map((locale) => ({
-      // /sr/destinacije, /en/destinations
+      // /destinacije, /en/destinations
       url: baseUrl + getPathname({ locale, href: '/destinations' }),
       lastModified: now,
       changeFrequency: 'weekly' as const,
