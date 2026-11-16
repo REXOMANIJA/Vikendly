@@ -69,3 +69,5 @@ Each page is `https://unsplash.com/photos/<code>`.
 Real houses listed with their owners' permission (16 Nov 2026). Photos are the owners' own,
 taken from each property's Booking.com page (15 per house, 01 = cover): Brvnara Miris Bora,
 Brvnara Tarski proplanak, Konak kod Munje, Dobrila apartmani, Zlatiborski katuni.
+More partner houses (migration `0021_more_partner_houses.sql`, same source and permission):
+Vila Lučić, Blue River – sojenica na Dunavu, Etno selo Komarnica.
