@@ -1,5 +1,6 @@
 import 'server-only';
 import { createAdminClient } from '@/lib/supabase/server';
+import { houseHealth, type HouseHealth } from '@/lib/admin-health';
 
 /**
  * Reads for the admin panel. Uses the admin's own session, so it also sees
@@ -20,6 +21,10 @@ export type AdminHouseListItem = {
   verified_at: string | null;
   updated_at: string;
   cover: string | null;
+  /** How complete the listing is and what's missing (lib/admin-health.ts) */
+  health: HouseHealth;
+  /** Booking requests in the last 90 days */
+  requests90: number;
 };
 
 export type AdminHouse = {
@@ -129,6 +134,10 @@ export type BookingRequest = {
   house_id: string | null;
   house_name: string;
   house_slug: string | null;
+  /** Written address, for sending to the guest after a confirmed booking (never on the site) */
+  house_address: string | null;
+  /** Exact map pin of the house (admin only) */
+  house_pin: { lat: number; lng: number } | null;
   owner_phone: string | null;
   check_in: string; // yyyy-MM-dd
   check_out: string;
@@ -166,14 +175,14 @@ export async function listBookingRequests(): Promise<BookingRequest[]> {
   const query = (withReviews: boolean) =>
     supabase
       .from('booking_requests')
-      .select(`*, houses(slug, house_owner_contacts(phone))${withReviews ? ', reviews(token, status, rating)' : ''}`)
+      .select(`*, houses(slug, address, lat, lng, house_owner_contacts(phone))${withReviews ? ', reviews(token, status, rating)' : ''}`)
       .order('created_at', { ascending: false });
   let { data, error } = await query(true);
   // Before migration 0013 there is no reviews table
   if (error && /reviews/.test(error.message)) ({ data, error } = await query(false));
   if (error) throw new Error(error.message);
-  type Row = Omit<BookingRequest, 'house_slug' | 'owner_phone' | 'review'> & {
-    houses: { slug: string; house_owner_contacts: { phone: string } | { phone: string }[] | null } | null;
+  type Row = Omit<BookingRequest, 'house_slug' | 'house_address' | 'house_pin' | 'owner_phone' | 'review'> & {
+    houses: { slug: string; address: string; lat: number | null; lng: number | null; house_owner_contacts: { phone: string } | { phone: string }[] | null } | null;
     reviews?: BookingReview | BookingReview[] | null;
   };
   return (data as unknown as Row[]).map(({ houses, reviews, ...r }) => {
@@ -182,6 +191,8 @@ export async function listBookingRequests(): Promise<BookingRequest[]> {
       ...r,
       quoted_total: Number(r.quoted_total),
       house_slug: houses?.slug ?? null,
+      house_address: houses?.address?.trim() || null,
+      house_pin: houses?.lat != null && houses?.lng != null ? { lat: houses.lat, lng: houses.lng } : null,
       owner_phone: (Array.isArray(contact) ? contact[0]?.phone : contact?.phone) ?? null,
       review: (Array.isArray(reviews) ? reviews[0] : reviews) ?? null,
     };
@@ -260,16 +271,58 @@ export async function getOwnerApplication(id: string): Promise<OwnerApplication 
 
 export async function listHousesForAdmin(): Promise<AdminHouseListItem[]> {
   const supabase = await createAdminClient();
-  const { data, error } = await supabase
-    .from('houses')
-    .select('id, slug, name, destination_id, address, capacity, day_capacity, weekday_price, is_published, featured_rank, verified_at, updated_at, house_photos(url, sort_order)')
-    .order('name');
+  const since = new Date(Date.now() - 90 * 86400000).toISOString();
+  const [{ data, error }, requests] = await Promise.all([
+    supabase
+      .from('houses')
+      .select(
+        'id, slug, name, destination_id, address, capacity, day_capacity, weekday_price, is_published, featured_rank, verified_at, updated_at, ' +
+          'description_sr, description_en, lat, nearby_sr, rules_sr, house_photos(url, sort_order), house_owner_contacts(phone)'
+      )
+      .order('name'),
+    supabase.from('booking_requests').select('house_id').gte('created_at', since),
+  ]);
   if (error) throw new Error(error.message);
-  return data.map(({ house_photos, ...h }) => ({
-    ...h,
-    weekday_price: Number(h.weekday_price),
-    cover: [...house_photos].sort((a, b) => a.sort_order - b.sort_order)[0]?.url ?? null,
-  }));
+  const requestCount: Record<string, number> = {};
+  for (const r of requests.data ?? []) if (r.house_id) requestCount[r.house_id] = (requestCount[r.house_id] ?? 0) + 1;
+
+  type Row = Omit<AdminHouseListItem, 'cover' | 'health' | 'requests90'> & {
+    description_sr: string | null;
+    description_en: string | null;
+    lat: number | null;
+    nearby_sr: string | null;
+    rules_sr: string | null;
+    house_photos: { url: string; sort_order: number }[];
+    house_owner_contacts: { phone: string } | { phone: string }[] | null;
+  };
+  return (data as unknown as Row[]).map(
+    ({ house_photos, house_owner_contacts, description_sr, description_en, lat, nearby_sr, rules_sr, ...h }) => {
+      const contact = Array.isArray(house_owner_contacts) ? house_owner_contacts[0] : house_owner_contacts;
+      return {
+        ...h,
+        weekday_price: Number(h.weekday_price),
+        cover: [...house_photos].sort((a, b) => a.sort_order - b.sort_order)[0]?.url ?? null,
+        health: houseHealth({
+          photos: house_photos.length,
+          description_sr,
+          description_en,
+          lat,
+          nearby_sr,
+          rules_sr,
+          owner_phone: contact?.phone ?? null,
+        }),
+        requests90: requestCount[h.id] ?? 0,
+      };
+    }
+  );
+}
+
+/** Approved guest reviews: average and count (dashboard) */
+export async function reviewSummary(): Promise<{ average: number; count: number } | null> {
+  const supabase = await createAdminClient();
+  const { data, error } = await supabase.from('reviews').select('rating').eq('status', 'approved');
+  if (error || !data?.length) return null;
+  return { average: data.reduce((sum, r) => sum + Number(r.rating), 0) / data.length, count: data.length };
 }
 
 export async function getHouseForAdmin(id: string): Promise<AdminHouse | null> {

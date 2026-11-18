@@ -9,7 +9,7 @@ export default async function AdminHousesPage() {
   return (
     <>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <h1 className="font-serif text-3xl font-bold text-primary">Kuće</h1>
+        <h1 className="font-serif text-3xl font-bold text-primary md:text-4xl">Kuće</h1>
         <Link
           href="/admin/kuce/nova"
           className="inline-flex items-center gap-2 rounded-lg bg-accent-dark px-4 py-2.5 font-medium text-white hover:bg-primary"

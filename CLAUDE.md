@@ -48,7 +48,10 @@ is committed in `public/maplibre/`; after updating maplibre-gl run `node scripts
   `/za-vlasnike`, `/kontakt`, `/cesta-pitanja`, `/uslovi-koriscenja`, `/privatnost`). Always link with internal names
   via `Link` from `@/i18n/navigation`. `[...rest]` + `not-found.tsx` = site 404; `error.tsx` = error page;
   `template.tsx` = page-change animations (View Transitions).
-- `app/admin/…` admin (Serbian only): Upiti (requests), Kuće, Destinacije, Prijave vlasnika.
+- `app/admin/…` admin (Serbian only): sidebar (`components/admin/AdminNav.tsx`), home = Pregled dashboard
+  (`app/admin/(panel)/page.tsx`: to-do list, numbers, requests per week), Upiti (status buttons, search, "send
+  address" WhatsApp message for confirmed stays), Kuće (cards with listing completeness, `lib/admin-health.ts`),
+  Destinacije, Praznici, Prijave vlasnika, Ocene. Admin text helpers: `lib/admin-format.ts`.
   Server actions in `app/admin/actions.ts`; reads in `lib/admin-data.ts`.
 - `lib/data.ts` – all public data access (published houses loaded once per request). In tests
   (`NODE_ENV=test`) it returns sample data from `/data`.
@@ -95,7 +98,7 @@ is committed in `public/maplibre/`; after updating maplibre-gl run `node scripts
 
 ## Database status
 
-Migrations **0001–0012 have all been run** in Supabase (checked 12 Nov 2026). **0013 (venues, reviews) run 13 Nov. 0014 (free-text rules) run (checked 13 Nov). 0015 (nearby text), 0016 (holidays, special prices) and 0017 (holiday read fix, party holiday prices) run 13 Nov. 0018 (5 demo houses) run 16 Nov. 0019 (5 more demo houses) run 16 Nov. 0020 (5 real partner houses from Booking.com) and 0021 (3 more: Vila Lučić, Blue River, Etno selo Komarnica), run 16 Nov. 0022 (deleted the 10 demo houses) run 16 Nov; demo photos removed.** **0023 (anon may not read houses.address: column-level grant) written 18 Nov, NOT yet run – check.** Tables of note:
+Migrations **0001–0012 have all been run** in Supabase (checked 12 Nov 2026). **0013 (venues, reviews) run 13 Nov. 0014 (free-text rules) run (checked 13 Nov). 0015 (nearby text), 0016 (holidays, special prices) and 0017 (holiday read fix, party holiday prices) run 13 Nov. 0018 (5 demo houses) run 16 Nov. 0019 (5 more demo houses) run 16 Nov. 0020 (5 real partner houses from Booking.com) and 0021 (3 more: Vila Lučić, Blue River, Etno selo Komarnica), run 16 Nov. 0022 (deleted the 10 demo houses) run 16 Nov; demo photos removed.** **0023 (anon may not read houses.address: column-level grant) run (checked 18 Nov).** Tables of note:
 `houses`, `house_units`, `house_price_tiers`, `house_photos`, `booking_requests` (with `details`,
 `party_guests`), `reviews` (0013: token link per confirmed booking, approved before public), `owner_applications`, `rate_limits`, `destinations` (id = URL slug, fixed after
 creation). **Address privacy:** the public site never reads `houses.address` (lib/data.ts reads named

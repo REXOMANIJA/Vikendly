@@ -1,11 +1,24 @@
 import Link from 'next/link';
-import { Home, Inbox, ExternalLink, LogOut, CalendarCheck, MapPin, Sparkles, Star } from 'lucide-react';
+import { ExternalLink, LogOut } from 'lucide-react';
 import { createAdminClient, getAdminUser } from '@/lib/supabase/server';
 import { countNewBookingRequests, countNewOwnerApplications, countNewReviews } from '@/lib/admin-data';
+import AdminNav from '@/components/admin/AdminNav';
 import { signOut } from '../actions';
 
 // Admin pages always show live data and are never cached
 export const dynamic = 'force-dynamic';
+
+/** The Vikendly logo mark (same drawing as app/icon.svg) */
+function Logo({ className = 'size-9' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 40 40" className={className} aria-hidden>
+      <rect width="40" height="40" rx="10" fill="#f5f1e8" />
+      <circle cx="28" cy="13" r="4.5" fill="#e07a5f" />
+      <path d="M9 30V20.5L18 13l9 7.5V30z" fill="#1a3c34" />
+      <rect x="15.5" y="23" width="5" height="7" rx="1" fill="#f5f1e8" />
+    </svg>
+  );
+}
 
 export default async function AdminPanelLayout({ children }: { children: React.ReactNode }) {
   const admin = await getAdminUser();
@@ -30,57 +43,58 @@ export default async function AdminPanelLayout({ children }: { children: React.R
     );
   }
 
-  const nav = 'inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-primary/10';
-  const [newRequests, newApplications, newReviews] = await Promise.all([
+  const [requests, applications, reviews] = await Promise.all([
     countNewBookingRequests(),
     countNewOwnerApplications(),
     countNewReviews(),
   ]);
+  const counts = { requests, applications, reviews };
+  const footerLink = 'flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-white/75 hover:bg-white/10 hover:text-white';
 
   return (
-    <div className="min-h-screen">
-      <header className="sticky top-0 z-40 border-b border-primary/10 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-3">
-          <Link href="/admin/upiti" className="mr-4 font-serif text-xl font-bold text-primary">
-            Vikendly <span className="font-sans text-sm font-normal text-text/60">admin</span>
-          </Link>
-          <nav className="flex flex-1 flex-wrap gap-1">
-            <Link href="/admin/upiti" className={nav}>
-              <CalendarCheck className="size-4" aria-hidden /> Upiti
-              {newRequests > 0 && (
-                <span className="rounded-full bg-accent-dark px-1.5 py-0.5 text-xs font-semibold text-white" title="Novi upiti">
-                  {newRequests}
-                </span>
-              )}
-            </Link>
-            <Link href="/admin/kuce" className={nav}><Home className="size-4" aria-hidden /> Kuće</Link>
-            <Link href="/admin/destinacije" className={nav}><MapPin className="size-4" aria-hidden /> Destinacije</Link>
-            <Link href="/admin/praznici" className={nav}><Sparkles className="size-4" aria-hidden /> Praznici</Link>
-            <Link href="/admin/prijave" className={nav}>
-              <Inbox className="size-4" aria-hidden /> Prijave vlasnika
-              {newApplications > 0 && (
-                <span className="rounded-full bg-accent-dark px-1.5 py-0.5 text-xs font-semibold text-white" title="Nove prijave">
-                  {newApplications}
-                </span>
-              )}
-            </Link>
-            <Link href="/admin/ocene" className={nav}>
-              <Star className="size-4" aria-hidden /> Ocene
-              {newReviews > 0 && (
-                <span className="rounded-full bg-accent-dark px-1.5 py-0.5 text-xs font-semibold text-white" title="Ocene koje čekaju odobrenje">
-                  {newReviews}
-                </span>
-              )}
-            </Link>
-            <a href="/" target="_blank" className={nav}><ExternalLink className="size-4" aria-hidden /> Sajt</a>
-          </nav>
-          <span className="hidden text-sm text-text/60 sm:inline">{admin.email}</span>
+    <div className="min-h-screen lg:pl-64">
+      {/* Computer: sidebar */}
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-primary px-4 py-6 lg:flex">
+        <Link href="/admin" className="mb-8 flex items-center gap-3 px-2">
+          <Logo />
+          <span className="font-serif text-xl font-bold text-white">
+            Vikendly <span className="block font-sans text-xs font-medium uppercase tracking-widest text-white/60">admin</span>
+          </span>
+        </Link>
+        <AdminNav counts={counts} variant="side" />
+        <div className="mt-auto space-y-1 border-t border-white/10 pt-4">
+          <a href="/" target="_blank" className={footerLink}>
+            <ExternalLink className="size-[18px]" aria-hidden /> Otvorite sajt
+          </a>
           <form action={signOut}>
-            <button className={nav} title="Odjava"><LogOut className="size-4" aria-hidden /> Odjava</button>
+            <button className={`${footerLink} w-full`}>
+              <LogOut className="size-[18px]" aria-hidden /> Odjava
+            </button>
+          </form>
+          <p className="truncate px-3 pt-2 text-xs text-white/50" title={admin.email ?? ''}>{admin.email}</p>
+        </div>
+      </aside>
+
+      {/* Phone and tablet: top bar with a menu that scrolls sideways */}
+      <header className="sticky top-0 z-40 bg-primary px-4 pt-3 lg:hidden">
+        <div className="mb-3 flex items-center gap-3">
+          <Link href="/admin" className="flex items-center gap-2">
+            <Logo className="size-8" />
+            <span className="font-serif text-lg font-bold text-white">Vikendly <span className="font-sans text-xs font-medium text-white/60">admin</span></span>
+          </Link>
+          <a href="/" target="_blank" className="ml-auto rounded-lg p-2 text-white/80 hover:bg-white/10" aria-label="Otvorite sajt">
+            <ExternalLink className="size-5" />
+          </a>
+          <form action={signOut}>
+            <button className="rounded-lg p-2 text-white/80 hover:bg-white/10" aria-label="Odjava">
+              <LogOut className="size-5" />
+            </button>
           </form>
         </div>
+        <AdminNav counts={counts} variant="top" />
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
+
+      <main className="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-10">{children}</main>
     </div>
   );
 }

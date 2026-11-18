@@ -167,6 +167,23 @@ const label = 'mb-1.5 block text-sm font-medium';
 /** Fields filled in from an owner application ("Napravite kuću iz prijave") */
 export type HousePrefill = Partial<Pick<FormState, 'owner_phone' | 'address' | 'destination_id'>>;
 
+
+/** Quick links at the top of the form: [section id, label] */
+const SECTIONS: [string, string][] = [
+  ['osnovno', 'Osnovno'],
+  ['kapacitet', 'Kapacitet'],
+  ['cene', 'Cene'],
+  ['field-units', 'Delovi objekta'],
+  ['field-special_prices', 'Praznične cene'],
+  ['opis', 'Opis'],
+  ['pravila', 'Pravila'],
+  ['field-photos', 'Fotografije'],
+  ['vrsta', 'Vrsta i oprema'],
+  ['ulazak', 'Dozvoljeno i vreme'],
+  ['lokacija', 'Lokacija i vlasnik'],
+  ['objava', 'Objava'],
+];
+
 export default function HouseForm({
   house,
   options,
@@ -333,15 +350,25 @@ export default function HouseForm({
 
   const fieldError = (field: string) =>
     error?.field === field ? <p className="mt-1 text-sm text-accent-dark">{error.message}</p> : null;
-  const box = 'rounded-2xl bg-white p-5 md:p-6 shadow-sm space-y-4';
+  const box = 'scroll-mt-36 rounded-2xl bg-white p-5 md:p-6 shadow-sm space-y-4 lg:scroll-mt-20';
   const hasUnits = form.units.length > 0;
   const unitBeds = form.units.reduce((sum, u) => sum + (Number(u.capacity) || 0), 0);
   const h2 = 'font-serif text-xl font-bold text-primary';
 
   return (
     <form onSubmit={onSubmit} className="space-y-6 pb-28">
+      {/* Jump to a part of the form */}
+      <nav aria-label="Delovi forme"
+        className="-mx-4 flex gap-1.5 overflow-x-auto bg-background/95 px-4 py-2 backdrop-blur [scrollbar-width:none] md:-mx-8 md:px-8 lg:sticky lg:top-0 lg:z-30">
+        {SECTIONS.map(([id, text]) => (
+          <a key={id} href={`#${id}`}
+            className="shrink-0 rounded-full bg-white px-3 py-1.5 text-sm font-medium text-text/75 ring-1 ring-primary/10 hover:bg-primary hover:text-white">
+            {text}
+          </a>
+        ))}
+      </nav>
       {/* ── Osnovno ── */}
-      <section className={box}>
+      <section className={box} id="osnovno">
         <h2 className={h2}>Osnovno</h2>
         <div className="grid gap-4 md:grid-cols-2">
           <div id="field-name">
@@ -374,7 +401,7 @@ export default function HouseForm({
       </section>
 
       {/* ── Kapacitet ── */}
-      <section className={box}>
+      <section className={box} id="kapacitet">
         <h2 className={h2}>Kapacitet</h2>
         {hasUnits && (
           <p className="rounded-lg bg-background px-4 py-3 text-sm text-text/80">
@@ -407,7 +434,7 @@ export default function HouseForm({
       </section>
 
       {/* ── Cene ── */}
-      <section className={box}>
+      <section className={box} id="cene">
         <h2 className={h2}>Cene</h2>
         <p className="text-sm text-text/70">
           {hasUnits
@@ -527,7 +554,7 @@ export default function HouseForm({
       </section>
 
       {/* ── Opis ── */}
-      <section className={box}>
+      <section className={box} id="opis">
         <h2 className={h2}>Opis</h2>
         <div id="field-description_sr">
           <label htmlFor="description_sr" className={label}>Na srpskom</label>
@@ -544,7 +571,7 @@ export default function HouseForm({
       </section>
 
       {/* ── Pravila kuće (tekst) ── */}
-      <section className={box}>
+      <section className={box} id="pravila">
         <div>
           <h2 className={h2}>
             Pravila kuće <span className="font-sans text-base font-normal text-text/60">(opciono)</span>
@@ -624,7 +651,7 @@ export default function HouseForm({
       </section>
 
       {/* ── Vrsta kuće i sadržaji ── */}
-      <section className={box}>
+      <section className={box} id="vrsta">
         <h2 className={h2}>Vrsta kuće</h2>
         <div className="flex flex-wrap gap-2">
           {options.categoryIds.map((id) => (
@@ -644,8 +671,8 @@ export default function HouseForm({
       </section>
 
       {/* ── Pravila ── */}
-      <section className={box}>
-        <h2 className={h2}>Pravila kuće</h2>
+      <section className={box} id="ulazak">
+        <h2 className={h2}>Dozvoljeno i vreme dolaska</h2>
         {hasUnits && (
           <p className="rounded-lg bg-background px-4 py-3 text-sm text-text/80">
             Svaka jedinica ima svoja pravila, vreme dolaska i odlaska i cenu žurke (u delu „Delovi objekta“).
@@ -683,7 +710,7 @@ export default function HouseForm({
       </section>
 
       {/* ── Lokacija i kontakt ── */}
-      <section className={box}>
+      <section className={box} id="lokacija">
         <h2 className={h2}>Lokacija i kontakt vlasnika</h2>
         <div id="field-address">
           <label htmlFor="address" className={label}>Adresa</label>
@@ -785,7 +812,7 @@ export default function HouseForm({
       </section>
 
       {/* ── Objava ── */}
-      <section className={box}>
+      <section className={box} id="objava">
         <h2 className={h2}>Objava</h2>
         <label className="flex items-center gap-3">
           <input type="checkbox" className="size-5 accent-primary" checked={form.is_published}
@@ -829,7 +856,7 @@ export default function HouseForm({
       </section>
 
       {/* ── Sticky save bar ── */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-primary/10 bg-white/95 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-primary/10 bg-white/95 backdrop-blur lg:left-64">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3">
           <button type="submit" disabled={pending || uploading > 0}
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-accent-dark disabled:opacity-60">

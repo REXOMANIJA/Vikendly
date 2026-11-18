@@ -38,6 +38,15 @@ Nothing open. Migrations 0015–0017 have run (13 Nov). Holiday "Nova godina 202
 
 ---
 
+## Done (18 Nov 2026, admin)
+
+- **Admin redesign:** green sidebar menu (phones: menu row on top) with counters; new **Pregled** home
+  (to-do list: new requests, "send the address" for arrivals in 7 days, applications, reviews, listings to
+  complete; numbers for the month; requests per week; upcoming arrivals; most requested houses).
+  **Upiti:** one-tap status buttons, "čeka odgovor" after 3 h, search, ready WhatsApp/copy message with the
+  address and map pin for confirmed guests. **Kuće:** photo cards, live houses first, listing completeness bar
+  with what's missing, requests in 90 days, "Za dopunu" filter. **House form:** section quick links.
+
 ## Done (16 Nov 2026)
 
 - **Serbian addresses without `/sr`:** vikendly.com, vikendly.com/kuce/…, /pretraga…; English stays under `/en/…`.
@@ -57,7 +66,7 @@ Nothing open. Migrations 0015–0017 have run (13 Nov). Holiday "Nova godina 202
 - **Maps and address privacy (18 Nov):** guests no longer get the written address, Google Maps links or
   directions. New simple light map (MapLibre + OpenFreeMap, free, recoloured to site colours, Latin names)
   with our house pin on the exact spot, on house pages and the search map.
-  **Owner must run migration 0023** so the address can't be read from the database with the public key.
+  Migration 0023 (address hidden from the public key) run, checked 18 Nov.
 
 ## Done (13 Nov 2026, fourth round)
 
