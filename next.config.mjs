@@ -26,8 +26,8 @@ const nextConfig = {
   poweredByHeader: false,
   async redirects() {
     return [
-      // Serbian pages have no /sr prefix any more (vikendly.com/kuce/…); other old /sr/… links
-      // are redirected by next-intl. The Serbian search page also moved from /search to /pretraga
+      // Serbian pages have no /sr prefix any more (vikendly.com/kuce/…); old /sr/… links are
+      // redirected at the end of this list. The Serbian search page also moved from /search to /pretraga
       // (shared links keep working; the ?destination=… part is carried over)
       { source: '/sr/search', destination: '/pretraga', permanent: true },
       { source: '/search', destination: '/pretraga', permanent: true },
@@ -39,6 +39,10 @@ const nextConfig = {
       { source: '/en/houses', destination: '/en/search', permanent: false },
       { source: '/en/kuce', destination: '/en/search', permanent: false },
       { source: '/en/pretraga', destination: '/en/search', permanent: false },
+      // Every other old Serbian address with /sr moves for good to the same address without it
+      // (permanent, so Google replaces the old /sr pages in search results)
+      { source: '/sr', destination: '/', permanent: true },
+      { source: '/sr/:path*', destination: '/:path*', permanent: true },
     ];
   },
   async headers() {
