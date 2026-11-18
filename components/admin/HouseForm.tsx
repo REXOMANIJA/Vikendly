@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ArrowRight, ImagePlus, Loader2, Trash2, X, Check, Plus, MapPin, BadgeCheck } from 'lucide-react';
+import { Loader2, Trash2, X, Check, Plus, MapPin, BadgeCheck } from 'lucide-react';
 import sr from '@/locales/sr/common.json';
 import { slugify } from '@/lib/slug';
 import { createBrowserAdminClient } from '@/lib/supabase/browser';
@@ -12,6 +12,7 @@ import { toDateParam } from '@/lib/dates';
 import { shrinkPhoto } from '@/lib/shrink-photo';
 import type { AdminHouse } from '@/lib/admin-data';
 import UnitsEditor, { type UnitFormRow } from '@/components/admin/UnitsEditor';
+import PhotoManager from '@/components/admin/PhotoManager';
 import { type PartyPriceRow } from '@/components/admin/PartyPricesEditor';
 import SpecialPricesEditor, { WHOLE, type SpecialRow } from '@/components/admin/SpecialPricesEditor';
 
@@ -201,7 +202,6 @@ export default function HouseForm({
   const [saved, setSaved] = useState(false);
   const [uploading, setUploading] = useState(0);
   const [pending, startTransition] = useTransition();
-  const fileInput = useRef<HTMLInputElement>(null);
   const [mapLink, setMapLink] = useState('');
   const [mapError, setMapError] = useState('');
   const [findingOnMap, setFindingOnMap] = useState(false);
@@ -235,13 +235,13 @@ export default function HouseForm({
   };
 
   // ───── Photos: uploaded straight to Supabase Storage (bucket house-photos) ─────
-  const uploadPhotos = async (files: FileList | null) => {
-    if (!files?.length) return;
+  const uploadPhotos = async (files: File[]) => {
+    if (!files.length) return;
     setError(null);
     const supabase = createBrowserAdminClient();
     const folder = form.slug || 'nova-kuca';
     setUploading((n) => n + files.length);
-    for (const original of Array.from(files)) {
+    for (const original of files) {
       try {
         if (original.size > 40 * 1024 * 1024) throw new Error(`${original.name} je veći od 40 MB.`);
         // Phone photos are shrunk to web size first (max 2000px), so pages load fast
@@ -263,15 +263,6 @@ export default function HouseForm({
         setUploading((n) => n - 1);
       }
     }
-    if (fileInput.current) fileInput.current.value = '';
-  };
-
-  const movePhoto = (index: number, by: -1 | 1) => {
-    const photos = [...form.photos];
-    const target = index + by;
-    if (target < 0 || target >= photos.length) return;
-    [photos[index], photos[target]] = [photos[target], photos[index]];
-    set('photos', photos);
   };
 
   // ───── Save / delete ─────
@@ -604,49 +595,10 @@ export default function HouseForm({
       <section className={box} id="field-photos">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className={h2}>Fotografije</h2>
-          <p className="text-sm text-text/60">Prva fotografija je naslovna. JPG, PNG ili WebP. Velike fotografije sa telefona se same smanje pre slanja.</p>
+          <p className="text-sm text-text/60">Prevucite fotografije ovde ili ih dodajte dugmetom. Redosled menjate prevlačenjem; prva je naslovna. Velike fotografije se same smanje.</p>
         </div>
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-          {form.photos.map((url, i) => (
-            <li key={url} className="group relative aspect-[4/3] overflow-hidden rounded-xl bg-background">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={url} alt="" className="size-full object-cover" />
-              {i === 0 && (
-                <span className="absolute left-2 top-2 rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-white">Naslovna</span>
-              )}
-              <div className="absolute inset-x-0 bottom-0 flex justify-between bg-gradient-to-t from-black/60 to-transparent p-2">
-                <div className="flex gap-1">
-                  <button type="button" onClick={() => movePhoto(i, -1)} disabled={i === 0}
-                    className="rounded-md bg-white/90 p-1.5 disabled:opacity-30" aria-label="Pomeri levo">
-                    <ArrowLeft className="size-4" />
-                  </button>
-                  <button type="button" onClick={() => movePhoto(i, 1)} disabled={i === form.photos.length - 1}
-                    className="rounded-md bg-white/90 p-1.5 disabled:opacity-30" aria-label="Pomeri desno">
-                    <ArrowRight className="size-4" />
-                  </button>
-                </div>
-                <button type="button" onClick={() => set('photos', form.photos.filter((p) => p !== url))}
-                  className="rounded-md bg-white/90 p-1.5 text-accent-dark" aria-label="Ukloni fotografiju">
-                  <X className="size-4" />
-                </button>
-              </div>
-            </li>
-          ))}
-          {Array.from({ length: uploading }).map((_, i) => (
-            <li key={`up-${i}`} className="flex aspect-[4/3] items-center justify-center rounded-xl bg-background">
-              <Loader2 className="size-6 animate-spin text-primary" aria-label="Otpremanje…" />
-            </li>
-          ))}
-          <li>
-            <button type="button" onClick={() => fileInput.current?.click()}
-              className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary/30 text-primary hover:bg-primary/5">
-              <ImagePlus className="size-6" aria-hidden />
-              <span className="text-sm font-medium">Dodajte fotografije</span>
-            </button>
-            <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple
-              className="hidden" onChange={(e) => uploadPhotos(e.target.files)} />
-          </li>
-        </ul>
+        <PhotoManager photos={form.photos} uploading={uploading} onUpload={uploadPhotos}
+          onChange={(photos) => set('photos', photos)} />
         {fieldError('photos')}
       </section>
 
