@@ -1,5 +1,6 @@
 import { cache } from 'react';
 import { getSupabase } from '@/lib/supabase/public';
+import { recommendHouses } from '@/lib/ranking';
 import type { Category, Destination, Holiday, House, HouseUnit, PartyPrice, PriceTier, RatingSummary, Review, SpecialPrice } from '@/types';
 
 /**
@@ -35,10 +36,11 @@ type HouseRow = {
   smoking_allowed: boolean;
   check_in_time: string;
   check_out_time: string;
-  address: string;
+  /** Map pin (the written address is never read by the public site) */
   lat: number | null;
   lng: number | null;
   featured_rank: number | null;
+  created_at?: string;
   /** Missing until migration 0008 is run */
   verified_at?: string | null;
   house_photos: { url: string; sort_order: number }[];
@@ -171,14 +173,18 @@ function toHouse(row: HouseRow): House & { featuredRank: number | null } {
       row.nearby_sr?.trim() || row.nearby_en?.trim()
         ? { sr: row.nearby_sr?.trim() ?? '', en: row.nearby_en?.trim() ?? '' }
         : undefined,
+    // Guests get the pin for the map, never the written address (it isn't read at all here,
+    // and after migration 0023 the public key can't read it)
     location: {
-      address: row.address,
+      address: '',
       lat: row.lat ?? undefined,
       lng: row.lng ?? undefined,
     },
     verifiedAt: row.verified_at ?? undefined,
     partyPrices: toPartyPrices(row.party_prices),
     units: [...(row.house_units ?? [])].sort((a, b) => a.sort_order - b.sort_order).map(toUnit),
+    createdAt: row.created_at ?? undefined,
+    featured: row.featured_rank !== null,
     featuredRank: row.featured_rank,
   };
 }
@@ -195,17 +201,25 @@ function toDestination(row: DestinationRow): Destination {
 
 // ───────────── Loaders (one query per table per request) ─────────────
 
+/** House columns guests may see (everything but the written address). Keep in step with migration 0023's grant. */
+const PUBLIC_HOUSE_COLUMNS =
+  'id, slug, name, destination_id, capacity, day_capacity, bedrooms, bathrooms, weekday_price, weekend_price, ' +
+  'min_nights, description_sr, description_en, parties_allowed, pets_allowed, smoking_allowed, check_in_time, ' +
+  'check_out_time, lat, lng, featured_rank, created_at, verified_at, party_prices, rules_sr, rules_en, nearby_sr, nearby_en';
+
 const loadHouses = cache(async (): Promise<(House & { featuredRank: number | null })[]> => {
   if (useSampleData) {
     const { houses } = await import('@/data/houses');
-    return houses.map((h, i) => ({ ...h, featuredRank: i < 6 ? i + 1 : null }));
+    return houses.map((h, i) => ({ ...h, featured: i < 6, featuredRank: i < 6 ? i + 1 : null }));
   }
   const related =
     'house_photos(url, sort_order), house_categories(category_id), house_amenities(amenity_id), house_price_tiers(max_guests, weekday_price, weekend_price)';
+  // Named columns, never "*": the written address is not read by the public site
+  // (and after migration 0023 the public key may not read it at all)
   const query = (withUnits: boolean) =>
     getSupabase()
       .from('houses')
-      .select(`*, ${related}${withUnits ? ', house_units(*)' : ''}`)
+      .select(`${PUBLIC_HOUSE_COLUMNS}, ${related}${withUnits ? ', house_units(*)' : ''}`)
       .eq('is_published', true)
       .order('name');
   const [first, reviews, specials] = await Promise.all([query(true), loadReviews(), loadSpecialPrices()]);
@@ -382,7 +396,8 @@ export async function getSimilarHouses(house: House, limit = 3): Promise<House[]
       h.destinationId !== house.destinationId &&
       h.categoryIds.some((c) => house.categoryIds.includes(c))
   );
-  return [...sameDestination, ...sameCategory].slice(0, limit);
+  // Same place first, then same kind of house; each part in recommended order (lib/ranking.ts)
+  return [...recommendHouses(sameDestination), ...recommendHouses(sameCategory)].slice(0, limit);
 }
 
 /** Approved reviews of one house, newest first */
@@ -457,5 +472,5 @@ export async function getHolidayBySlug(slug: string): Promise<Holiday | undefine
 
 /** Published houses ticked for a holiday, in the order of the house list */
 export async function getHolidayHouses(holiday: Holiday): Promise<House[]> {
-  return (await loadHouses()).filter((h) => holiday.houseIds.includes(h.id));
+  return recommendHouses((await loadHouses()).filter((h) => holiday.houseIds.includes(h.id)));
 }

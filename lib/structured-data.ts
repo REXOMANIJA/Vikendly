@@ -9,7 +9,7 @@ const absolute = (src: string) => (src.startsWith('http') ? src : site.url + src
 
 /**
  * Google "rich results" data for a house page (schema.org LodgingBusiness): name, photos, place,
- * map pin, "from" price and, once there are approved guest reviews, the stars.
+ * map pin, "from" price and, once there are approved guest reviews, the stars. No written address.
  */
 export function houseStructuredData({
   house,
@@ -39,6 +39,7 @@ export function houseStructuredData({
       ...(destinationName ? { addressLocality: destinationName } : {}),
       ...(country && COUNTRY[country] ? { addressCountry: COUNTRY[country] } : {}),
     },
+    // Map pin, but never the written address (only the place name above)
     ...(house.location.lat != null && house.location.lng != null
       ? { geo: { '@type': 'GeoCoordinates', latitude: house.location.lat, longitude: house.location.lng } }
       : {}),

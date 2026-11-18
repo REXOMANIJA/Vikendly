@@ -20,7 +20,7 @@ Supabase. Alerts: Telegram bot @VikendlyBot.
   words, no jargon. Show results (what changed on the site), not code.
 - **"Save and upload" = commit and push to `main`.** Never commit or push without being asked.
   Before pushing, scan the staged diff for secrets (Telegram token, keys) and leftover `TEMP-PREVIEW`.
-- **Database changes:** write a new numbered file in `supabase/migrations/` (next is `0023_…`), make
+- **Database changes:** write a new numbered file in `supabase/migrations/` (next is `0024_…`), make
   it safe to run twice (`if not exists`, `create or replace`, guarded `update`s), and ask the owner
   to run it in Supabase → SQL Editor. Never assume it ran: check with a read-only REST query using
   the publishable key from `.env.local` (e.g. `curl "$URL/rest/v1/table?select=col&limit=1" -H "apikey: $KEY"`).
@@ -39,7 +39,8 @@ Supabase. Alerts: Telegram bot @VikendlyBot.
 Next.js 16 (App Router, Turbopack, React 19.3) · TypeScript · Tailwind CSS 4 (tokens in
 `app/globals.css` `@theme`: primary `#1a3c34`, background `#f5f1e8`, accent `#e07a5f`,
 accent-dark `#a84b2e`, sand `#ece4d3`) · next-intl 4 (sr default, en) · Supabase (`@supabase/ssr`) ·
-react-day-picker 10 · lucide-react (no brand icons) · Jest · Vercel Analytics.
+react-day-picker 10 · maplibre-gl 6 (maps: OpenFreeMap tiles, look in `lib/map-style.ts`; its worker
+is copied to `public/maplibre/` by `scripts/copy-map-worker.cjs` in `dev`/`build`) · lucide-react (no brand icons) · Jest · Vercel Analytics.
 
 ## Map of the code
 
@@ -51,6 +52,9 @@ react-day-picker 10 · lucide-react (no brand icons) · Jest · Vercel Analytics
   Server actions in `app/admin/actions.ts`; reads in `lib/admin-data.ts`.
 - `lib/data.ts` – all public data access (published houses loaded once per request). In tests
   (`NODE_ENV=test`) it returns sample data from `/data`.
+- `lib/ranking.ts` – "Preporučeno" order for house lists (search default, holiday offers, similar
+  houses, empty-search suggestions): verified first, then points for reviews, complete listing,
+  homepage pick, new house, group fit and a daily shuffle. Homepage "Izdvojeno" keeps the admin's order.
 - `lib/pricing.ts` + `lib/booking.ts` – **all price and request rules, shared by browser and server**
   (the server recalculates every price). `lib/actions.ts` – public form actions (booking request,
   owner application) with rate limits (`lib/notify.ts`) and Telegram alerts.
@@ -91,10 +95,14 @@ react-day-picker 10 · lucide-react (no brand icons) · Jest · Vercel Analytics
 
 ## Database status
 
-Migrations **0001–0012 have all been run** in Supabase (checked 12 Nov 2026). **0013 (venues, reviews) run 13 Nov. 0014 (free-text rules) run (checked 13 Nov). 0015 (nearby text), 0016 (holidays, special prices) and 0017 (holiday read fix, party holiday prices) run 13 Nov. 0018 (5 demo houses) run 16 Nov. 0019 (5 more demo houses) run 16 Nov. 0020 (5 real partner houses from Booking.com) and 0021 (3 more: Vila Lučić, Blue River, Etno selo Komarnica), run 16 Nov. 0022 (deleted the 10 demo houses) run 16 Nov; demo photos removed.** Tables of note:
+Migrations **0001–0012 have all been run** in Supabase (checked 12 Nov 2026). **0013 (venues, reviews) run 13 Nov. 0014 (free-text rules) run (checked 13 Nov). 0015 (nearby text), 0016 (holidays, special prices) and 0017 (holiday read fix, party holiday prices) run 13 Nov. 0018 (5 demo houses) run 16 Nov. 0019 (5 more demo houses) run 16 Nov. 0020 (5 real partner houses from Booking.com) and 0021 (3 more: Vila Lučić, Blue River, Etno selo Komarnica), run 16 Nov. 0022 (deleted the 10 demo houses) run 16 Nov; demo photos removed.** **0023 (anon may not read houses.address: column-level grant) written 18 Nov, NOT yet run – check.** Tables of note:
 `houses`, `house_units`, `house_price_tiers`, `house_photos`, `booking_requests` (with `details`,
 `party_guests`), `reviews` (0013: token link per confirmed booking, approved before public), `owner_applications`, `rate_limits`, `destinations` (id = URL slug, fixed after
-creation). Save function: `admin_save_house(jsonb)` – redefine it fully in any migration that adds
+creation). **Address privacy:** the public site never reads `houses.address` (lib/data.ts reads named
+`PUBLIC_HOUSE_COLUMNS`, never `*`); maps show the exact pin but no address, Google link or directions.
+After 0023 the anon key has a column-level grant on `houses`: a new house column the public site reads
+must be added to that grant.
+Save function: `admin_save_house(jsonb)` – redefine it fully in any migration that adds
 house/unit fields. Storage bucket: `house-photos`.
 
 ## Environment

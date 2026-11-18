@@ -280,14 +280,60 @@ a {
   }
 }
 
-/* ───── Search results map (components/search/ResultsMap.tsx) ───── */
-.vk-pin-wrap {
-  background: none;
-  border: 0;
+/* ───── Maps (MapLibre, look in lib/map-style.ts) ───── */
+
+/* House page pin (components/house/AreaMap.tsx) */
+.vk-house-pin-wrap {
+  position: relative;
+  width: 44px;
+  height: 56px;
 }
+.vk-house-pin {
+  position: relative;
+  display: block;
+  width: 44px;
+  height: 56px;
+  filter: drop-shadow(0 4px 6px rgb(0 0 0 / 0.3));
+  animation: vk-pin-drop 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.vk-house-pin-halo {
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 22px;
+  height: 8px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: rgb(26 60 52 / 0.35);
+  animation: vk-pin-halo 2.4s ease-out infinite;
+}
+@keyframes vk-pin-drop {
+  from {
+    transform: translateY(-24px);
+    opacity: 0;
+  }
+}
+@keyframes vk-pin-halo {
+  0% {
+    scale: 1;
+    opacity: 0.6;
+  }
+  100% {
+    scale: 3.2;
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vk-house-pin,
+  .vk-house-pin-halo {
+    animation: none;
+  }
+}
+
+/* ───── Search results map (components/search/ResultsMap.tsx) ───── */
 .vk-pin {
   display: inline-block;
-  translate: -50% -100%;
+  cursor: pointer;
   white-space: nowrap;
   border-radius: 9999px;
   background: var(--color-primary);
@@ -299,17 +345,26 @@ a {
   transition: background-color 150ms;
 }
 .vk-pin:hover,
-.leaflet-marker-icon:focus .vk-pin {
+.vk-pin:focus-visible {
   background: var(--color-accent-dark);
+  outline: none;
 }
-.leaflet-popup-content-wrapper {
+.maplibregl-popup-content {
+  width: 220px;
   border-radius: 14px;
   padding: 0;
   overflow: hidden;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.18);
 }
-.leaflet-popup-content {
-  margin: 0;
-  width: 220px !important;
+.maplibregl-popup-close-button {
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  margin: 6px;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.9);
+  font-size: 18px;
+  line-height: 1;
 }
 .vk-pop {
   display: block;

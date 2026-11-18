@@ -107,6 +107,56 @@ export function getLowestNightlyPrice(house: House): number {
   return Math.min(house.pricing.weekdayPrice, ...(house.pricing.tiers ?? []).map((t) => t.weekdayPrice));
 }
 
+/** What a group would book in a listing: how many people it sleeps, its nightly price, which units */
+export interface GroupOption {
+  /** Beds in the picked units (or the whole house) */
+  capacity: number;
+  /** Weekday price per night for this group (units summed), for "Od €X / noć" */
+  weekdayPrice: number;
+  /** Picked unit names in the listed order; empty for a house rented as one */
+  units: string[];
+}
+
+/**
+ * The option a group of `guests` would book, without dates: for a listing with units the
+ * cheapest set of bed units with room for everyone (e.g. 4 people → one chalet for 6,
+ * 9 people → two chalets). Ties go to fewer beds, then fewer units.
+ * Undefined for a venue or when the listing is too small.
+ */
+export function groupOption(house: House, guests: number): GroupOption | undefined {
+  const people = Math.max(guests, 1);
+  if (isVenue(house)) return undefined;
+  if (!hasUnits(house)) {
+    if (house.capacity < people) return undefined;
+    return { capacity: house.capacity, weekdayPrice: ratesFor(house.pricing, house.capacity, people).weekdayPrice, units: [] };
+  }
+  const units = getBookables(house).filter((u) => !u.partyOnly);
+  if (!units.length || units.length > 12) return undefined;
+  let best: { picked: number[]; capacity: number; price: number } | undefined;
+  for (let mask = 1; mask < 1 << units.length; mask++) {
+    const picked = units.map((_, i) => i).filter((i) => mask & (1 << i));
+    const capacity = picked.reduce((sum, i) => sum + units[i].capacity, 0);
+    if (capacity < people) continue;
+    // Fill the biggest units first; each is priced for the people in it (smaller-group prices)
+    let left = people;
+    const price = [...picked]
+      .sort((a, b) => units[b].capacity - units[a].capacity)
+      .reduce((sum, i) => {
+        const here = Math.max(1, Math.min(units[i].capacity, left));
+        left -= here;
+        return sum + ratesFor(units[i].pricing, units[i].capacity, here).weekdayPrice;
+      }, 0);
+    const better =
+      !best ||
+      price < best.price ||
+      (price === best.price &&
+        (capacity < best.capacity || (capacity === best.capacity && picked.length < best.picked.length)));
+    if (better) best = { picked, capacity, price };
+  }
+  if (!best) return undefined;
+  return { capacity: best.capacity, weekdayPrice: best.price, units: best.picked.map((i) => units[i].name) };
+}
+
 /** Number of nights between two dates (safe across clock changes) */
 export function countNights(checkIn: Date, checkOut: Date): number {
   // Round, not ceil: across a clock change a 2-night stay is 47 or 49 hours long

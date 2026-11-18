@@ -4,7 +4,7 @@ import { PartyPopper, Moon, PawPrint, WavesLadder, Users, BedDouble, Images, Sta
 import FavoriteButton from '@/components/FavoriteButton';
 import type { LucideIcon } from 'lucide-react';
 import { House, PriceCalculation } from '@/types';
-import { getLowestNightlyPrice, isVenue, maxGuestsOf } from '@/lib/pricing';
+import { getLowestNightlyPrice, groupOption, isVenue, maxGuestsOf } from '@/lib/pricing';
 import { Link } from '@/i18n/navigation';
 import { isVector } from '@/lib/images';
 import VerifiedBadge from '@/components/VerifiedBadge';
@@ -42,6 +42,16 @@ export default function HouseCard({
   const { capacity, name, rules } = house;
   // Event venue: no beds, priced per party
   const venue = isVenue(house);
+
+  // When the guest chose a number of people, a listing with several units shows only what that
+  // group would book (4 people → "Noćenje: do 6 osoba · Za vas: Šale 1"), not all 29 beds.
+  // With dates the units come from the price (quote); without dates from groupOption.
+  const option = guests && !venue ? groupOption(house, guests) : undefined;
+  const pickedNames = quote?.units && !quote.partyDay ? quote.units : option?.units ?? [];
+  const pickedBeds = pickedNames.length
+    ? (house.units ?? []).filter((u) => pickedNames.includes(u.name)).reduce((sum, u) => sum + u.capacity, 0)
+    : capacity;
+  const showPicked = pickedNames.length > 0 && pickedBeds < capacity;
 
   // House rules are a core promise of Vikendly, so they're visible on every card
   const badges: Badge[] = [
@@ -109,7 +119,16 @@ export default function HouseCard({
           ) : (
             <span className="inline-flex items-center gap-1.5">
               <BedDouble className="size-4" aria-hidden />
-              {t('sleeps', { count: capacity })}
+              {t('sleeps', { count: showPicked ? pickedBeds : capacity })}
+            </span>
+          )}
+          {showPicked && (
+            <span className="basis-full text-xs text-text/60">
+              <span className="font-medium text-primary">
+                {t('pickedUnits', { count: pickedNames.length, names: pickedNames.join(', ') })}
+              </span>
+              {' · '}
+              {t('wholePlace', { count: capacity })}
             </span>
           )}
           {!venue && house.dayCapacity && house.dayCapacity > capacity && (
@@ -161,7 +180,7 @@ export default function HouseCard({
           ) : (
             <p>
               <span className="text-lg font-bold text-primary">
-                {t('from', { price: eur(getLowestNightlyPrice(house)) })}
+                {t('from', { price: eur(option?.weekdayPrice ?? getLowestNightlyPrice(house)) })}
               </span>
               <span className="text-sm text-text/70">{venue ? t('perParty') : t('perNight')}</span>
             </p>

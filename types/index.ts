@@ -154,6 +154,10 @@ export interface House {
   units?: HouseUnit[];
   /** Average of approved guest reviews; missing = no reviews yet */
   rating?: RatingSummary;
+  /** When the house was added in admin (ISO date); new houses get a short boost in the order */
+  createdAt?: string;
+  /** Picked by the team for "Izdvojeno za ovaj vikend" on the homepage */
+  featured?: boolean;
   // Owner contact is private (admin only, table house_owner_contacts); guests send booking requests instead.
 }
 

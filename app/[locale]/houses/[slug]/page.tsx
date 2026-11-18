@@ -395,7 +395,6 @@ export default async function HousePage({ params }: { params: Params }) {
               <h2 className="mb-4 font-serif text-2xl font-bold text-primary">{t('locationTitle')}</h2>
               <HouseMap
                 name={house.name}
-                address={house.location.address}
                 lat={house.location.lat}
                 lng={house.location.lng}
                 placeLabel={destination ? `${destination.name}, ${tCountry(destination.country)}` : undefined}

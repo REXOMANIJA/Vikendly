@@ -48,6 +48,16 @@ Nothing open. Migrations 0015–0017 have run (13 Nov). Holiday "Nova godina 202
   (WebSite + Organization data); category and destination pages (`/pretraga?category=pool`,
   `?destination=tara`) have their own title, description and short intro text (`search.seo` in
   both locale files) and are in the sitemap; empty ones are not indexed.
+- **"Preporučeno" order (18 Nov, `lib/ranking.ts`):** houses are no longer A–Z. Verified houses stay
+  first; then points for reviews, complete listing, homepage pick, new houses, fit to the group size
+  and a small daily shuffle. Used in search, holiday offers, similar houses and suggestions.
+- **Cards show what the group would book (18 Nov, `groupOption` in `lib/pricing.ts`):** when a guest
+  searches for N people, a listing with units shows the cheapest units that fit ("Za vas 2 smeštaja:
+  Šale 1, Šale 2 · Ceo objekat do 29 osoba"), their beds and "Od" price; ranking fit uses the same.
+- **Maps and address privacy (18 Nov):** guests no longer get the written address, Google Maps links or
+  directions. New simple light map (MapLibre + OpenFreeMap, free, recoloured to site colours, Latin names)
+  with our house pin on the exact spot, on house pages and the search map.
+  **Owner must run migration 0023** so the address can't be read from the database with the public key.
 
 ## Done (13 Nov 2026, fourth round)
 

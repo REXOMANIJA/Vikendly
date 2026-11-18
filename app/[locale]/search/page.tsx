@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { localizedAlternates } from '@/lib/seo';
 import { getHouses, getDestinations, getCategories, getCategoryBySlug, getHouseCountsByDestination } from '@/lib/data';
 import { getLowestNightlyPrice, isVenue, maxGuestsOf, quoteStay } from '@/lib/pricing';
+import { recommendHouses } from '@/lib/ranking';
 import { parseDateParam } from '@/lib/dates';
 import { slugify } from '@/lib/slug';
 import { Link, getPathname } from '@/i18n/navigation';
@@ -154,9 +155,13 @@ export default async function SearchPage({
     .filter(({ quote }) => !(budget && quote && quote.total > budget));
 
   // Sorting: price uses the stay total when dates are known, otherwise the lowest nightly price.
-  // "Recommended" puts houses we visited in person first, then keeps the alphabetical order.
+  // "Recommended" (default): houses we visited in person first, then by reviews, a complete
+  // listing, new houses and how well the house fits the group (lib/ranking.ts).
   const sort = (SORTS as readonly string[]).includes(sp.sort ?? '') ? sp.sort : undefined;
   const priceOf = (r: (typeof results)[number]) => r.quote?.total ?? getLowestNightlyPrice(r.house);
+  const recommendedPlace = new Map(
+    recommendHouses(results.map((r) => r.house), { guests }).map((h, i) => [h.id, i])
+  );
   results.sort((a, b) =>
     sort === 'price-asc'
       ? priceOf(a) - priceOf(b)
@@ -164,7 +169,7 @@ export default async function SearchPage({
         ? priceOf(b) - priceOf(a)
         : sort === 'capacity'
           ? maxGuestsOf(b.house) - maxGuestsOf(a.house)
-          : Number(!!b.house.verifiedAt) - Number(!!a.house.verifiedAt)
+          : recommendedPlace.get(a.house.id)! - recommendedPlace.get(b.house.id)!
   );
 
   // Empty results: suggest dropping one filter at a time, and show a few other houses
@@ -175,7 +180,7 @@ export default async function SearchPage({
     Object.fromEntries(
       Object.entries(sp).filter(([k, v]) => v && k !== key && !(key === 'checkIn' && k === 'checkOut'))
     ) as Record<string, string>;
-  const suggestions = results.length === 0 ? houses.slice(0, 3) : [];
+  const suggestions = results.length === 0 ? recommendHouses(houses, { guests }).slice(0, 3) : [];
   const listedDestinations = destinations.filter((d) => (houseCounts[d.id] ?? 0) > 0);
   const filterValues: SearchValues = Object.fromEntries(Object.entries(sp).filter(([, v]) => v)) as SearchValues;
 

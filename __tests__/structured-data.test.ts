@@ -22,7 +22,7 @@ const house: House = {
 describe('house structured data (Google)', () => {
   const base = { reviews: [], destinationName: 'Tara', country: 'SR', url: 'https://vikendly.com/sr/kuce/kuca', description: 'Opis' };
 
-  it('has name, absolute photos, place, map pin and from-price', () => {
+  it('has name, absolute photos, place, map pin and from-price, but no written address', () => {
     const data = houseStructuredData({ house, ...base });
     expect(data).toMatchObject({
       '@type': 'LodgingBusiness',
@@ -31,6 +31,7 @@ describe('house structured data (Google)', () => {
       geo: { latitude: 43.9, longitude: 19.5 },
       priceRange: '€80+',
     });
+    expect(JSON.stringify(data)).not.toContain('Kaluđerske bare');
     expect(data.image[0]).toMatch(/^https:\/\/.+\/images\/house-01\.svg$/);
     expect(data.image[1]).toBe(house.photos[1]);
     expect(data).not.toHaveProperty('aggregateRating');

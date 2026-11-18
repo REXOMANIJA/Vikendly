@@ -105,7 +105,9 @@
     "partyCapacity": "Žurka: {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}",
     "perParty": " po žurci",
     "partyDay": "žurka, jedan dan",
-    "reviews": "({count, plural, one {# ocena} few {# ocene} other {# ocena}})"
+    "reviews": "({count, plural, one {# ocena} few {# ocene} other {# ocena}})",
+    "pickedUnits": "{count, plural, one {Za vas: {names}} few {Za vas # smeštaja: {names}} other {Za vas # smeštaja: {names}}}",
+    "wholePlace": "Ceo objekat {count, plural, one {do # osobe} few {do # osobe} other {do # osoba}}"
   },
   "search": {
     "title": "Rezultati pretrage",
@@ -430,10 +432,8 @@
       "contactTitle": "Vaši podaci"
     },
     "map": {
-      "iframeTitle": "Mapa: {name}",
-      "directions": "Kako stići",
-      "open": "Google mape",
-      "approximate": "Prikazana je približna lokacija na osnovu adrese."
+      "label": "Mapa sa lokacijom: {name}",
+      "addressLater": "Tačnu adresu i uputstvo kako da stignete šaljemo kada potvrdimo rezervaciju."
     },
     "units": {
       "title": "Delovi objekta",

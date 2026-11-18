@@ -105,7 +105,9 @@
     "partyCapacity": "Parties: {count, plural, one {up to # guest} other {up to # guests}}",
     "perParty": " per party",
     "partyDay": "party, one day",
-    "reviews": "({count, plural, one {# review} other {# reviews}})"
+    "reviews": "({count, plural, one {# review} other {# reviews}})",
+    "pickedUnits": "{count, plural, one {For you: {names}} other {For you, # units: {names}}}",
+    "wholePlace": "Whole place {count, plural, one {up to # guest} other {up to # guests}}"
   },
   "search": {
     "title": "Search results",
@@ -430,10 +432,8 @@
       "contactTitle": "Your details"
     },
     "map": {
-      "iframeTitle": "Map: {name}",
-      "directions": "Directions",
-      "open": "Google Maps",
-      "approximate": "Approximate location based on the address."
+      "label": "Map showing where {name} is",
+      "addressLater": "We send the exact address and directions once your booking is confirmed."
     },
     "units": {
       "title": "Parts of the property",
