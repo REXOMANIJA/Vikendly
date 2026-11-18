@@ -113,9 +113,45 @@
     "noResults": "Nema kuća koje odgovaraju vašoj pretrazi.",
     "clearFilters": "Obrišite filtere",
     "invalidDates": "Datum odlaska mora biti posle datuma dolaska.",
-    "metaDestination": "Vikend kuće – {name} | Vikendly",
-    "metaCategory": "{name} – vikend kuće | Vikendly",
     "metaTitle": "Pretraga vikend kuća | Vikendly",
+    "metaDescription": "Sve vikend kuće na Vikendly-ju: pretraga po destinaciji, datumima i broju gostiju. Ukupna cena unapred, jasna pravila i upit bez obaveze.",
+    "seo": {
+      "destination": {
+        "title": "Vikendice i vikend kuće – {name} | Vikendly",
+        "description": "{name}: {count, plural, one {# vikend kuća} few {# vikend kuće} other {# vikend kuća}} koje je odabrao Vikendly tim. Ukupna cena unapred, jasna pravila i upit bez obaveze.",
+        "text": "Vikend kuće koje je odabrao Vikendly tim. Za svaku vidite ukupnu cenu za vaše datume pre slanja upita, a mi proverimo slobodne termine sa domaćinom i javimo vam se telefonom."
+      },
+      "mountain": {
+        "title": "Planinske vikendice i brvnare | Vikendly",
+        "description": "Planinske vikend kuće i brvnare u Srbiji i regionu. Ukupna cena unapred, jasna pravila i upit bez obaveze.",
+        "text": "Brvnare i kuće u planinama, za mirne vikende, šetnje i čist vazduh. Za svaku kuću vidite ukupnu cenu za vaše datume pre nego što pošaljete upit."
+      },
+      "party": {
+        "title": "Vikendice za žurke i proslave | Vikendly",
+        "description": "Vikend kuće i prostori za žurke, rođendane i proslave. Jasno piše koliko ljudi primaju, ukupna cena unapred i upit bez obaveze.",
+        "text": "Kuće i prostori za rođendane, proslave i druženja sa više ljudi. Kod svake piše koliko ljudi prima i koja su kućna pravila, pa nema iznenađenja kod domaćina."
+      },
+      "lake": {
+        "title": "Vikendice na jezeru i reci | Vikendly",
+        "description": "Vikend kuće pored jezera i reka u Srbiji i regionu. Ukupna cena unapred, jasna pravila i upit bez obaveze.",
+        "text": "Kuće pored jezera i reka, za kupanje, pecanje i jutarnju kafu uz vodu. Za svaku kuću vidite ukupnu cenu za vaše datume pre slanja upita."
+      },
+      "pool": {
+        "title": "Vikendice sa bazenom | Vikendly",
+        "description": "Vikend kuće sa bazenom u Srbiji i regionu. Ukupna cena unapred, jasna pravila i upit bez obaveze.",
+        "text": "Vikend kuće sa bazenom, za leto u dvorištu i opuštanje sa društvom ili porodicom. Za svaku kuću vidite ukupnu cenu za vaše datume pre nego što pošaljete upit."
+      },
+      "family": {
+        "title": "Porodične vikendice | Vikendly",
+        "description": "Porodične vikend kuće u Srbiji i regionu, sa dovoljno mesta za sve. Ukupna cena unapred, jasna pravila i upit bez obaveze.",
+        "text": "Kuće pogodne za porodice: dovoljno mesta, dvorište i mir. Kućna pravila i sve što je uključeno u cenu piše kod svake kuće."
+      },
+      "apartment": {
+        "title": "Apartmani za vikend | Vikendly",
+        "description": "Apartmani za vikend u Srbiji i regionu. Ukupna cena unapred, jasna pravila i upit bez obaveze.",
+        "text": "Apartmani za vikend, kada vam ne treba cela kuća. Za svaki vidite ukupnu cenu za vaše datume pre slanja upita."
+      }
+    },
     "filters": {
       "filters": "Filteri",
       "name": "Naziv kuće",

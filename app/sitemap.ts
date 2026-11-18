@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { site } from '@/lib/site';
 import { locales } from '@/i18n/routing';
 import { getPathname } from '@/i18n/navigation';
-import { getActiveHolidays, getHouses } from '@/lib/data';
+import { getActiveHolidays, getCategories, getDestinations, getHouses } from '@/lib/data';
 
 const baseUrl = site.url;
 
@@ -11,7 +11,9 @@ export const revalidate = 3600;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
-  const housePages = (await getHouses()).flatMap((house) =>
+  const [houses, categories, destinations] = await Promise.all([getHouses(), getCategories(), getDestinations()]);
+
+  const housePages = houses.flatMap((house) =>
     locales.map((locale) => ({
       // /kuce/vila-ribnica, /en/houses/vila-ribnica
       url:
@@ -45,6 +47,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: now,
         changeFrequency: 'daily' as const,
         priority: 0.9,
+      }))
+    ),
+    // Category and destination pages that have houses (/pretraga?category=pool,
+    // /en/search?destination=tara); empty ones are left out
+    ...[
+      ...categories
+        .filter((c) => houses.some((h) => h.categoryIds.includes(c.id)))
+        .map((c) => `?category=${c.slug}`),
+      ...destinations
+        .filter((d) => houses.some((h) => h.destinationId === d.id))
+        .map((d) => `?destination=${d.slug}`),
+    ].flatMap((query) =>
+      locales.map((locale) => ({
+        url: baseUrl + getPathname({ locale, href: '/search' }) + query,
+        lastModified: now,
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
       }))
     ),
     ...locales.map((locale) => ({

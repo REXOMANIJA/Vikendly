@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 import { localizedAlternates } from '@/lib/seo';
+import { siteStructuredData } from '@/lib/structured-data';
+import { site } from '@/lib/site';
+import { routing } from '@/i18n/routing';
 import Hero from '@/components/sections/Hero';
 import Categories from '@/components/sections/Categories';
 import Destinations from '@/components/sections/Destinations';
@@ -44,8 +47,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const holiday = holidays[0];
   const holidayHouses = holiday ? await getHolidayHouses(holiday) : [];
 
+  // Site name, logo and Instagram for Google (lib/structured-data.ts)
+  const home = site.url + (locale === routing.defaultLocale ? '/' : `/${locale}`);
+  const structuredData = siteStructuredData(home, locale);
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
+      />
       <Hero destinations={listed} />
       <Categories categories={categories} />
       {/* Holiday offer, right under "Kakav vikend želite?" */}

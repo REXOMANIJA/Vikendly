@@ -48,23 +48,54 @@ export async function generateMetadata({
   // dates, guests, budget or a name are one-off results, so Google follows their links but
   // doesn't list them.
   const onlyOneFilter = Object.keys(sp).filter((k) => sp[k as keyof SearchParams]).length <= 1;
-  const indexable = onlyOneFilter && (!!destination || !!category || Object.keys(sp).length === 0);
+  // A destination or category with no houses yet is an empty page: Google shouldn't list it
+  const count = (await getHouses()).filter(
+    (h) => (!destination || h.destinationId === destination.id) && (!category || h.categoryIds.includes(category.id))
+  ).length;
+  const indexable = onlyOneFilter && (!!destination || !!category || Object.keys(sp).length === 0) && count > 0;
   const query = destination ? `?destination=${destination.slug}` : category ? `?category=${category.slug}` : '';
 
-  const title = destination
-    ? t('metaDestination', { name: destination.name })
-    : category
-      ? t('metaCategory', { name: tCat(category.id as 'mountain') })
-      : t('metaTitle');
+  // Destination and category pages get their own title and description for Google (search.seo)
+  const seo = seoTexts(t, destination, category, count);
+  const title = seo?.title ?? t('metaTitle');
+  const description = seo?.description ?? t('metaDescription');
   // Shared destination/category links show that place's photo (drawings can't be previews)
   const photo = destination?.imageUrl ?? (category ? `/images/categories/${category.id}.jpg` : undefined);
 
   return {
     title,
+    description,
     alternates: localizedAlternates(locale, '/search', query),
     robots: indexable ? undefined : { index: false, follow: true },
-    ...(photo && !isVector(photo) ? { openGraph: { title, images: [photo] } } : {}),
+    ...(photo && !isVector(photo) ? { openGraph: { title, description, images: [photo] } } : {}),
   };
+}
+
+type SearchT = Awaited<ReturnType<typeof getTranslations<'search'>>>;
+
+/**
+ * Own title, description and short intro for a page with only a destination or only a category
+ * (e.g. /pretraga?category=pool). Undefined for other searches.
+ */
+function seoTexts(
+  t: SearchT,
+  destination: { name: string } | undefined,
+  category: { id: string } | undefined,
+  count: number
+) {
+  if (destination && !category) {
+    const values = { name: destination.name, count };
+    return {
+      title: t('seo.destination.title', values),
+      description: t('seo.destination.description', values),
+      text: t('seo.destination.text'),
+    };
+  }
+  if (category && !destination && t.has(`seo.${category.id}.title` as 'seo.pool.title')) {
+    const key = category.id as 'pool';
+    return { title: t(`seo.${key}.title`), description: t(`seo.${key}.description`), text: t(`seo.${key}.text`) };
+  }
+  return undefined;
 }
 
 export default async function SearchPage({
@@ -148,7 +179,9 @@ export default async function SearchPage({
   const listedDestinations = destinations.filter((d) => (houseCounts[d.id] ?? 0) > 0);
   const filterValues: SearchValues = Object.fromEntries(Object.entries(sp).filter(([, v]) => v)) as SearchValues;
 
-  const heading = [query ? `„${query}”` : undefined, destination?.name, category ? tCat(category.id as 'mountain') : undefined]
+  const intro = !query ? seoTexts(t, destination, category, results.length)?.text : undefined;
+
+  const heading = [query ?`„${query}”` : undefined, destination?.name, category ? tCat(category.id as 'mountain') : undefined]
     .filter(Boolean)
     .join(' · ');
 
@@ -233,6 +266,9 @@ export default async function SearchPage({
           <p className="text-text/70 mt-2">{t('found', { count: results.length })}</p>
         </div>
       )}
+
+      {/* Short intro on plain destination / category pages (also helps Google understand the page) */}
+      {intro && <p className="-mt-2 mb-6 max-w-3xl text-text/75 md:text-lg">{intro}</p>}
 
       <SearchFilters values={filterValues} destinations={listedDestinations} categories={categories} />
 

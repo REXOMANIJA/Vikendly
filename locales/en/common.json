@@ -113,9 +113,45 @@
     "noResults": "No houses found matching your criteria.",
     "clearFilters": "Clear filters",
     "invalidDates": "Check-out must be after check-in.",
-    "metaDestination": "Weekend houses in {name} | Vikendly",
-    "metaCategory": "{name} – weekend houses | Vikendly",
     "metaTitle": "Search weekend houses | Vikendly",
+    "metaDescription": "All weekend houses on Vikendly: search by destination, dates and number of guests. Full price upfront, clear rules and requests with no obligation.",
+    "seo": {
+      "destination": {
+        "title": "Weekend houses in {name} | Vikendly",
+        "description": "{name}: {count, plural, one {# weekend house} other {# weekend houses}} chosen by the Vikendly team. Full price upfront, clear rules and requests with no obligation.",
+        "text": "Weekend houses chosen by the Vikendly team. You see the full price for your dates before sending a request; we check availability with the host and call you back."
+      },
+      "mountain": {
+        "title": "Mountain houses and log cabins | Vikendly",
+        "description": "Mountain weekend houses and log cabins in Serbia and the region. Full price upfront, clear rules and requests with no obligation.",
+        "text": "Log cabins and houses in the mountains, for quiet weekends, walks and fresh air. You see the full price for your dates before sending a request."
+      },
+      "party": {
+        "title": "Houses for parties and celebrations | Vikendly",
+        "description": "Weekend houses and venues for parties, birthdays and celebrations. Clear guest limits, full price upfront and requests with no obligation.",
+        "text": "Houses and venues for birthdays, celebrations and larger get-togethers. Each one shows how many people it takes and its house rules, so there are no surprises."
+      },
+      "lake": {
+        "title": "Lake and river houses | Vikendly",
+        "description": "Weekend houses by lakes and rivers in Serbia and the region. Full price upfront, clear rules and requests with no obligation.",
+        "text": "Houses by lakes and rivers, for swimming, fishing and morning coffee by the water. You see the full price for your dates before sending a request."
+      },
+      "pool": {
+        "title": "Weekend houses with a pool | Vikendly",
+        "description": "Weekend houses with a pool in Serbia and the region. Full price upfront, clear rules and requests with no obligation.",
+        "text": "Weekend houses with a pool, for summer days in the garden with friends or family. You see the full price for your dates before sending a request."
+      },
+      "family": {
+        "title": "Family weekend houses | Vikendly",
+        "description": "Family-friendly weekend houses in Serbia and the region, with room for everyone. Full price upfront, clear rules and requests with no obligation.",
+        "text": "Houses that suit families: plenty of room, a garden and peace and quiet. House rules and what the price includes are listed for each house."
+      },
+      "apartment": {
+        "title": "Weekend apartments | Vikendly",
+        "description": "Weekend apartments in Serbia and the region. Full price upfront, clear rules and requests with no obligation.",
+        "text": "Apartments for a weekend away when you don't need a whole house. You see the full price for your dates before sending a request."
+      }
+    },
     "filters": {
       "filters": "Filters",
       "name": "House name",

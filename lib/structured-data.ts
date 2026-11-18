@@ -66,3 +66,38 @@ export function houseStructuredData({
       : {}),
   };
 }
+
+/**
+ * Homepage data that tells Google the site's name ("Vikendly" above the search result instead of
+ * "vikendly.com"), its logo and its Instagram. `home` is the page's own address
+ * (vikendly.com or vikendly.com/en).
+ */
+export function siteStructuredData(home: string, language: string) {
+  const root = `${site.url}/`;
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        '@id': `${root}#website`,
+        name: 'Vikendly',
+        alternateName: ['vikendly.com', 'Vikendly vikend kuće'],
+        url: root,
+        inLanguage: language,
+        publisher: { '@id': `${root}#organization` },
+      },
+      {
+        '@type': 'Organization',
+        '@id': `${root}#organization`,
+        name: 'Vikendly',
+        url: root,
+        // Square PNG made from app/apple-icon.tsx (Google needs at least 112×112)
+        logo: `${site.url}/apple-icon`,
+        ...(site.email ? { email: site.email } : {}),
+        ...(site.phone ? { telephone: site.phone } : {}),
+        ...(site.instagram ? { sameAs: [`https://www.instagram.com/${site.instagram}/`] } : {}),
+      },
+      { '@type': 'WebPage', '@id': `${home}#webpage`, url: home, isPartOf: { '@id': `${root}#website` } },
+    ],
+  };
+}

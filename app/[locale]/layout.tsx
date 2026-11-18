@@ -41,8 +41,10 @@ export async function generateMetadata({
     metadataBase: new URL(site.url),
     title: t('title'),
     description: t('description'),
+    applicationName: 'Vikendly',
     openGraph: {
       title: 'Vikendly',
+      siteName: 'Vikendly',
       description: t('ogDescription'),
       type: 'website',
       locale,

@@ -43,6 +43,11 @@ Nothing open. Migrations 0015–0017 have run (13 Nov). Holiday "Nova godina 202
 - **Serbian addresses without `/sr`:** vikendly.com, vikendly.com/kuce/…, /pretraga…; English stays under `/en/…`.
   Old `/sr/…` links redirect to the same page. Sitemap, canonicals and admin "open on site" links updated.
   After deploy: resubmit `sitemap.xml` in Google Search Console.
+- **Old `/sr/…` links redirect permanently (308)** (18 Nov).
+- **Google helpers (18 Nov):** homepage tells Google the site name "Vikendly", logo and Instagram
+  (WebSite + Organization data); category and destination pages (`/pretraga?category=pool`,
+  `?destination=tara`) have their own title, description and short intro text (`search.seo` in
+  both locale files) and are in the sitemap; empty ones are not indexed.
 
 ## Done (13 Nov 2026, fourth round)
 
