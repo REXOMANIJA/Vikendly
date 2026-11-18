@@ -20,7 +20,7 @@ P2 = can come after launch
 | — | P1 | **Commission %** on the owners page (now "agreed when we meet"). | Owner decides whether to show it. |
 | — | P1 | **Legal entity** in privacy policy and terms (now "Vikendly tim"). | Business name, address, PIB, MB once registered → `lib/site.ts` + `content/legal.ts`. Legal texts should be read by a lawyer. |
 | — | P1 | **Real houses with photos.** Only 1 published house (Kutak u Vraniću); 12 sample houses are hidden in admin. | Owner adds houses. Sample houses can be deleted in admin → Kuće → "Skrivene". |
-| — | P1 | **Partner houses (0020):** 5 real houses (Miris Bora, Tarski proplanak, Konak kod Munje on Tara; Dobrila, Zlatiborski katuni on Zlatibor), owners agreed. Prices are Booking.com prices for 2 people. | 0020 and 0021 run (plus Vila Lučić, Blue River, Etno selo Komarnica). Owner confirms prices, capacity and owner phone numbers in admin. |
+| — | P1 | **Partner houses (0020):** 5 real houses (Miris Bora, Tarski proplanak, Konak kod Munje on Tara; Dobrila, Zlatiborski katuni on Zlatibor), owners agreed. Prices are Booking.com prices for 2 people. | 0020 and 0021 run (plus Vila Lučić, Blue River, Etno selo Komarnica). Owner runs `0024_airbnb_partner_houses.sql` (Kod male kolibe, Gorska Vila, Apartman Meri – set their exact map pins). Owner confirms prices, capacity and owner phone numbers in admin. |
 
 ### Code work, no input needed
 
