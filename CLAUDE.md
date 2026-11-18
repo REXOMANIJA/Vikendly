@@ -40,7 +40,7 @@ Next.js 16 (App Router, Turbopack, React 19.3) · TypeScript · Tailwind CSS 4 (
 `app/globals.css` `@theme`: primary `#1a3c34`, background `#f5f1e8`, accent `#e07a5f`,
 accent-dark `#a84b2e`, sand `#ece4d3`) · next-intl 4 (sr default, en) · Supabase (`@supabase/ssr`) ·
 react-day-picker 10 · maplibre-gl 6 (maps: OpenFreeMap tiles, look in `lib/map-style.ts`; its worker
-is copied to `public/maplibre/` by `scripts/copy-map-worker.cjs` in `dev`/`build`) · lucide-react (no brand icons) · Jest · Vercel Analytics.
+is committed in `public/maplibre/`; after updating maplibre-gl run `node scripts/copy-map-worker.cjs` and commit) · lucide-react (no brand icons) · Jest · Vercel Analytics.
 
 ## Map of the code
 

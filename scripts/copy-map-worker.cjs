@@ -1,7 +1,7 @@
 // Copies MapLibre's background helper (web worker) into public/maplibre/, named with the
 // library version. The bundler can't serve it from node_modules, so lib/map-style.ts points
-// MapLibre at this copy. Runs automatically before dev and build (package.json); the copy is
-// not committed (.gitignore).
+// MapLibre at this copy. Runs before dev and build (package.json), but the copy IS committed
+// because Vercel may skip this step; __tests__/map-worker.test.ts checks it matches the version.
 const fs = require('fs');
 const path = require('path');
 

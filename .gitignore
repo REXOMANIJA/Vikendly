@@ -23,5 +23,3 @@ Thumbs.db
 # Vercel
 .vercel
 
-# MapLibre worker, copied from node_modules before dev/build (scripts/copy-map-worker.cjs)
-public/maplibre/
