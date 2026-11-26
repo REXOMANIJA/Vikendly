@@ -79,7 +79,8 @@ export const privacy: Record<'sr' | 'en', LegalSection[]> = {
       id: 'kolacici',
       title: 'Kolačići i mapa',
       text: [
-        'Sajt ne koristi kolačiće za praćenje ni reklame. Pamti samo ono što je neophodno za rad (na primer prijavu Vikendly tima u administraciju).',
+        'Bez vaše dozvole sajt ne koristi kolačiće za praćenje ni reklame. Pamti samo ono što je neophodno za rad (na primer prijavu Vikendly tima u administraciju i vaš izbor o kolačićima).',
+        'Meta Pixel (Facebook i Instagram): samo ako u obaveštenju o kolačićima izaberete „Prihvatam“, učitavamo alat kompanije Meta koji meri koliko nam reklame na Facebooku i Instagramu pomažu. Meta tada može da postavi svoje kolačiće, vidi vašu internet adresu i stranice koje otvorite na sajtu, i da li ste poslali upit ili prijavu. Vaše ime, telefon i email nikada ne šaljemo kompaniji Meta. Meta te podatke obrađuje prema svojoj politici privatnosti (facebook.com/privacy/policy), a servere ima i van Srbije. Dozvolu možete povući bilo kada preko linka „Podešavanja kolačića“ na dnu sajta.',
         'Kuće koje sačuvate srcem pamte se samo u vašem pregledaču, na vašem uređaju. Mi ih ne vidimo i ne šaljemo nigde.',
         'Broj poseta merimo alatom Vercel Web Analytics, koji ne koristi kolačiće i ne prepoznaje pojedinačne posetioce: vidimo samo zbirne brojke, na primer koliko je ljudi posetilo neku stranicu i iz koje zemlje.',
         'Na stranici kuće prikazujemo Google mapu sa lokacijom. Kada se mapa učita, Google može da postavi svoje kolačiće i vidi vašu internet adresu, prema svojoj politici privatnosti (policies.google.com/privacy).',
@@ -166,7 +167,8 @@ export const privacy: Record<'sr' | 'en', LegalSection[]> = {
       id: 'cookies',
       title: 'Cookies and the map',
       text: [
-        'The site uses no tracking or advertising cookies. It only stores what it needs to work (for example, the Vikendly team’s admin login).',
+        'Without your permission the site uses no tracking or advertising cookies. It only stores what it needs to work (for example, the Vikendly team’s admin login and your cookie choice).',
+        'Meta Pixel (Facebook and Instagram): only if you choose “Accept” in the cookie notice, we load a Meta tool that measures how well our Facebook and Instagram ads work. Meta may then set its own cookies and see your internet address, the pages you open on the site, and whether you sent a request or application. We never send your name, phone number or email to Meta. Meta handles this data under its own privacy policy (facebook.com/privacy/policy) and has servers outside Serbia. You can withdraw permission at any time through the “Cookie settings” link at the bottom of the site.',
         'Houses you save with the heart are kept only in your browser, on your device. We never see them or send them anywhere.',
         'We count visits with Vercel Web Analytics, which uses no cookies and cannot recognise individual visitors: we only see totals, such as how many people visited a page and from which country.',
         'House pages show a Google map of the location. When the map loads, Google may set its own cookies and see your internet address, under its own privacy policy (policies.google.com/privacy).',

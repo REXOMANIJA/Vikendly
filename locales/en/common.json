@@ -291,7 +291,8 @@
       "destinations": "Destinations",
       "faq": "FAQ"
     },
-    "copyright": "© {year} Vikendly. All rights reserved."
+    "copyright": "© {year} Vikendly. All rights reserved.",
+    "cookieSettings": "Cookie settings"
   },
   "amenities": {
     "wifi": "WiFi",
@@ -754,5 +755,12 @@
     "countdown": "{count, plural, one {# day to go} other {# days to go}}",
     "started": "The holidays have started",
     "cta": "See available houses"
+  },
+  "cookies": {
+    "title": "Cookies",
+    "text": "With your permission we use Meta cookies to measure how well our Facebook and Instagram ads work. The site works the same if you decline.",
+    "more": "Learn more",
+    "accept": "Accept",
+    "decline": "Decline"
   }
 }

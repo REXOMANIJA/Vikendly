@@ -9,6 +9,7 @@ import { getBookables, getNightlyRates, hasUnits, isVenue, partyLimit, stayMinNi
 import { checkSelection, quoteSelection, suggestForStay, type Selection, type SelectionProblem } from '@/lib/booking';
 import { formatDateRange, parseDateParam } from '@/lib/dates';
 import { submitBookingRequest, type BookingRequestResult } from '@/lib/actions';
+import { trackPixel } from '@/lib/meta-pixel';
 import DateRangePicker from '@/components/DateRangePicker';
 import PrivacyNote from '@/components/PrivacyNote';
 
@@ -195,16 +196,17 @@ export default function PriceCalculator({
     setResult(null);
     startTransition(async () => {
       try {
-        setResult(
-          await submitBookingRequest({
-            slug: house.slug,
-            checkIn,
-            checkOut,
-            selections,
-            ...contact,
-            locale: locale === 'en' ? 'en' : 'sr',
-          })
-        );
+        const sent = await submitBookingRequest({
+          slug: house.slug,
+          checkIn,
+          checkOut,
+          selections,
+          ...contact,
+          locale: locale === 'en' ? 'en' : 'sr',
+        });
+        setResult(sent);
+        // Meta Pixel (only with cookie consent): a request was sent. No name or phone goes to Meta.
+        if (sent.ok) trackPixel('Lead', { content_name: house.slug, content_category: 'booking_request' });
       } catch {
         setResult({ ok: false, error: 'server' });
       }

@@ -25,6 +25,7 @@ export const CLIENT_MESSAGE_PATHS = [
   'share', // ShareButton
   'review', // ReviewForm
   'errorPage', // error.tsx
+  'cookies', // CookieConsent
 ] as const;
 
 type Messages = Record<string, unknown>;

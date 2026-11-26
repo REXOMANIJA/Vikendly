@@ -291,7 +291,8 @@
       "destinations": "Destinacije",
       "faq": "Česta pitanja"
     },
-    "copyright": "© {year} Vikendly. Sva prava zadržana."
+    "copyright": "© {year} Vikendly. Sva prava zadržana.",
+    "cookieSettings": "Podešavanja kolačića"
   },
   "amenities": {
     "wifi": "WiFi",
@@ -754,5 +755,12 @@
     "countdown": "{count, plural, one {Još # dan} few {Još # dana} other {Još # dana}}",
     "started": "Praznici su počeli",
     "cta": "Pogledajte slobodne kuće"
+  },
+  "cookies": {
+    "title": "Kolačići",
+    "text": "Uz vašu dozvolu koristimo Meta kolačiće da bismo merili koliko nam reklame na Facebooku i Instagramu pomažu. Sajt radi isto i ako odbijete.",
+    "more": "Više o tome",
+    "accept": "Prihvatam",
+    "decline": "Odbijam"
   }
 }

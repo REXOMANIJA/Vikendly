@@ -32,6 +32,7 @@ Nothing open. Migrations 0015–0017 have run (13 Nov). Holiday "Nova godina 202
 |---|-----|------|
 | H5 | P1 | **Supabase free plan pauses the database after a week without visits and keeps no backups.** Upgrade to Pro (~$25/month) before real clients, or set up regular backups. |
 | — | P1 | **Vercel → project → Analytics → Enable** (code is in place). |
+| — | P2 | **Meta Pixel** (code in place 26 Nov, with cookie notice "Prihvatam/Odbijam"; events PageView, Lead = booking request, SubmitApplication = owner application). Meta Events Manager → copy the Pixel ID → Vercel → Settings → Environment Variables → `NEXT_PUBLIC_META_PIXEL_ID`, then redeploy. Without the ID there is no pixel and no notice. |
 | — | P1 | **Telegram on Vercel:** `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in Vercel → Settings → Environment Variables, then redeploy. Works locally already. |
 | — | P1 | **Email `info@vikendly.com`** via ImprovMX forwarding to Gmail (MX done, SPF TXT record being added in Vercel DNS). |
 | G7 | P2 | Google Search Console: verified, `sitemap.xml` submitted. Check "Pages" report after a few days. |

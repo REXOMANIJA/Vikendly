@@ -9,6 +9,7 @@ import { site } from '@/lib/site';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import NavigationProgress from '@/components/layout/NavigationProgress';
+import CookieConsent from '@/components/layout/CookieConsent';
 import { Suspense } from 'react';
 import { Analytics } from '@vercel/analytics/next';
 import '../globals.css';
@@ -83,6 +84,8 @@ export default async function LocaleLayout({
           <Header />
           <main>{children}</main>
           <Footer />
+          {/* Cookie notice + Meta Pixel (only when NEXT_PUBLIC_META_PIXEL_ID is set) */}
+          <CookieConsent />
         </NextIntlClientProvider>
         {/* Anonymous visit counts (Vercel Web Analytics: no cookies, nothing personal). Only
             collects on the live site once Analytics is switched on in the Vercel project. */}

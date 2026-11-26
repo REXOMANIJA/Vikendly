@@ -2,6 +2,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import LanguageSwitcher from './LanguageSwitcher';
 import Logo from './Logo';
+import { CookieSettingsButton } from './CookieConsent';
 import { Camera, Mail, Phone } from 'lucide-react';
 import { phoneDigits, site } from '@/lib/site';
 
@@ -66,6 +67,9 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <CookieSettingsButton label={t('cookieSettings')} />
+              </li>
             </ul>
           </nav>
 

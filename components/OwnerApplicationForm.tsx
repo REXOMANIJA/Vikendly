@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { CircleCheck } from 'lucide-react';
 import { submitOwnerApplication } from '@/lib/actions';
+import { trackPixel } from '@/lib/meta-pixel';
 import PrivacyNote from '@/components/PrivacyNote';
 
 const inputClass =
@@ -25,6 +26,8 @@ export default function OwnerApplicationForm({ idPrefix = 'owner' }: { idPrefix?
     try {
       const result = await submitOwnerApplication(new FormData(e.currentTarget));
       setStatus(result.ok ? 'sent' : result.error === 'server' ? 'error' : result.error);
+      // Meta Pixel (only with cookie consent): an owner applied. No personal details go to Meta.
+      if (result.ok) trackPixel('SubmitApplication', { content_category: 'owner_application' });
     } catch {
       setStatus('error');
     }
