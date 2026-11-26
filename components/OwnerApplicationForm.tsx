@@ -18,7 +18,7 @@ const labelClass = 'block text-sm font-medium text-text mb-1.5';
 export default function OwnerApplicationForm({ idPrefix = 'owner' }: { idPrefix?: string }) {
   const t = useTranslations('ownerCTA');
   const locale = useLocale();
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'invalid' | 'tooMany' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'invalid' | 'tooMany' | 'error' | 'reload'>('idle');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,7 +29,8 @@ export default function OwnerApplicationForm({ idPrefix = 'owner' }: { idPrefix?
       // Meta Pixel (only with cookie consent): an owner applied. No personal details go to Meta.
       if (result.ok) trackPixel('SubmitApplication', { content_category: 'owner_application' });
     } catch {
-      setStatus('error');
+      // Old page after a new site version went live, or no connection: a retry needs a refresh
+      setStatus('reload');
     }
   };
 
@@ -106,9 +107,9 @@ export default function OwnerApplicationForm({ idPrefix = 'owner' }: { idPrefix?
           className={`${inputClass} resize-none`}
         />
       </div>
-      {(status === 'invalid' || status === 'tooMany' || status === 'error') && (
+      {(status === 'invalid' || status === 'tooMany' || status === 'error' || status === 'reload') && (
         <p role="alert" className="rounded-lg bg-accent/10 px-4 py-3 text-sm text-accent-dark">
-          {t(status === 'invalid' ? 'form.errorInvalid' : status === 'tooMany' ? 'form.errorTooMany' : 'form.errorServer')}
+          {t(status === 'invalid' ? 'form.errorInvalid' : status === 'tooMany' ? 'form.errorTooMany' : status === 'reload' ? 'form.errorReload' : 'form.errorServer')}
         </p>
       )}
       <button

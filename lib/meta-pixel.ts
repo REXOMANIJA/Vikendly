@@ -83,6 +83,11 @@ export function revokePixel() {
 /** Sends a standard event (e.g. 'Lead') – does nothing without consent or without a pixel ID */
 export function trackPixel(event: string, params?: Record<string, string | number>) {
   if (typeof window === 'undefined' || !window.fbq || readConsent() !== 'yes') return;
-  if (params) window.fbq('track', event, params);
-  else window.fbq('track', event);
+  // Measuring must never break the form that called it
+  try {
+    if (params) window.fbq('track', event, params);
+    else window.fbq('track', event);
+  } catch {
+    // ignore
+  }
 }

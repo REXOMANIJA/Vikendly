@@ -257,7 +257,8 @@
       "sending": "Šaljem…",
       "errorInvalid": "Proverite polja: ime, telefon, lokacija i opis su obavezni.",
       "errorServer": "Prijava nije poslata zbog greške kod nas. Pokušajte ponovo za par minuta.",
-      "errorTooMany": "Poslali ste više prijava za kratko vreme. Pokušajte ponovo za sat vremena."
+      "errorTooMany": "Poslali ste više prijava za kratko vreme. Pokušajte ponovo za sat vremena.",
+      "errorReload": "Prijava nije poslata. Osvežite stranicu i pošaljite je ponovo. Ako se ponovi, pozovite nas."
     },
     "eyebrow": "Za vlasnike",
     "benefits": {
@@ -428,7 +429,8 @@
         "server": "Upit nije poslat zbog greške kod nas. Pokušajte ponovo za par minuta.",
         "tooMany": "Poslali ste više upita za kratko vreme. Sačekajte malo pa pokušajte ponovo, ili nas pozovite.",
         "units": "Proverite izbor smeštaja.",
-        "party": "Proverite broj osoba na žurci."
+        "party": "Proverite broj osoba na žurci.",
+        "reload": "Upit nije poslat. Osvežite stranicu i pošaljite ga ponovo. Ako se ponovi, pozovite nas."
       },
       "contactTitle": "Vaši podaci"
     },

@@ -415,9 +415,12 @@ export default async function HousePage({ params }: { params: Params }) {
             </section>
           </div>
 
-          {/* Price + contact, sticks while scrolling on desktop */}
+          {/* Price + contact, sticks while scrolling on desktop. Taller than the screen (several
+              units, contact form)? It scrolls on its own while the mouse is over it, then the page
+              carries on. Padding keeps the box shadow visible; while the date calendar is open the
+              box stops clipping so the calendar isn't cut off. */}
           <aside id="booking-box" className="lg:col-span-5">
-            <div className="lg:sticky lg:top-24">
+            <div className="lg:sticky lg:top-24 lg:-mx-4 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto lg:px-4 lg:pb-4 lg:[scrollbar-width:thin] lg:has-[[role=dialog]]:overflow-visible">
               <PriceCalculatorFromUrl house={house} />
             </div>
           </aside>

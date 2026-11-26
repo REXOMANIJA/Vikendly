@@ -23,6 +23,8 @@ interface DateRangePickerProps {
    * checkOut to the next day.
    */
   single?: boolean;
+  /** Which edge of the field the calendar lines up with on wider screens ('right' for boxes on the right of the page) */
+  align?: 'left' | 'right';
 }
 
 /** Shows two months on wider screens */
@@ -43,7 +45,7 @@ function useIsWide() {
  * Dates are shown day-month-year ("13.11. – 15.11.2026."); values stay "yyyy-MM-dd" strings.
  * Desktop: dropdown with two months. Phones: panel from the bottom with one month.
  */
-export default function DateRangePicker({ checkIn, checkOut, onChange, label, id, className = '', single = false }: DateRangePickerProps) {
+export default function DateRangePicker({ checkIn, checkOut, onChange, label, id, className = '', single = false, align = 'left' }: DateRangePickerProps) {
   const t = useTranslations('datePicker');
   const locale = useLocale();
   const wide = useIsWide();
@@ -137,7 +139,7 @@ export default function DateRangePicker({ checkIn, checkOut, onChange, label, id
           <div
             role="dialog"
             aria-label={label ?? t('label')}
-            className="vk-calendar fixed inset-x-0 bottom-0 z-50 max-h-[90dvh] overflow-y-auto rounded-t-2xl bg-white p-4 shadow-2xl md:absolute md:inset-x-auto md:bottom-auto md:left-0 md:top-full md:mt-2 md:max-h-none md:w-max md:rounded-2xl md:p-5"
+            className={`vk-calendar fixed inset-x-0 bottom-0 z-50 max-h-[90dvh] overflow-y-auto rounded-t-2xl bg-white p-4 shadow-2xl md:absolute md:inset-x-auto md:bottom-auto ${align === 'right' ? 'md:right-0' : 'md:left-0'} md:top-full md:mt-2 md:max-h-none md:w-max md:rounded-2xl md:p-5`}
           >
             <div className="mb-2 flex items-center justify-between gap-4">
               <p className="font-semibold text-primary" aria-live="polite">{status}</p>

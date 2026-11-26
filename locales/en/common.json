@@ -257,7 +257,8 @@
       "sending": "Sending…",
       "errorInvalid": "Please check the fields: name, phone, location and description are required.",
       "errorServer": "Your application could not be sent because of an error on our side. Please try again in a few minutes.",
-      "errorTooMany": "You have sent several applications in a short time. Please try again in an hour."
+      "errorTooMany": "You have sent several applications in a short time. Please try again in an hour.",
+      "errorReload": "Your application wasn’t sent. Please refresh the page and send it again. If it happens again, give us a call."
     },
     "eyebrow": "For owners",
     "benefits": {
@@ -428,7 +429,8 @@
         "server": "Your request could not be sent because of an error on our side. Please try again in a few minutes.",
         "tooMany": "You have sent several requests in a short time. Please wait a little and try again.",
         "units": "Please check your choice of where to stay.",
-        "party": "Please check the number of party guests."
+        "party": "Please check the number of party guests.",
+        "reload": "Your request wasn’t sent. Please refresh the page and send it again. If it happens again, give us a call."
       },
       "contactTitle": "Your details"
     },

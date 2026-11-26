@@ -98,7 +98,9 @@ export default function PriceCalculator({
     return linesFrom(suggestion);
   });
   const [contact, setContact] = useState({ name: '', phone: '', email: '', message: '', website: '' });
-  const [result, setResult] = useState<BookingRequestResult | null>(null);
+  // 'reload': the send itself failed in the browser – usually the page was opened before a new
+  // version of the site went live (its form no longer matches the server), or the connection dropped
+  const [result, setResult] = useState<BookingRequestResult | { ok: false; error: 'reload'; minNights?: undefined } | null>(null);
   const [pending, startTransition] = useTransition();
 
   /** The guest changed a unit themselves: from now on their choice is kept */
@@ -208,7 +210,7 @@ export default function PriceCalculator({
         // Meta Pixel (only with cookie consent): a request was sent. No name or phone goes to Meta.
         if (sent.ok) trackPixel('Lead', { content_name: house.slug, content_category: 'booking_request' });
       } catch {
-        setResult({ ok: false, error: 'server' });
+        setResult({ ok: false, error: 'reload' });
       }
     });
   };
@@ -266,6 +268,7 @@ export default function PriceCalculator({
           id="calc-dates"
           label={oneDay ? t('partyDate') : tDates('label')}
           single={oneDay}
+          align="right"
           checkIn={checkIn}
           checkOut={checkOut}
           onChange={onDatesChange}
